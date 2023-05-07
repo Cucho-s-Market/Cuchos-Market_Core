@@ -14,7 +14,7 @@ import lombok.Setter;
 @Entity
 public abstract class Usuario {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) //Todo: check
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected String id;
     protected String nombre;
     protected String apellido;

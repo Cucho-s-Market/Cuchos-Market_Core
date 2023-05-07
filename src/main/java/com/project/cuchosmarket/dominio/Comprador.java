@@ -1,6 +1,5 @@
 package com.project.cuchosmarket.dominio;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
@@ -18,11 +17,9 @@ public class Comprador extends Usuario {
     private int telefono;
     private boolean bloqueado;
 
-    @OneToMany(mappedBy = "comprador", orphanRemoval = true) //TODO tiene sentido que sea bidireccional?
+    @OneToMany(orphanRemoval = true)
     private List<Domicilio> domicilios;
 
-//    @OneToMany(mappedBy = "cliente")
-//    private List<Pedido> pedidosRealizados;
     @OneToMany
     private Map<String, Pedido> pedidosRealizados;
 }

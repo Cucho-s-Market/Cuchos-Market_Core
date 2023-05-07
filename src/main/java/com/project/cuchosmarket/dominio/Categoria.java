@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -20,7 +21,8 @@ public class Categoria {
     private String id;
     private String nombre;
     private String descripcion;
+    private List<Categoria> subcategorias;
 
-    @OneToMany()
-    private List<Producto> productos; //TODO Lista o map?
+    @OneToMany(mappedBy = "categoria")
+    private Map<String, Producto> productos;
 }
