@@ -1,7 +1,5 @@
 package com.project.cuchosmarket.dominio;
 
-import com.project.cuchosmarket.enums.EstadoCompra;
-import com.project.cuchosmarket.enums.TipoPedido;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,21 +12,14 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity
-public class Pedido {
+public abstract class Promocion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private float costo;
+    private String nombre;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
 
-    @Enumerated(EnumType.STRING)
-    private EstadoCompra estado;
-
-    @Enumerated(EnumType.STRING)
-    private TipoPedido tipoPedido;
-
-    @OneToMany
+    @OneToMany //TODO Checkear Cascada
     private List<Producto> productos;
 }

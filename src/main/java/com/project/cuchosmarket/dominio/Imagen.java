@@ -12,13 +12,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-public abstract class Usuario {
+public class Imagen {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
-    protected String nombre;
-    protected String apellido;
-    protected String email;
-    protected String contrasenaHash;
-    protected String contrasenaSalt;
+    private Long id;
+    private String url;
 }
