@@ -1,1 +1,2 @@
-# Cuchos-Market-be
+# Cuchos-Market-Core
+Spring Boot backend Application for Cucho's Market e-commerce.
