@@ -1,4 +1,4 @@
-package com.project.cuchosmarket.dominio;
+package com.project.cuchosmarket.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -9,8 +9,8 @@ import lombok.Setter;
 @Entity
 @Setter
 @Getter
-public class Empleado extends Usuario {
+public class Employee extends User {
     @ManyToOne
-    @JoinColumn(name = "sucursal_id", nullable = false)
-    private Sucursal sucursal;
+    @JoinColumn(name = "branch_id", nullable = false)
+    private MarketBranch marketBranch;
 }

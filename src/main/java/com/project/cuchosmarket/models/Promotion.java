@@ -1,25 +1,25 @@
-package com.project.cuchosmarket.dominio;
+package com.project.cuchosmarket.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Sucursal {
+public abstract class Promotion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nombre;
-    private String direccion;
+    private String name;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     @OneToMany
-    private Map<String, Pedido> pedidos;
+    private List<Product> products;
 }

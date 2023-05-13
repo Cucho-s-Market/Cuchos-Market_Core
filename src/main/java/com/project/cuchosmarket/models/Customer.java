@@ -1,4 +1,4 @@
-package com.project.cuchosmarket.dominio;
+package com.project.cuchosmarket.models;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -14,14 +14,16 @@ import java.util.Map;
 @Getter
 @Setter
 @Entity
-public class Comprador extends Usuario {
-    private LocalDate fechaNac;
-    private int telefono;
-    private boolean bloqueado;
+public class Customer extends User {
+    private LocalDate birthdate;
+    private int telephone;
+    private boolean disabled;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Domicilio> domicilios;
+    @JoinColumn(name = "client_id")
+    private List<Address> addresses;
 
     @OneToMany
-    private Map<String, Pedido> pedidosRealizados;
+    @JoinColumn(name = "client_id")
+    private Map<String, Order> ordersPlaced;
 }
