@@ -30,6 +30,6 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderType type;
 
-    @OneToMany
-    private List<Product> products;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Item> products;
 }
