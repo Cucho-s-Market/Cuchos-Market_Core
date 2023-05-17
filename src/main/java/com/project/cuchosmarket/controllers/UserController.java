@@ -1,10 +1,11 @@
 package com.project.cuchosmarket.controllers;
 
+import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtUser;
+import com.project.cuchosmarket.exceptions.MarketBranchNotExist;
+import com.project.cuchosmarket.exceptions.UserExistException;
 import com.project.cuchosmarket.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -14,9 +15,19 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/market_branch/{branch_id}/employee")
-    public ResponseEntity addEmployee(@PathVariable("branch_id") Long branch_id, @RequestBody DtUser employee) {
+    public DtResponse addEmployee(@PathVariable("branch_id") Long branch_id, @RequestBody DtUser employee) {
+        try {
+            userService.addEmployee(branch_id, employee);
+        } catch (MarketBranchNotExist | UserExistException | IllegalArgumentException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
 
-        userService.addEmployee(branch_id, employee);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return DtResponse.builder()
+                .error(false)
+                .message("Usuario añadido con exito.")
+                .build();
     }
 }
