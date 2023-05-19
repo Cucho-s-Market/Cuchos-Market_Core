@@ -3,6 +3,7 @@ package com.project.cuchosmarket.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -28,4 +29,7 @@ public class Product {
     private Category category;
 
     private List<String> images;
+
+    public Product(String code, String name, String description, LocalDate entryDate, float price, String brand, Category category, List<String> images) {
+    }
 }
