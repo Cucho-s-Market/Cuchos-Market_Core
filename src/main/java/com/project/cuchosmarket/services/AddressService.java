@@ -4,14 +4,11 @@ import com.project.cuchosmarket.dto.DtAddress;
 import com.project.cuchosmarket.exceptions.UserNotExistExeption;
 import com.project.cuchosmarket.models.Address;
 import com.project.cuchosmarket.models.Customer;
-import com.project.cuchosmarket.models.MarketBranch;
 import com.project.cuchosmarket.repositories.AddressRepository;
 import com.project.cuchosmarket.repositories.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor

@@ -11,7 +11,6 @@ import com.project.cuchosmarket.repositories.CategoryRepository;
 import com.project.cuchosmarket.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 

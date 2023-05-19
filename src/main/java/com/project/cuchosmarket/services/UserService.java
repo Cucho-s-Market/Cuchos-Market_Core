@@ -1,16 +1,14 @@
 package com.project.cuchosmarket.services;
 
-import com.project.cuchosmarket.dto.DtAddress;
 import com.project.cuchosmarket.dto.DtCustomer;
 import com.project.cuchosmarket.dto.DtUser;
-import com.project.cuchosmarket.exceptions.CustomerExistExeption;
 import com.project.cuchosmarket.exceptions.MarketBranchNotExist;
 import com.project.cuchosmarket.exceptions.UserExistException;
 import com.project.cuchosmarket.models.Customer;
 import com.project.cuchosmarket.models.Employee;
 import com.project.cuchosmarket.models.MarketBranch;
-import com.project.cuchosmarket.repositories.CustomerRepository;
 import com.project.cuchosmarket.models.User;
+import com.project.cuchosmarket.repositories.CustomerRepository;
 import com.project.cuchosmarket.repositories.EmployeeRepository;
 import com.project.cuchosmarket.repositories.MarketBranchRepository;
 import com.project.cuchosmarket.repositories.UserRepository;
