@@ -54,7 +54,7 @@ public class UserService {
                 user.getPassword(), user.getPassword(), marketBranch.get());
         employeeRepository.save(employee);
     }
-    public void addCustomer(long branchId, DtCustomer dtCustomer) throws MarketBranchNotExist, CustomerExistExeption, UserExistException {
+    public void addCustomer(Long branch_dni, DtCustomer dtCustomer) throws MarketBranchNotExist, CustomerExistExeption, UserExistException {
 
         if(customerRepository.existsByDni(dtCustomer.getDni())) {
             throw new CustomerExistExeption("ya se encuentra en el sistema");
