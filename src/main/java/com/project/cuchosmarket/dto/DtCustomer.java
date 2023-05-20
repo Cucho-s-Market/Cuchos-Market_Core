@@ -11,8 +11,8 @@ import java.time.LocalDate;
 public class DtCustomer extends DtUser{
 
     private LocalDate birthdate;
-    private int telephone;
-    private int dni;
+    private long telephone;
+    private long dni;
     private boolean disabled;
 
 

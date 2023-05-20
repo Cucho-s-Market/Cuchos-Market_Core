@@ -56,6 +56,10 @@ public class UserService {
     }
     public void addCustomer(long branchId, DtCustomer dtCustomer) throws MarketBranchNotExist, CustomerExistExeption, UserExistException {
 
+        if(customerRepository.existsByDni(dtCustomer.getDni())) {
+            throw new CustomerExistExeption("ya se encuentra en el sistema");
+        }
+
         validateUser(dtCustomer);
 
         Customer customer = new Customer(dtCustomer.getFirstName(),dtCustomer.getLastName(),dtCustomer.getEmail(),dtCustomer.getPassword(),
