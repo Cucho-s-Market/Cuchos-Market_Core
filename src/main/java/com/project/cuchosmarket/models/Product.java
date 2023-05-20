@@ -15,10 +15,11 @@ import java.util.List;
 @Entity
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    private String name;
+
+    @GeneratedValue(strategy = GenerationType.UUID)//TODO: Consultar validez
     private String code;
 
-    private String name;
     private String description;
     private LocalDate entryDate;
     private float price;
@@ -30,6 +31,14 @@ public class Product {
 
     private List<String> images;
 
-    public Product(String code, String name, String description, LocalDate entryDate, float price, String brand, Category category, List<String> images) {
+    public Product(String name, String code, String description, LocalDate entryDate, float price, String brand, Category category, List<String> images) {
+        this.name = name;
+        this.code = code;
+        this.description = description;
+        this.entryDate = entryDate;
+        this.price = price;
+        this.brand = brand;
+        this.category = category;
+        this.images = images;
     }
 }

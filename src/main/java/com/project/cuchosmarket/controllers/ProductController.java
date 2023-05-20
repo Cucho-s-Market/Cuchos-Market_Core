@@ -3,6 +3,7 @@ package com.project.cuchosmarket.controllers;
 import com.project.cuchosmarket.dto.DtProduct;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.exceptions.CategoryNotExist;
+import com.project.cuchosmarket.exceptions.ProductExistException;
 import com.project.cuchosmarket.exceptions.ProductInvalidException;
 import com.project.cuchosmarket.services.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +15,12 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
     private final ProductService productService;
 
-    @PostMapping("/product/new-product")
-    public DtResponse addProduct(@RequestBody DtProduct newProduct) throws CategoryNotExist, ProductInvalidException {
+    @PostMapping("/add-product")
+    public DtResponse addProduct(@RequestBody DtProduct newProduct) {
         try {
             productService.addProduct(newProduct);
         }
-        catch (CategoryNotExist | ProductInvalidException e) {
+        catch (CategoryNotExist | ProductInvalidException | ProductExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
