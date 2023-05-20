@@ -20,8 +20,8 @@ import java.util.Map;
 @NoArgsConstructor
 public class Customer extends User {
     private LocalDate birthdate;
-    private int telephone;
-    private int dni;
+    private long telephone;
+    private long dni;
     private boolean disabled;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -33,7 +33,7 @@ public class Customer extends User {
     private Map<String, Order> ordersPlaced;
 
 
-    public Customer(String firstName, String lastName, String email, String password, String password1, LocalDate birthdate, int telephone,int dni) {
+    public Customer(String firstName, String lastName, String email, String password, String password1, LocalDate birthdate, long telephone,long dni) {
         super(firstName, lastName, email, password, password1);
         this.birthdate = birthdate;
         this.telephone = telephone;
@@ -41,4 +41,3 @@ public class Customer extends User {
         this.disabled = true;
     }
 }
-
