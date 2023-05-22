@@ -31,7 +31,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/user-list")
+    @GetMapping("/user-list")
     public DtResponse getUsers() {
         return DtResponse.builder()
                 .error(false)
