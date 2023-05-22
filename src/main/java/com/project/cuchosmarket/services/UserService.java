@@ -1,5 +1,6 @@
 package com.project.cuchosmarket.services;
 
+import com.project.cuchosmarket.dto.DtAddress;
 import com.project.cuchosmarket.dto.DtCustomer;
 import com.project.cuchosmarket.dto.DtUser;
 import com.project.cuchosmarket.exceptions.CustomerExistExeption;
@@ -54,10 +55,10 @@ public class UserService {
                 user.getPassword(), user.getPassword(), marketBranch.get());
         employeeRepository.save(employee);
     }
-    public void addCustomer(Long branch_dni, DtCustomer dtCustomer) throws MarketBranchNotExist, CustomerExistExeption, UserExistException {
+    public void addCustomer(Long branch_dni, DtCustomer dtCustomer) throws   UserExistException {
 
         if(customerRepository.existsByDni(dtCustomer.getDni())) {
-            throw new CustomerExistExeption("ya se encuentra en el sistema");
+            throw new UserExistException("ya se encuentra en el sistema");
         }
 
         validateUser(dtCustomer);

@@ -32,11 +32,11 @@ public class UserController {
                 .message("Usuario añadido con exito.")
                 .build();
     }
-    @PostMapping("/market_branch/{branch_dni}/customer")
-    public DtResponse addCustomer(@PathVariable("branch_dni") Long branch_dni, @RequestBody DtCustomer customer) {
+    @PostMapping("/customer/{user_id}")
+    public DtResponse addCustomer(@PathVariable("user_id") Long dni, @RequestBody DtCustomer customer) {
         try {
-            userService.addCustomer(branch_dni, customer);
-        }  catch (MarketBranchNotExist | UserExistException | IllegalArgumentException | CustomerExistExeption e) {
+            userService.addCustomer(dni, customer);
+        }  catch ( UserExistException | IllegalArgumentException  e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
