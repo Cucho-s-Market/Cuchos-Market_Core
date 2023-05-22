@@ -5,6 +5,7 @@ import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.exceptions.CategoryNotExist;
 import com.project.cuchosmarket.exceptions.ProductExistException;
 import com.project.cuchosmarket.exceptions.ProductInvalidException;
+import com.project.cuchosmarket.exceptions.ProductNotExistException;
 import com.project.cuchosmarket.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,25 @@ public class ProductController {
         return  DtResponse.builder()
                 .error(false)
                 .message("Producto agregado correctamente.")
+                .build();
+    }
+
+    @PostMapping("/update-product")
+    public DtResponse updateProduct(@RequestBody DtProduct updatedProduct) {
+
+        try {
+            productService.updateProduct(updatedProduct);
+        }
+        catch (ProductNotExistException | ProductInvalidException e) {
+            return  DtResponse.builder()
+                    .error(false)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return  DtResponse.builder()
+                .error(false)
+                .message("La informacion del producto " + updatedProduct.getName() + " fue actualizada correctamente.")
                 .build();
     }
 }
