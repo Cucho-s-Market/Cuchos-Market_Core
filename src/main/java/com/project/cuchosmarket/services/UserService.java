@@ -1,23 +1,32 @@
 package com.project.cuchosmarket.services;
 
+import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtCustomer;
 import com.project.cuchosmarket.dto.DtUser;
 import com.project.cuchosmarket.exceptions.MarketBranchNotExist;
 import com.project.cuchosmarket.exceptions.UserExistException;
+import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.models.Customer;
 import com.project.cuchosmarket.models.Employee;
 import com.project.cuchosmarket.models.MarketBranch;
+import com.project.cuchosmarket.models.User;
 import com.project.cuchosmarket.models.User;
 import com.project.cuchosmarket.repositories.CustomerRepository;
 import com.project.cuchosmarket.repositories.EmployeeRepository;
 import com.project.cuchosmarket.repositories.MarketBranchRepository;
 import com.project.cuchosmarket.repositories.UserRepository;
+import com.project.cuchosmarket.security.JwtService;
+import com.project.cuchosmarket.security.UserDetailsImpl;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -27,6 +36,29 @@ public class UserService {
     private final EmployeeRepository employeeRepository;
     private final CustomerRepository customerRepository;
     private final MarketBranchRepository marketBranchRepository;
+
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+
+    public DtResponse authenticate(DtUser dtUser) throws UserNotExistException {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        dtUser.getEmail(),
+                        dtUser.getPassword()
+                )
+        );
+        User user = userRepository.findByEmail(dtUser.getEmail());
+        if (user == null) {
+            throw new UserNotExistException("Usuario no existe.");
+        }
+
+        var jwtToken = jwtService.createToken(new HashMap<>(), new UserDetailsImpl(user));
+
+        return DtResponse.builder()
+                .token(jwtToken)
+                .build();
+    }
 
     private void validateUser(DtUser user) throws UserExistException {
         if(userRepository.existsByEmail(user.getEmail())) {
@@ -52,11 +84,15 @@ public class UserService {
 
         validateUser(user);
 
-        Employee employee = new Employee(user.getFirstName(), user.getLastName(), user.getEmail(),
-                user.getPassword(), user.getPassword(), marketBranch.get());
+        Employee employee = new Employee(user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPassword(),
+                passwordEncoder.encode(user.getPassword()),
+                marketBranch.get());
         employeeRepository.save(employee);
     }
-  
+
     public void addCustomer( DtCustomer dtCustomer) throws UserExistException {
 
         if(customerRepository.existsByDni(dtCustomer.getDni())) {

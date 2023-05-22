@@ -5,6 +5,7 @@ import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtUser;
 import com.project.cuchosmarket.exceptions.MarketBranchNotExist;
 import com.project.cuchosmarket.exceptions.UserExistException;
+import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,22 @@ public class UserController {
     @GetMapping
     public String check() {
         return "Hello World";
+    }
+
+    @PostMapping("/auth/login")
+    public DtResponse login(@RequestBody DtUser user) {
+        DtResponse token;
+        try {
+            token = userService.authenticate(user);
+        } catch (UserNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        token.setError(false);
+        return token;
     }
 
     @PostMapping("/market_branch/{branch_id}/employee")
