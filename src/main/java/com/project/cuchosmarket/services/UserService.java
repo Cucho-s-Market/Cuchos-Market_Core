@@ -1,20 +1,13 @@
 package com.project.cuchosmarket.services;
 
-import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtCustomer;
+import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtUser;
 import com.project.cuchosmarket.exceptions.MarketBranchNotExist;
 import com.project.cuchosmarket.exceptions.UserExistException;
 import com.project.cuchosmarket.exceptions.UserNotExistException;
-import com.project.cuchosmarket.models.Customer;
-import com.project.cuchosmarket.models.Employee;
-import com.project.cuchosmarket.models.MarketBranch;
-import com.project.cuchosmarket.models.User;
-import com.project.cuchosmarket.models.User;
-import com.project.cuchosmarket.repositories.CustomerRepository;
-import com.project.cuchosmarket.repositories.EmployeeRepository;
-import com.project.cuchosmarket.repositories.MarketBranchRepository;
-import com.project.cuchosmarket.repositories.UserRepository;
+import com.project.cuchosmarket.models.*;
+import com.project.cuchosmarket.repositories.*;
 import com.project.cuchosmarket.security.JwtService;
 import com.project.cuchosmarket.security.UserDetailsImpl;
 import io.micrometer.common.util.StringUtils;
@@ -25,8 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -34,6 +27,7 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
+    private final AdminRepository adminRepository;
     private final CustomerRepository customerRepository;
     private final MarketBranchRepository marketBranchRepository;
 
@@ -113,5 +107,20 @@ public class UserService {
         users.forEach(user -> dtUsers.add(new DtUser(user.getFirstName(), user.getLastName(), user.getEmail(), null)));
 
         return dtUsers;
+    }
+
+    public DtResponse addAdmin(DtUser admin) throws UserExistException {
+        validateUser(admin);
+        Admin administrator = new Admin(admin.getFirstName(),
+                admin.getLastName(),
+                admin.getEmail(),
+                passwordEncoder.encode(admin.getPassword()));
+        adminRepository.save(administrator);
+
+        var jwtToken = jwtService.createToken(new HashMap<>(), new UserDetailsImpl(administrator));
+
+        return DtResponse.builder()
+                .token(jwtToken)
+                .build();
     }
 }

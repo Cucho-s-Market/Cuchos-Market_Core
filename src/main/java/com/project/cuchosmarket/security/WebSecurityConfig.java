@@ -3,6 +3,7 @@ package com.project.cuchosmarket.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static com.project.cuchosmarket.enums.Role.ADMIN;
 
 @Configuration
 @EnableWebSecurity
@@ -25,17 +28,16 @@ public class WebSecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers(
-                        "/users/auth/login",
-                        "/users/**",
-                        "/category/**"
-                )
+                .requestMatchers(HttpMethod.POST, "/users/auth")
                 .permitAll()
+                .requestMatchers(HttpMethod.GET, "/users/**", "/category/**")
+                    .permitAll()
+                .requestMatchers(HttpMethod.POST, "/users/market_branch/**").hasRole(ADMIN.name())
                 .anyRequest()
-                .authenticated()
+                    .authenticated()
                 .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
