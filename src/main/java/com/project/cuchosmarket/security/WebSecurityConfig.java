@@ -26,7 +26,9 @@ public class WebSecurityConfig {
                 .disable()
                 .authorizeHttpRequests()
                 .requestMatchers(
-                        "/users/auth/login"
+                        "/users/auth/login",
+                        "/users/**",
+                        "/category/**"
                 )
                 .permitAll()
                 .anyRequest()

@@ -87,7 +87,6 @@ public class UserService {
         Employee employee = new Employee(user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                user.getPassword(),
                 passwordEncoder.encode(user.getPassword()),
                 marketBranch.get());
         employeeRepository.save(employee);

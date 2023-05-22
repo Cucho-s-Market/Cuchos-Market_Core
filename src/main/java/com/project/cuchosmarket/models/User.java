@@ -20,14 +20,12 @@ public abstract class User {
     protected String firstName;
     protected String lastName;
     protected String email;
-    protected String passwordHash;
-    protected String passwordSalt;
+    protected String password;
 
-    public User(String firstName, String lastName, String email, String passwordHash, String passwordSalt) {
+    public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.passwordHash = passwordHash;
-        this.passwordSalt = passwordSalt;
+        this.password = password;
     }
 }
