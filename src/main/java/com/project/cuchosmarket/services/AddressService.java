@@ -21,10 +21,10 @@ public class AddressService {
     public void  addAddress(DtAddress dtAddress,Long  id) throws UserNotExistExeption {
         Optional<Customer> custmer = customerRepository.findById(id);
         if(custmer.isEmpty()){
-           throw  new UserNotExistExeption("Usuario no existe");
+           throw new UserNotExistExeption("Usuario no existe");
         }
         if(dtAddress.getAddress().length() > 50 || dtAddress.getLocation() == null || dtAddress.getState() == null){
-            throw  new IllegalArgumentException("Datos invalidos");
+            throw new IllegalArgumentException("Datos invalidos");
         }
         Address address = new Address(dtAddress.getAddress(), dtAddress.getDoorNumber(), dtAddress.getLocation(), dtAddress.getState());
 

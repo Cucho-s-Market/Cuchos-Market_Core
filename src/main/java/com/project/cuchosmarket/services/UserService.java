@@ -86,25 +86,33 @@ public class UserService {
         employeeRepository.save(employee);
     }
 
-    public void addCustomer( DtCustomer dtCustomer) throws UserExistException {
-
+    public DtResponse addCustomer( DtCustomer dtCustomer) throws UserExistException {
+        validateUser(dtCustomer);
         if(customerRepository.existsByDni(dtCustomer.getDni())) {
-            throw new UserExistException("ya se encuentra en el sistema");
+            throw new UserExistException("Usuario con CI " + dtCustomer.getDni() + " ya existe en el sistema.");
         }
 
-        validateUser(dtCustomer);
-
-        Customer customer = new Customer(dtCustomer.getFirstName(),dtCustomer.getLastName(),dtCustomer.getEmail(),dtCustomer.getPassword(),
-                    dtCustomer.getPassword(),dtCustomer.getBirthdate(),dtCustomer.getTelephone(),dtCustomer.getDni());
+        Customer customer = new Customer(dtCustomer.getFirstName(),
+                dtCustomer.getLastName(),
+                dtCustomer.getEmail(),
+                passwordEncoder.encode(dtCustomer.getPassword()),
+                dtCustomer.getBirthdate(),
+                dtCustomer.getTelephone(),
+                dtCustomer.getDni());
 
         customerRepository.save(customer);
+        var jwtToken = jwtService.createToken(new HashMap<>(), new UserDetailsImpl(customer));
+
+        return DtResponse.builder()
+                .token(jwtToken)
+                .build();
     }
 
     public List<DtUser> getUsers() {
         List<DtUser> dtUsers = new ArrayList<>();
         List<User> users = userRepository.findAll();
 
-        users.forEach(user -> dtUsers.add(new DtUser(user.getFirstName(), user.getLastName(), user.getEmail(), null)));
+        users.forEach(user -> dtUsers.add(new DtUser(user.getFirstName(), user.getLastName(), user.getEmail(), null, user.getRole().name())));
 
         return dtUsers;
     }

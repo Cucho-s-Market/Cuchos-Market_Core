@@ -28,11 +28,16 @@ public class WebSecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST, "/users/auth")
-                .permitAll()
-                .requestMatchers(HttpMethod.GET, "/users/**", "/category/**")
+
+                .requestMatchers(HttpMethod.POST, "/users/auth/**", "users/customers")
                     .permitAll()
-                .requestMatchers(HttpMethod.POST, "/users/market_branch/**").hasRole(ADMIN.name())
+
+                .requestMatchers(HttpMethod.GET, "/users/**", "/category/**", "/marketBranches")
+                    .permitAll()
+
+                .requestMatchers(HttpMethod.POST, "/users/market_branch/**", "/product/**").hasRole(ADMIN.name())
+                .requestMatchers(HttpMethod.GET, "/users/user-list").hasRole(ADMIN.name())
+
                 .anyRequest()
                     .authenticated()
                 .and()

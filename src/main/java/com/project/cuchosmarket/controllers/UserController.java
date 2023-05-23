@@ -16,11 +16,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping
-    public String check() {
-        return "Hello World";
-    }
-
     @PostMapping("/auth/login")
     public DtResponse login(@RequestBody DtUser user) {
         DtResponse token;
@@ -37,7 +32,7 @@ public class UserController {
         return token;
     }
 
-    @PostMapping("/market_branch/{branch_id}/employee")
+    @PostMapping("/market_branches/{branch_id}/employees")
     public DtResponse addEmployee(@PathVariable("branch_id") Long branch_id, @RequestBody DtUser employee) {
         try {
             userService.addEmployee(branch_id, employee);
@@ -54,10 +49,11 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/customer")
-    public DtResponse addCustomer( @RequestBody DtCustomer customer) {
+    @PostMapping("/customers")
+    public DtResponse addCustomer(@RequestBody DtCustomer customer) {
+        DtResponse response;
         try {
-            userService.addCustomer(customer );
+            response = userService.addCustomer(customer);
         }  catch ( UserExistException | IllegalArgumentException  e) {
             return DtResponse.builder()
                     .error(true)
@@ -66,9 +62,9 @@ public class UserController {
 
         }
 
-        return DtResponse.builder()
-                .error(false)
-                .message("Cliente añadido con exito.")
+        response.setError(false);
+        response.setMessage("Cliente añadido con exito.");
+        return response;
     }
 
     @GetMapping("/user-list")

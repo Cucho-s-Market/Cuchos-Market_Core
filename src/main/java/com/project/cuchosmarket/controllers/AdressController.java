@@ -14,9 +14,9 @@ public class AdressController {
     private final AddressService addressService;
 
     @PostMapping("/customer/{user_id}")
-    public DtResponse addAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
+    public DtResponse addAddress(@PathVariable("user_id") Long user_id, @RequestBody DtAddress address) {
         try {
-        addressService.addAddress(address, id);
+        addressService.addAddress(address, user_id);
         }  catch (UserNotExistExeption | IllegalArgumentException  e) {
             return DtResponse.builder()
                     .error(true)
