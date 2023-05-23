@@ -34,7 +34,7 @@ public class AddressService {
         custmer.get().addAddress(address);
 
         customerRepository.save(custmer.get());
-        addressRepository.save(address);
+
 
 
     }

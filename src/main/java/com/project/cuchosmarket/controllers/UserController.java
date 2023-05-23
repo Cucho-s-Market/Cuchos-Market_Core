@@ -32,10 +32,10 @@ public class UserController {
                 .message("Usuario añadido con exito.")
                 .build();
     }
-    @PostMapping("/customer/{user_id}")
-    public DtResponse addCustomer(@PathVariable("user_id") Long dni, @RequestBody DtCustomer customer) {
+    @PostMapping("/customer")
+    public DtResponse addCustomer( @RequestBody DtCustomer customer) {
         try {
-            userService.addCustomer(dni, customer);
+            userService.addCustomer(customer );
         }  catch ( UserExistException | IllegalArgumentException  e) {
             return DtResponse.builder()
                     .error(true)
