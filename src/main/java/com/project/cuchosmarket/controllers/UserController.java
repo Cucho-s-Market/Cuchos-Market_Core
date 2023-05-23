@@ -32,6 +32,7 @@ public class UserController {
                 .message("Usuario añadido con exito.")
                 .build();
     }
+
     @PostMapping("/customer")
     public DtResponse addCustomer( @RequestBody DtCustomer customer) {
         try {
@@ -47,6 +48,14 @@ public class UserController {
         return DtResponse.builder()
                 .error(false)
                 .message("Cliente añadido con exito.")
+    }
+
+    @GetMapping("/user-list")
+    public DtResponse getUsers() {
+        return DtResponse.builder()
+                .error(false)
+                .message(String.valueOf(userService.getUsers().size()))
+                .data(userService.getUsers())
                 .build();
     }
 }

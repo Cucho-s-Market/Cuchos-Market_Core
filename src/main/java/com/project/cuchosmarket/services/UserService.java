@@ -10,6 +10,7 @@ import com.project.cuchosmarket.models.Customer;
 import com.project.cuchosmarket.models.Employee;
 import com.project.cuchosmarket.models.MarketBranch;
 import com.project.cuchosmarket.repositories.CustomerRepository;
+import com.project.cuchosmarket.models.User;
 import com.project.cuchosmarket.repositories.EmployeeRepository;
 import com.project.cuchosmarket.repositories.MarketBranchRepository;
 import com.project.cuchosmarket.repositories.UserRepository;
@@ -17,6 +18,8 @@ import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -55,7 +58,8 @@ public class UserService {
                 user.getPassword(), user.getPassword(), marketBranch.get());
         employeeRepository.save(employee);
     }
-    public void addCustomer( DtCustomer dtCustomer) throws   UserExistException {
+  
+    public void addCustomer( DtCustomer dtCustomer) throws UserExistException {
 
         if(customerRepository.existsByDni(dtCustomer.getDni())) {
             throw new UserExistException("ya se encuentra en el sistema");
@@ -67,6 +71,14 @@ public class UserService {
                     dtCustomer.getPassword(),dtCustomer.getBirthdate(),dtCustomer.getTelephone(),dtCustomer.getDni());
 
         customerRepository.save(customer);
+    }
 
+    public List<DtUser> getUsers() {
+        List<DtUser> dtUsers = new ArrayList<>();
+        List<User> users = userRepository.findAll();
+
+        users.forEach(user -> dtUsers.add(new DtUser(user.getFirstName(), user.getLastName(), user.getEmail(), null)));
+
+        return dtUsers;
     }
 }
