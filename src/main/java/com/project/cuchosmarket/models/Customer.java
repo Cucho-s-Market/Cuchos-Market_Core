@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,5 +40,9 @@ public class Customer extends User {
         this.telephone = telephone;
         this.dni = dni;
         this.disabled = true;
+        this.addresses = new ArrayList<>();
+    }
+    public void addAddress(Address address){
+        this.addresses.add(address);
     }
 }
