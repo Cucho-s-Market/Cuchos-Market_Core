@@ -131,4 +131,9 @@ public class UserService {
                 .token(jwtToken)
                 .build();
     }
+
+    public void deleteEmployee(Long id) {
+        employeeRepository.deleteById(id);
+        userRepository.deleteById(id);
+    }
 }

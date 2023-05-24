@@ -32,7 +32,7 @@ public class UserController {
         return token;
     }
 
-    @PostMapping("/market_branches/{branch_id}/employees")
+    @PostMapping("employees/market_branches/{branch_id}")
     public DtResponse addEmployee(@PathVariable("branch_id") Long branch_id, @RequestBody DtUser employee) {
         try {
             userService.addEmployee(branch_id, employee);
@@ -73,6 +73,15 @@ public class UserController {
                 .error(false)
                 .message(String.valueOf(userService.getUsers().size()))
                 .data(userService.getUsers())
+                .build();
+    }
+
+    @DeleteMapping("/employees/{employee_id}")
+    public DtResponse deleteEmployee(@PathVariable("employee_id") Long employee_id) {
+        userService.deleteEmployee(employee_id);
+        return DtResponse.builder()
+                .error(false)
+                .message("Empleado borrado con exito.")
                 .build();
     }
 }
