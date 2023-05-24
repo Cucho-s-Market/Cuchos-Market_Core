@@ -77,4 +77,8 @@ public class ProductService {
 
         productRepository.save(product);
     }
+
+//    public List<Product> getProducts() {
+//        return productRepository.findAll();
+//    }
 }

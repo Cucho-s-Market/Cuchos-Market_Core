@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
 
@@ -55,4 +55,13 @@ public class ProductController {
                 .message("La informacion del producto " + updatedProduct.getName() + " fue actualizada correctamente.")
                 .build();
     }
+
+//    @GetMapping
+//    public DtResponse getProducts() {
+//        return DtResponse.builder()
+//                .error(false)
+//                .message(String.valueOf(productService.getProducts().size()))
+//                .data(productService.getProducts())
+//                .build();
+//    }
 }
