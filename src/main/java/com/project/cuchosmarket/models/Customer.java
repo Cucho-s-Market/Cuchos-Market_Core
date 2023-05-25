@@ -1,5 +1,6 @@
 package com.project.cuchosmarket.models;
 
+import com.project.cuchosmarket.enums.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -34,8 +35,8 @@ public class Customer extends User {
     private Map<String, Order> ordersPlaced;
 
 
-    public Customer(String firstName, String lastName, String email, String password, String password1, LocalDate birthdate, long telephone,long dni) {
-        super(firstName, lastName, email, password, password1);
+    public Customer(String firstName, String lastName, String email, String password, LocalDate birthdate, long telephone,long dni) {
+        super(firstName, lastName, email, password, Role.CUSTOMER);
         this.birthdate = birthdate;
         this.telephone = telephone;
         this.dni = dni;

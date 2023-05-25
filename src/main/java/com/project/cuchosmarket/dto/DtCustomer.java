@@ -7,7 +7,6 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-
 public class DtCustomer extends DtUser{
 
     private LocalDate birthdate;
@@ -16,7 +15,7 @@ public class DtCustomer extends DtUser{
     private boolean disabled;
 
 
-    public DtCustomer(String firstName, String lastName, String email, String password) {
-        super(firstName, lastName, email, password);
+    public DtCustomer(String firstName, String lastName, String email, String password, String role) {
+        super(firstName, lastName, email, password, role);
     }
 }
