@@ -29,10 +29,17 @@ public class WebSecurityConfig {
                 .disable()
                 .authorizeHttpRequests()
 
+                .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/doc/swagger-ui/**"
+                )
+                    .permitAll()
+
                 .requestMatchers(HttpMethod.POST, "/users/auth/**", "users/customers")
                     .permitAll()
 
-                .requestMatchers(HttpMethod.GET, "/users/**", "/category/**", "/marketBranches")
+                .requestMatchers(HttpMethod.GET, "/users/**", "/category/**", "/marketBranches", "/products")
                     .permitAll()
 
                 .requestMatchers(HttpMethod.POST, "/users/employees/**", "/product/**").hasRole(ADMIN.name())

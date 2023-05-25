@@ -82,7 +82,7 @@ public class ProductService {
     }
 
     public List<Product> getProductsBy(String name, String brand, Long category_id, String orderBy, String orderDirection) {
-        Specification<Product> specification = ProductSpecifications.filterByAttributes(name, brand, orderBy, orderDirection);
+        Specification<Product> specification = ProductSpecifications.filterByAttributes(name, brand, orderBy, orderDirection, category_id);
         return productRepository.findAll(specification);
     }
 }
