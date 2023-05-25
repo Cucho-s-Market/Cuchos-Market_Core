@@ -9,9 +9,12 @@ import com.project.cuchosmarket.models.Category;
 import com.project.cuchosmarket.models.Product;
 import com.project.cuchosmarket.repositories.CategoryRepository;
 import com.project.cuchosmarket.repositories.ProductRepository;
+import com.project.cuchosmarket.repositories.specifications.ProductSpecifications;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -78,7 +81,8 @@ public class ProductService {
         productRepository.save(product);
     }
 
-//    public List<Product> getProducts() {
-//        return productRepository.findAll();
-//    }
+    public List<Product> getProductsBy(String name, String brand, Long category_id, String orderBy, String orderDirection) {
+        Specification<Product> specification = ProductSpecifications.filterByAttributes(name, brand, orderBy, orderDirection);
+        return productRepository.findAll(specification);
+    }
 }
