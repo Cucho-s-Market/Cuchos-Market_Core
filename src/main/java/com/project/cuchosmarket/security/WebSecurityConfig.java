@@ -35,8 +35,9 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/users/**", "/category/**", "/marketBranches")
                     .permitAll()
 
-                .requestMatchers(HttpMethod.POST, "/users/market_branch/**", "/product/**").hasRole(ADMIN.name())
+                .requestMatchers(HttpMethod.POST, "/users/employees/**", "/product/**").hasRole(ADMIN.name())
                 .requestMatchers(HttpMethod.GET, "/users/user-list").hasRole(ADMIN.name())
+                .requestMatchers(HttpMethod.DELETE, "/users/employees/**").hasRole(ADMIN.name())
 
                 .anyRequest()
                     .authenticated()
