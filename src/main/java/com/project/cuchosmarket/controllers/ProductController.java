@@ -6,16 +6,16 @@ import com.project.cuchosmarket.exceptions.CategoryNotExist;
 import com.project.cuchosmarket.exceptions.ProductExistException;
 import com.project.cuchosmarket.exceptions.ProductInvalidException;
 import com.project.cuchosmarket.exceptions.ProductNotExistException;
+import com.project.cuchosmarket.models.Product;
 import com.project.cuchosmarket.services.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
 
@@ -53,6 +53,20 @@ public class ProductController {
         return  DtResponse.builder()
                 .error(false)
                 .message("La informacion del producto " + updatedProduct.getName() + " fue actualizada correctamente.")
+                .build();
+    }
+
+    @GetMapping
+    public DtResponse getProducts(@RequestParam(value = "name", required = false) String name,
+                                  @RequestParam(value = "brand", required = false) String brand,
+                                  @RequestParam(value = "category_id", required = false) Long category_id,
+                                  @RequestParam(value = "orderBy", required = false) String orderBy,
+                                  @RequestParam(value = "orderDirection", required = false) String orderDirection) {
+        List<Product> productsList = productService.getProductsBy(name, brand, category_id, orderBy, orderDirection);
+        return DtResponse.builder()
+                .error(false)
+                .message(String.valueOf(productsList.size()))
+                .data(productsList)
                 .build();
     }
 }
