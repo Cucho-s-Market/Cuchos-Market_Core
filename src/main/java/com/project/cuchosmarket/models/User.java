@@ -1,6 +1,7 @@
 package com.project.cuchosmarket.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "Users")
@@ -20,4 +22,12 @@ public abstract class User {
     protected String email;
     protected String passwordHash;
     protected String passwordSalt;
+
+    public User(String firstName, String lastName, String email, String passwordHash, String passwordSalt) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.passwordSalt = passwordSalt;
+    }
 }
