@@ -52,7 +52,7 @@ public class ProductController {
                 .build();
     }
 
-    @PostMapping("/delete-product")
+    @DeleteMapping("/delete-product")
     public DtResponse deleteProduct(@RequestBody DtProduct productToDelete) {
         try {
             productService.deleteProduct(productToDelete);
