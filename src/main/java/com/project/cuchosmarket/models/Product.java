@@ -17,9 +17,7 @@ public class Product {
     @Id
     private String name;
 
-    @GeneratedValue(strategy = GenerationType.UUID)//TODO: Consultar validez
     private String code;
-
     private String description;
     private LocalDate entryDate;
     private float price;

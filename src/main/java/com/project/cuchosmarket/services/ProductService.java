@@ -81,6 +81,13 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    public void deleteProduct(DtProduct dtProduct) throws ProductNotExistException {
+        Product product;
+        product = findProduct(dtProduct);
+
+        productRepository.delete(product);
+    }
+  
     public List<Product> getProductsBy(String name, String brand, Long category_id, String orderBy, String orderDirection) {
         Specification<Product> specification = ProductSpecifications.filterByAttributes(name, brand, orderBy, orderDirection, category_id);
         return productRepository.findAll(specification);
