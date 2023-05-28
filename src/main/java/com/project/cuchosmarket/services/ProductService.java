@@ -78,4 +78,11 @@ public class ProductService {
 
         productRepository.save(product);
     }
+
+    public void deleteProduct(DtProduct dtProduct) throws ProductNotExistException {
+        Product product;
+        product = findProduct(dtProduct);
+
+        productRepository.delete(product);
+    }
 }

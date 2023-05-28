@@ -36,13 +36,12 @@ public class ProductController {
 
     @PostMapping("/update-product")
     public DtResponse updateProduct(@RequestBody DtProduct updatedProduct) {
-
         try {
             productService.updateProduct(updatedProduct);
         }
         catch (ProductNotExistException | ProductInvalidException e) {
             return  DtResponse.builder()
-                    .error(false)
+                    .error(true)
                     .message(e.getMessage())
                     .build();
         }
@@ -50,6 +49,23 @@ public class ProductController {
         return  DtResponse.builder()
                 .error(false)
                 .message("La informacion del producto " + updatedProduct.getName() + " fue actualizada correctamente.")
+                .build();
+    }
+
+    @PostMapping("/delete-product")
+    public DtResponse deleteProduct(@RequestBody DtProduct productToDelete) {
+        try {
+            productService.deleteProduct(productToDelete);
+        }
+        catch (ProductNotExistException e) {
+            return  DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+        return  DtResponse.builder()
+                .error(false)
+                .message("El producto " + productToDelete.getName() + " fue eliminado correctamente.")
                 .build();
     }
 }
