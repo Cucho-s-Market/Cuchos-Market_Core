@@ -21,4 +21,11 @@ public class Address {
     private int doorNumber;
     private String location;
     private String state;
+
+    public Address(String address, int doorNumber, String location, String state) {
+        this.address = address;
+        this.doorNumber = doorNumber;
+        this.location   = location;
+        this.state = state;
+    }
 }

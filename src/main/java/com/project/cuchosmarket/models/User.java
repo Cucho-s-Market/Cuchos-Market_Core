@@ -1,5 +1,6 @@
 package com.project.cuchosmarket.models;
 
+import com.project.cuchosmarket.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,14 +21,16 @@ public abstract class User {
     protected String firstName;
     protected String lastName;
     protected String email;
-    protected String passwordHash;
-    protected String passwordSalt;
+    protected String password;
 
-    public User(String firstName, String lastName, String email, String passwordHash, String passwordSalt) {
+    @Enumerated(EnumType.STRING)
+    protected Role role;
+
+    public User(String firstName, String lastName, String email, String password, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.passwordHash = passwordHash;
-        this.passwordSalt = passwordSalt;
+        this.password = password;
+        this.role = role;
     }
 }
