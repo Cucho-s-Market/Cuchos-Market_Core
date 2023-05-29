@@ -1,7 +1,7 @@
 package com.project.cuchosmarket.controllers;
-
 import com.project.cuchosmarket.dto.DtAddress;
 import com.project.cuchosmarket.dto.DtResponse;
+import com.project.cuchosmarket.exceptions.AddressNotExistExeption;
 import com.project.cuchosmarket.exceptions.UserNotExistExeption;
 import com.project.cuchosmarket.services.AddressService;
 import lombok.RequiredArgsConstructor;
@@ -13,16 +13,15 @@ import org.springframework.web.bind.annotation.*;
 public class AddressController {
     private final AddressService addressService;
 
-    @PostMapping("/customer/{user_id}")
-    public DtResponse addAddress(@PathVariable("user_id") Long user_id, @RequestBody DtAddress address) {
+    @PostMapping("/add-address/{user_id}")
+    public DtResponse addAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
         try {
-        addressService.addAddress(address, user_id);
-        }  catch (UserNotExistExeption | IllegalArgumentException  e) {
+        addressService.addAddress(address, id);
+        }  catch (UserNotExistExeption | IllegalArgumentException | AddressNotExistExeption e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
                     .build();
-
         }
 
         return DtResponse.builder()
@@ -31,5 +30,20 @@ public class AddressController {
                 .build();
     }
 
+    @DeleteMapping("/delete-address/{user_id}")
+    public DtResponse deleteAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
+        try {
+            addressService.deleteAddress(id, address);
+        } catch (UserNotExistExeption | AddressNotExistExeption e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
 
+        return DtResponse.builder()
+                .error(false)
+                .message("Direccion eliminada con exito.")
+                .build();
+    }
 }
