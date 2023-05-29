@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/address")
-public class AdressController {
+public class AddressController {
     private final AddressService addressService;
 
     @PostMapping("/customer/{user_id}")

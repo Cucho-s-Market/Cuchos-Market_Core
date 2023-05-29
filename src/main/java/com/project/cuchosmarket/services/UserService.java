@@ -3,7 +3,7 @@ package com.project.cuchosmarket.services;
 import com.project.cuchosmarket.dto.DtCustomer;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtUser;
-import com.project.cuchosmarket.exceptions.MarketBranchNotExist;
+import com.project.cuchosmarket.exceptions.MarketBranchNotExistException;
 import com.project.cuchosmarket.exceptions.UserExistException;
 import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.models.*;
@@ -69,11 +69,11 @@ public class UserService {
         }
     }
 
-    public void addEmployee(Long branchId, DtUser user) throws MarketBranchNotExist, UserExistException {
+    public void addEmployee(Long branchId, DtUser user) throws MarketBranchNotExistException, UserExistException {
         Optional<MarketBranch> marketBranch = marketBranchRepository.findById(branchId);
 
         if (marketBranch.isEmpty()) {
-            throw new MarketBranchNotExist("La sucursal con la id " + branchId + " no existe");
+            throw new MarketBranchNotExistException("La sucursal con la id " + branchId + " no existe");
         }
 
         validateUser(user);

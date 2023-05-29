@@ -2,11 +2,10 @@ package com.project.cuchosmarket.controllers;
 
 import com.project.cuchosmarket.dto.DtProduct;
 import com.project.cuchosmarket.dto.DtResponse;
-import com.project.cuchosmarket.exceptions.CategoryNotExist;
-import com.project.cuchosmarket.exceptions.ProductExistException;
-import com.project.cuchosmarket.exceptions.ProductInvalidException;
-import com.project.cuchosmarket.exceptions.ProductNotExistException;
+import com.project.cuchosmarket.dto.DtStock;
+import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.Product;
+import com.project.cuchosmarket.security.JwtService;
 import com.project.cuchosmarket.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +17,14 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
+    private final JwtService jwtService;
 
     @PostMapping("/add-product")
     public DtResponse addProduct(@RequestBody DtProduct newProduct) {
         try {
             productService.addProduct(newProduct);
         }
-        catch (CategoryNotExist | ProductInvalidException | ProductExistException e) {
+        catch (CategoryNotExistException | ProductInvalidException | ProductExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -69,6 +69,7 @@ public class ProductController {
         return  DtResponse.builder()
                 .error(false)
                 .message("El producto " + productToDelete.getName() + " fue eliminado correctamente.")
+                .build();
     }
   
     @GetMapping
@@ -82,6 +83,23 @@ public class ProductController {
                 .error(false)
                 .message(String.valueOf(productsList.size()))
                 .data(productsList)
+                .build();
+    }
+
+    @PutMapping("/update-stock")
+    public DtResponse updateStock(@RequestHeader("Authorization") String authorizationHeader, @RequestBody DtStock stockProduct) {
+        try {
+            String userEmail = jwtService.extractUsername(authorizationHeader.substring(7));
+            productService.updateStockProduct(userEmail, stockProduct);
+        } catch (EmployeeNotWorksInException | ProductNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+        return DtResponse.builder()
+                .error(false)
+                .message("Stock del producto " + stockProduct.getProduct_id() + " actualizado con exito.")
                 .build();
     }
 }
