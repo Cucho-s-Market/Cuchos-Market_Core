@@ -1,18 +1,15 @@
 package com.project.cuchosmarket.services;
 
 import com.project.cuchosmarket.dto.DtProduct;
-import com.project.cuchosmarket.exceptions.CategoryNotExist;
-import com.project.cuchosmarket.exceptions.ProductExistException;
-import com.project.cuchosmarket.exceptions.ProductInvalidException;
-import com.project.cuchosmarket.exceptions.ProductNotExistException;
-import com.project.cuchosmarket.models.Category;
-import com.project.cuchosmarket.models.Product;
-import com.project.cuchosmarket.repositories.CategoryRepository;
-import com.project.cuchosmarket.repositories.ProductRepository;
+import com.project.cuchosmarket.dto.DtStock;
+import com.project.cuchosmarket.exceptions.*;
+import com.project.cuchosmarket.models.*;
+import com.project.cuchosmarket.repositories.*;
 import com.project.cuchosmarket.repositories.specifications.ProductSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +19,10 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final MarketBranchRepository marketBranchRepository;
+    private final StockRepository stockRepository;
+    private final UserRepository userRepository;
+    private final EmployeeRepository employeeRepository;
 
     private void validateProduct(DtProduct dtProduct) throws ProductInvalidException {
         if(dtProduct.getCode() == null | dtProduct.getName() == null | dtProduct.getCategoryId() == null | dtProduct.getEntryDate() == null) throw new ProductInvalidException();
@@ -38,7 +39,8 @@ public class ProductService {
         return product.get();
     }
 
-    public void addProduct(DtProduct dtProduct) throws CategoryNotExist, ProductInvalidException, ProductExistException {
+    @Transactional
+    public void addProduct(DtProduct dtProduct) throws CategoryNotExistException, ProductInvalidException, ProductExistException {
         Optional<Category> category;
 
         //Validations
@@ -48,7 +50,7 @@ public class ProductService {
 
         category = categoryRepository.findById(dtProduct.getCategoryId());
 
-        if(category.isEmpty()) throw new CategoryNotExist();
+        if(category.isEmpty()) throw new CategoryNotExistException();
 
         //New product creation
         Product newProduct = new Product(
@@ -62,6 +64,16 @@ public class ProductService {
                 dtProduct.getImages()
         );
         productRepository.save(newProduct);
+
+        createStock(newProduct);
+    }
+
+    private void createStock(Product product) {
+        List<MarketBranch> marketBranches = marketBranchRepository.findAll();
+        for (MarketBranch branch : marketBranches) {
+            Stock stock = new Stock(new StockId(product, branch), 0);
+            stockRepository.save(stock);
+        }
     }
 
     public void updateProduct(DtProduct dtProduct) throws ProductNotExistException, ProductInvalidException {
@@ -91,5 +103,20 @@ public class ProductService {
     public List<Product> getProductsBy(String name, String brand, Long category_id, String orderBy, String orderDirection) {
         Specification<Product> specification = ProductSpecifications.filterByAttributes(name, brand, orderBy, orderDirection, category_id);
         return productRepository.findAll(specification);
+    }
+
+    public void updateStockProduct(String userEmail, DtStock stockProduct) throws EmployeeNotWorksInException, ProductNotExistException {
+        Product product = findProduct(DtProduct.builder().name(stockProduct.getProduct_id()).build());
+
+        User user = userRepository.findByEmail(userEmail);
+        MarketBranch marketBranchEmployee = employeeRepository.findById(user.getId()).get().getMarketBranch();
+
+        if (!marketBranchEmployee.getId().equals(stockProduct.getBranch_id())) throw new EmployeeNotWorksInException();
+
+        if (stockProduct.getQuantity() < 0) throw new IllegalArgumentException("Cantidad de producto invalida.");
+
+        Stock stock = stockRepository.findById(new StockId(product, marketBranchEmployee)).get();
+        stock.setQuantity(stockProduct.getQuantity());
+        stockRepository.save(stock);
     }
 }

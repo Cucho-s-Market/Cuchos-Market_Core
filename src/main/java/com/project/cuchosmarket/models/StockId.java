@@ -3,9 +3,13 @@ package com.project.cuchosmarket.models;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class StockId implements Serializable {
     @ManyToOne
