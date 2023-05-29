@@ -2,7 +2,7 @@ package com.project.cuchosmarket.controllers;
 
 import com.project.cuchosmarket.dto.DtProduct;
 import com.project.cuchosmarket.dto.DtResponse;
-import com.project.cuchosmarket.exceptions.CategoryNotExist;
+import com.project.cuchosmarket.exceptions.CategoryNotExistException;
 import com.project.cuchosmarket.exceptions.ProductExistException;
 import com.project.cuchosmarket.exceptions.ProductInvalidException;
 import com.project.cuchosmarket.exceptions.ProductNotExistException;
@@ -24,7 +24,7 @@ public class ProductController {
         try {
             productService.addProduct(newProduct);
         }
-        catch (CategoryNotExist | ProductInvalidException | ProductExistException e) {
+        catch (CategoryNotExistException | ProductInvalidException | ProductExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())

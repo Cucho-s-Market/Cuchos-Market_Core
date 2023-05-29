@@ -1,7 +1,7 @@
 package com.project.cuchosmarket.services;
 
 import com.project.cuchosmarket.dto.DtProduct;
-import com.project.cuchosmarket.exceptions.CategoryNotExist;
+import com.project.cuchosmarket.exceptions.CategoryNotExistException;
 import com.project.cuchosmarket.exceptions.ProductExistException;
 import com.project.cuchosmarket.exceptions.ProductInvalidException;
 import com.project.cuchosmarket.exceptions.ProductNotExistException;
@@ -38,7 +38,7 @@ public class ProductService {
         return product.get();
     }
 
-    public void addProduct(DtProduct dtProduct) throws CategoryNotExist, ProductInvalidException, ProductExistException {
+    public void addProduct(DtProduct dtProduct) throws CategoryNotExistException, ProductInvalidException, ProductExistException {
         Optional<Category> category;
 
         //Validations
@@ -48,7 +48,7 @@ public class ProductService {
 
         category = categoryRepository.findById(dtProduct.getCategoryId());
 
-        if(category.isEmpty()) throw new CategoryNotExist();
+        if(category.isEmpty()) throw new CategoryNotExistException();
 
         //New product creation
         Product newProduct = new Product(

@@ -3,7 +3,7 @@ package com.project.cuchosmarket.controllers;
 import com.project.cuchosmarket.dto.DtCustomer;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtUser;
-import com.project.cuchosmarket.exceptions.MarketBranchNotExist;
+import com.project.cuchosmarket.exceptions.MarketBranchNotExistException;
 import com.project.cuchosmarket.exceptions.UserExistException;
 import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.services.UserService;
@@ -36,7 +36,7 @@ public class UserController {
     public DtResponse addEmployee(@PathVariable("branch_id") Long branch_id, @RequestBody DtUser employee) {
         try {
             userService.addEmployee(branch_id, employee);
-        } catch (MarketBranchNotExist | UserExistException | IllegalArgumentException e) {
+        } catch (MarketBranchNotExistException | UserExistException | IllegalArgumentException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
