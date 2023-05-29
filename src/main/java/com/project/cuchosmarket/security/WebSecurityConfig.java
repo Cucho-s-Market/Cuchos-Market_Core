@@ -13,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static com.project.cuchosmarket.enums.Role.ADMIN;
+import static com.project.cuchosmarket.enums.Role.EMPLOYEE;
 
 @Configuration
 @EnableWebSecurity
@@ -45,6 +46,9 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/users/employees/**", "/product/**").hasRole(ADMIN.name())
                 .requestMatchers(HttpMethod.GET, "/users/user-list").hasRole(ADMIN.name())
                 .requestMatchers(HttpMethod.DELETE, "/users/employees/**").hasRole(ADMIN.name())
+
+                .requestMatchers(HttpMethod.GET, "/orders/market_branches/**").hasRole(EMPLOYEE.name())
+                .requestMatchers(HttpMethod.PUT, "/products/update-stock").hasRole(EMPLOYEE.name())
 
                 .anyRequest()
                     .authenticated()
