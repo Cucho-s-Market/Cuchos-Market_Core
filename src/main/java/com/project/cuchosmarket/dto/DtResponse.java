@@ -11,4 +11,5 @@ public class DtResponse {
     private boolean error;
     private String message;
     private Object data;
+    private String token;
 }

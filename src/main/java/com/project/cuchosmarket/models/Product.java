@@ -1,6 +1,10 @@
 package com.project.cuchosmarket.models;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,10 +18,9 @@ import java.util.List;
 @Entity
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String code;
-
     private String name;
+
+    private String code;
     private String description;
     private LocalDate entryDate;
     private float price;
@@ -25,7 +28,19 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
+    @JsonIgnore
     private Category category;
 
     private List<String> images;
+
+    public Product(String name, String code, String description, LocalDate entryDate, float price, String brand, Category category, List<String> images) {
+        this.name = name;
+        this.code = code;
+        this.description = description;
+        this.entryDate = entryDate;
+        this.price = price;
+        this.brand = brand;
+        this.category = category;
+        this.images = images;
+    }
 }
