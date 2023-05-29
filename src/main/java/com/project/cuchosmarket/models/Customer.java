@@ -45,4 +45,8 @@ public class Customer extends User {
     public void addAddress(Address address){
         this.addresses.add(address);
     }
+
+    public Boolean removeAddress(Long addressId) {
+        return this.addresses.removeIf(address -> address.getId().equals(addressId));
+    }
 }

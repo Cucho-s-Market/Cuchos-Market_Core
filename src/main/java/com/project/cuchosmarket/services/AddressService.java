@@ -35,8 +35,8 @@ public class AddressService {
     }
 
     public void  addAddress(DtAddress dtAddress,Long  id) throws UserNotExistExeption, AddressNotExistExeption {
-        Optional<Customer> custmer = customerRepository.findById(id);
-        if(custmer.isEmpty()){
+        Optional<Customer> customer = customerRepository.findById(id);
+        if(customer.isEmpty()){
            throw  new UserNotExistExeption("Usuario no existe");
         }
         if(dtAddress.getAddress().length() > 50 || dtAddress.getLocation() == null || dtAddress.getState() == null){
@@ -47,23 +47,20 @@ public class AddressService {
 
         Address address = new Address(dtAddress.getAddress(), dtAddress.getDoorNumber(), dtAddress.getLocation(), dtAddress.getState());
 
-        custmer.get().addAddress(address);
+        customer.get().addAddress(address);
 
-        customerRepository.save(custmer.get());
+        customerRepository.save(customer.get());
 
 
     }
-    public void  deleteAddress(DtAddress dtAddress,Long  id) throws UserNotExistExeption, AddressNotExistExeption {
-        Optional<Customer> custmer = customerRepository.findById(id);
-        if(custmer.isEmpty()){ throw  new UserNotExistExeption("Usuario no existe");  }
+    public void deleteAddress(Long  id, DtAddress dtAddress) throws UserNotExistExeption, AddressNotExistExeption {
+        Optional<Customer> customer = customerRepository.findById(id);
 
-        List<Address> addresses = custmer.get().getAddresses();
-        addresses.forEach(address -> {
-            if (address.getId().equals(dtAddress.getId())) {
-                addresses.remove(address);
-            }
-        });
-        userRepository.save(custmer.get());
+        if(customer.isEmpty()) throw  new UserNotExistExeption("Usuario no existe");
+
+        if(!customer.get().removeAddress(dtAddress.getId())) throw new AddressNotExistExeption();
+
+        userRepository.save(customer.get());
     }
 
   }
