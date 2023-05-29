@@ -2,15 +2,8 @@ package com.project.cuchosmarket.controllers;
 
 import com.project.cuchosmarket.dto.DtProduct;
 import com.project.cuchosmarket.dto.DtResponse;
-<<<<<<< HEAD
-import com.project.cuchosmarket.exceptions.CategoryNotExistException;
-import com.project.cuchosmarket.exceptions.ProductExistException;
-import com.project.cuchosmarket.exceptions.ProductInvalidException;
-import com.project.cuchosmarket.exceptions.ProductNotExistException;
-=======
 import com.project.cuchosmarket.dto.DtStock;
 import com.project.cuchosmarket.exceptions.*;
->>>>>>> d27848512a814415fd7a257f4768dc1609a7e74e
 import com.project.cuchosmarket.models.Product;
 import com.project.cuchosmarket.security.JwtService;
 import com.project.cuchosmarket.services.ProductService;
