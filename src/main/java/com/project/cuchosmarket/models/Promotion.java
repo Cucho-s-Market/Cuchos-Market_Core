@@ -19,6 +19,7 @@ public abstract class Promotion {
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String image;
 
     @OneToMany
     private List<Product> products;

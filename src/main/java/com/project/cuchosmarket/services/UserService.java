@@ -3,7 +3,7 @@ package com.project.cuchosmarket.services;
 import com.project.cuchosmarket.dto.DtCustomer;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtUser;
-import com.project.cuchosmarket.exceptions.MarketBranchNotExistException;
+import com.project.cuchosmarket.exceptions.BranchNotExistException;
 import com.project.cuchosmarket.exceptions.UserExistException;
 import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.models.*;
@@ -44,7 +44,7 @@ public class UserService {
         );
         User user = userRepository.findByEmail(dtUser.getEmail());
         if (user == null) {
-            throw new UserNotExistException("Usuario no existe.");
+            throw new UserNotExistException();
         }
 
         var jwtToken = jwtService.createToken(new HashMap<>(), new UserDetailsImpl(user));
@@ -69,11 +69,11 @@ public class UserService {
         }
     }
 
-    public void addEmployee(Long branchId, DtUser user) throws MarketBranchNotExistException, UserExistException {
-        Optional<MarketBranch> marketBranch = marketBranchRepository.findById(branchId);
+    public void addEmployee(Long branchId, DtUser user) throws BranchNotExistException, UserExistException {
+        Optional<Branch> marketBranch = marketBranchRepository.findById(branchId);
 
         if (marketBranch.isEmpty()) {
-            throw new MarketBranchNotExistException("La sucursal con la id " + branchId + " no existe");
+            throw new BranchNotExistException("La sucursal con la id " + branchId + " no existe");
         }
 
         validateUser(user);

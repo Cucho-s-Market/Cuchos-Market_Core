@@ -24,7 +24,7 @@ public class ProductController {
         try {
             productService.addProduct(newProduct);
         }
-        catch (CategoryNotExistException | ProductInvalidException | ProductExistException e) {
+        catch (CategoryNotExistException | InvalidProductException | ProductExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -42,7 +42,7 @@ public class ProductController {
         try {
             productService.updateProduct(updatedProduct);
         }
-        catch (ProductNotExistException | ProductInvalidException e) {
+        catch (ProductNotExistException | InvalidProductException e) {
             return  DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())

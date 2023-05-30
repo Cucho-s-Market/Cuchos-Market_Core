@@ -18,5 +18,5 @@ public class StockId implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "branch_id")
-    private MarketBranch marketBranch;
+    private Branch branch;
 }

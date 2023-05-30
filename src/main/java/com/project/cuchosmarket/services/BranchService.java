@@ -9,7 +9,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class MarketBranchService {
+public class BranchService {
     private final MarketBranchRepository marketBranchRepository;
 
     public List<DtMarketBranch> getMarketBranches() {

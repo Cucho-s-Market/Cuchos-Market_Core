@@ -1,11 +1,11 @@
 package com.project.cuchosmarket.controllers;
 
+import com.project.cuchosmarket.dto.DtAddress;
 import com.project.cuchosmarket.dto.DtCustomer;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtUser;
-import com.project.cuchosmarket.exceptions.MarketBranchNotExistException;
-import com.project.cuchosmarket.exceptions.UserExistException;
-import com.project.cuchosmarket.exceptions.UserNotExistException;
+import com.project.cuchosmarket.exceptions.*;
+import com.project.cuchosmarket.services.AddressService;
 import com.project.cuchosmarket.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final AddressService addressService;
 
     @PostMapping("/auth/login")
     public DtResponse login(@RequestBody DtUser user) {
@@ -32,11 +33,11 @@ public class UserController {
         return token;
     }
 
-    @PostMapping("employees/market_branches/{branch_id}")
+    @PostMapping("/add-employee/{branch_id}")
     public DtResponse addEmployee(@PathVariable("branch_id") Long branch_id, @RequestBody DtUser employee) {
         try {
             userService.addEmployee(branch_id, employee);
-        } catch (MarketBranchNotExistException | UserExistException | IllegalArgumentException e) {
+        } catch (BranchNotExistException | UserExistException | IllegalArgumentException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -49,7 +50,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/customers")
+    @PostMapping("/add-customer")
     public DtResponse addCustomer(@RequestBody DtCustomer customer) {
         DtResponse response;
         try {
@@ -67,7 +68,7 @@ public class UserController {
         return response;
     }
 
-    @GetMapping("/user-list")
+    @GetMapping("/get-users")
     public DtResponse getUsers() {
         return DtResponse.builder()
                 .error(false)
@@ -76,12 +77,46 @@ public class UserController {
                 .build();
     }
 
-    @DeleteMapping("/employees/{employee_id}")
+    @DeleteMapping("/delete-employee/{employee_id}")
     public DtResponse deleteEmployee(@PathVariable("employee_id") Long employee_id) {
         userService.deleteEmployee(employee_id);
         return DtResponse.builder()
                 .error(false)
                 .message("Empleado borrado con exito.")
+                .build();
+    }
+
+    @PostMapping("/add-address/{user_id}")
+    public DtResponse addAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
+        try {
+            addressService.addAddress(address, id);
+        }  catch (UserNotExistException | IllegalArgumentException | AddressNotExistExeption e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Direccion añadida con exito.")
+                .build();
+    }
+
+    @DeleteMapping("/delete-address/{user_id}")
+    public DtResponse deleteAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
+        try {
+            addressService.deleteAddress(id, address);
+        } catch (UserNotExistException | AddressNotExistExeption e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Direccion eliminada con exito.")
                 .build();
     }
 }

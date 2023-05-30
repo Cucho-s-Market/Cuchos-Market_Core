@@ -18,6 +18,7 @@ public class Category {
     private Long id;
     private String name;
     private String description;
+    private String image;
 
     @ManyToOne
     @JoinColumn(name = "category_parent_id")

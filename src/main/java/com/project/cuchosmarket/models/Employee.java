@@ -17,10 +17,10 @@ import lombok.Setter;
 public class Employee extends User {
     @ManyToOne
     @JoinColumn(name = "branch_id", nullable = false)
-    private MarketBranch marketBranch;
+    private Branch branch;
 
-    public Employee(String firstName, String lastName, String email, String password, MarketBranch marketBranch) {
+    public Employee(String firstName, String lastName, String email, String password, Branch branch) {
         super(firstName, lastName, email, password, Role.EMPLOYEE);
-        this.marketBranch = marketBranch;
+        this.branch = branch;
     }
 }

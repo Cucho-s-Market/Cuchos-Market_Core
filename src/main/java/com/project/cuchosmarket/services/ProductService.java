@@ -24,12 +24,12 @@ public class ProductService {
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
 
-    private void validateProduct(DtProduct dtProduct) throws ProductInvalidException {
-        if(dtProduct.getCode() == null | dtProduct.getName() == null | dtProduct.getCategoryId() == null | dtProduct.getEntryDate() == null) throw new ProductInvalidException();
+    private void validateProduct(DtProduct dtProduct) throws InvalidProductException {
+        if(dtProduct.getCode() == null | dtProduct.getName() == null | dtProduct.getCategoryId() == null | dtProduct.getEntryDate() == null) throw new InvalidProductException();
 
-        if(dtProduct.getCode().isBlank()) throw new ProductInvalidException("Codigo de producto invalido.");
-        if(dtProduct.getName().isBlank()) throw new ProductInvalidException("Nombre de producto invalido.");
-        if(dtProduct.getPrice() <= 0) throw new ProductInvalidException("Precio de producto invalido.");
+        if(dtProduct.getCode().isBlank()) throw new InvalidProductException("Codigo de producto invalido.");
+        if(dtProduct.getName().isBlank()) throw new InvalidProductException("Nombre de producto invalido.");
+        if(dtProduct.getPrice() <= 0) throw new InvalidProductException("Precio de producto invalido.");
     }
 
     private Product findProduct(DtProduct dtProduct) throws ProductNotExistException {
@@ -40,7 +40,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void addProduct(DtProduct dtProduct) throws CategoryNotExistException, ProductInvalidException, ProductExistException {
+    public void addProduct(DtProduct dtProduct) throws CategoryNotExistException, InvalidProductException, ProductExistException {
         Optional<Category> category;
 
         //Validations
@@ -69,14 +69,14 @@ public class ProductService {
     }
 
     private void createStock(Product product) {
-        List<MarketBranch> marketBranches = marketBranchRepository.findAll();
-        for (MarketBranch branch : marketBranches) {
+        List<Branch> branches = marketBranchRepository.findAll();
+        for (Branch branch : branches) {
             Stock stock = new Stock(new StockId(product, branch), 0);
             stockRepository.save(stock);
         }
     }
 
-    public void updateProduct(DtProduct dtProduct) throws ProductNotExistException, ProductInvalidException {
+    public void updateProduct(DtProduct dtProduct) throws ProductNotExistException, InvalidProductException {
         Product product;
         //Verify and get product
         validateProduct(dtProduct);
@@ -109,13 +109,13 @@ public class ProductService {
         Product product = findProduct(DtProduct.builder().name(stockProduct.getProduct_id()).build());
 
         User user = userRepository.findByEmail(userEmail);
-        MarketBranch marketBranchEmployee = employeeRepository.findById(user.getId()).get().getMarketBranch();
+        Branch branchEmployee = employeeRepository.findById(user.getId()).get().getBranch();
 
-        if (!marketBranchEmployee.getId().equals(stockProduct.getBranch_id())) throw new EmployeeNotWorksInException();
+        if (!branchEmployee.getId().equals(stockProduct.getBranch_id())) throw new EmployeeNotWorksInException();
 
         if (stockProduct.getQuantity() < 0) throw new IllegalArgumentException("Cantidad de producto invalida.");
 
-        Stock stock = stockRepository.findById(new StockId(product, marketBranchEmployee)).get();
+        Stock stock = stockRepository.findById(new StockId(product, branchEmployee)).get();
         stock.setQuantity(stockProduct.getQuantity());
         stockRepository.save(stock);
     }
