@@ -77,12 +77,19 @@ public class UserController {
                 .build();
     }
 
-    @DeleteMapping("/delete-employee/{employee_id}")
-    public DtResponse deleteEmployee(@PathVariable("employee_id") Long employee_id) {
-        userService.deleteEmployee(employee_id);
+    @DeleteMapping("/delete-user/{user_id}")
+    public DtResponse deleteUser(@PathVariable("user_id") Long user_id) {
+        try {
+            userService.deleteUser(user_id);
+        } catch (UserNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
         return DtResponse.builder()
                 .error(false)
-                .message("Empleado borrado con exito.")
+                .message("Usuario eliminado con exito.")
                 .build();
     }
 
