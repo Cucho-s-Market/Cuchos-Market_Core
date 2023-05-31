@@ -37,7 +37,7 @@ public class ProductController {
                 .build();
     }
 
-    @PostMapping("/update-product")
+    @PutMapping("/update-product")
     public DtResponse updateProduct(@RequestBody DtProduct updatedProduct) {
         try {
             productService.updateProduct(updatedProduct);
