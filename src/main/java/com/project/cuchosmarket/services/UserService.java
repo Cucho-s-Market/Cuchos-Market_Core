@@ -3,6 +3,7 @@ package com.project.cuchosmarket.services;
 import com.project.cuchosmarket.dto.DtCustomer;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtUser;
+import com.project.cuchosmarket.enums.Role;
 import com.project.cuchosmarket.exceptions.BranchNotExistException;
 import com.project.cuchosmarket.exceptions.UserExistException;
 import com.project.cuchosmarket.exceptions.UserNotExistException;
@@ -16,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -132,8 +134,19 @@ public class UserService {
                 .build();
     }
 
-    public void deleteEmployee(Long id) {
-        employeeRepository.deleteById(id);
-        userRepository.deleteById(id);
+    @Transactional
+    public void deleteUser(Long id) throws UserNotExistException {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new UserNotExistException();
+        }
+
+        if (user.get().getRole().equals(Role.EMPLOYEE)) {
+            employeeRepository.deleteById(id);
+        } else if (user.get().getRole().equals(Role.CUSTOMER)) {
+            customerRepository.deleteById(id);
+        }
+
+        userRepository.delete(user.get());
     }
 }

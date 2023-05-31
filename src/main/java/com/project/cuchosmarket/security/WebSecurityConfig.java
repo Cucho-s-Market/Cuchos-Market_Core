@@ -37,7 +37,7 @@ public class WebSecurityConfig {
                 )
                     .permitAll()
 
-                .requestMatchers(HttpMethod.POST, "/users/auth/**", "users/customers")
+                .requestMatchers(HttpMethod.POST, "/users/auth/**", "users/add-customer")
                     .permitAll()
 
                 .requestMatchers(HttpMethod.GET, "/users/**", "/category/**", "/marketBranches", "/products")
