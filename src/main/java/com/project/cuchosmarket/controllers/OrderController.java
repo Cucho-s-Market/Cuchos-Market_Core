@@ -2,6 +2,8 @@ package com.project.cuchosmarket.controllers;
 
 import com.project.cuchosmarket.dto.DtOrder;
 import com.project.cuchosmarket.dto.DtResponse;
+import com.project.cuchosmarket.exceptions.EmployeeNotWorksInException;
+import com.project.cuchosmarket.exceptions.OrderNotExistException;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.Order;
 import com.project.cuchosmarket.security.JwtService;
@@ -60,5 +62,22 @@ public class OrderController {
                 .error(false)
                 .message("Compra realizada con exito")
                 .build();
+    }
+
+    @PutMapping("/update-status")
+    public DtResponse updateOrderStatus(@RequestHeader("Authorization") String authorizationHeader, @RequestBody DtOrder order) {
+        String userEmail = jwtService.extractUsername(authorizationHeader.substring(7));
+        try {
+            orderService.updateStatus(userEmail, order);
+        } catch (EmployeeNotWorksInException | OrderNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Estado de orden " + order.getId() + " actualizada: " + order.getStatus().name()).build();
     }
 }

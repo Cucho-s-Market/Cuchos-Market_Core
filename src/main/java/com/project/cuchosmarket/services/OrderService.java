@@ -1,8 +1,17 @@
 package com.project.cuchosmarket.services;
 
+import com.project.cuchosmarket.dto.DtOrder;
 import com.project.cuchosmarket.dto.DtItem;
 import com.project.cuchosmarket.dto.DtOrder;
 import com.project.cuchosmarket.enums.OrderStatus;
+import com.project.cuchosmarket.exceptions.EmployeeNotWorksInException;
+import com.project.cuchosmarket.exceptions.OrderNotExistException;
+import com.project.cuchosmarket.models.Branch;
+import com.project.cuchosmarket.models.Order;
+import com.project.cuchosmarket.models.User;
+import com.project.cuchosmarket.repositories.EmployeeRepository;
+import com.project.cuchosmarket.repositories.OrderRepository;
+import com.project.cuchosmarket.repositories.UserRepository;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.*;
 import com.project.cuchosmarket.repositories.*;
@@ -27,13 +36,16 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final StockRepository stockRepository;
 
+    private void employeeWorksInBranch(String username, Long marketBranchId) throws EmployeeNotWorksInException {
+        User user = userRepository.findByEmail(username);
+        Branch branchEmployee = employeeRepository.findById(user.getId()).get().getBranch();
+
+        if (!branchEmployee.getId().equals(marketBranchId)) throw new EmployeeNotWorksInException();
+    }
 
     public List<Order> getOrdersBy(String userEmail, Long marketBranchId, String orderStatus, LocalDate startDate,
                                    LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException, UserNotExistException {
-        User user = userRepository.findByEmail(userEmail);
-        Branch branchEmployee = employeeRepository.findById(user.getId()).orElseThrow(UserNotExistException::new).getBranch();
-
-        if (!branchEmployee.getId().equals(marketBranchId)) throw new EmployeeNotWorksInException();
+        employeeWorksInBranch(userEmail, marketBranchId);
 
         OrderStatus status = null;
         if (orderStatus != null) {
@@ -89,5 +101,16 @@ public class OrderService {
 
         marketBranch.addOrder(order);
         marketBranchRepository.save(marketBranch);
+    }
+
+    public void updateStatus(String userEmail, DtOrder dtOrder) throws EmployeeNotWorksInException, OrderNotExistException {
+        employeeWorksInBranch(userEmail, dtOrder.getBranchId());
+
+        Order order = orderRepository.findById(dtOrder.getId()).orElseThrow(() -> new OrderNotExistException(dtOrder.getId()));
+
+        if (order.getStatus().equals(OrderStatus.CANCELLED)) throw new IllegalArgumentException("Orden ya cancelada.");
+
+        order.setStatus(dtOrder.getStatus());
+        orderRepository.save(order);
     }
 }
