@@ -1,7 +1,11 @@
 package com.project.cuchosmarket.controllers;
 
+import com.project.cuchosmarket.dto.DtOrder;
 import com.project.cuchosmarket.dto.DtResponse;
+import com.project.cuchosmarket.exceptions.BranchNotExistException;
 import com.project.cuchosmarket.exceptions.EmployeeNotWorksInException;
+import com.project.cuchosmarket.exceptions.ProductNotExistException;
+import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.models.Order;
 import com.project.cuchosmarket.security.JwtService;
 import com.project.cuchosmarket.services.OrderService;
@@ -40,6 +44,23 @@ public class OrderController {
                 .error(false)
                 .message(String.valueOf(orderList.size()))
                 .data(orderList)
+                .build();
+    }
+
+    @PostMapping("/customer/{user_id}/buy-products")
+    public DtResponse purchaseProducts(@PathVariable("user_id") Long user_id, @RequestBody DtOrder order) {
+        try {
+            orderService.buyProducts(user_id, order);
+        } catch (BranchNotExistException | ProductNotExistException | UserNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Compra realizada con exito")
                 .build();
     }
 }
