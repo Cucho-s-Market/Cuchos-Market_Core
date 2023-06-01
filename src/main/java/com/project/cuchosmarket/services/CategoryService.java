@@ -31,13 +31,16 @@ public class CategoryService {
                 dtCategory.getImage()
         );
 
-        categoryParent = categoryRepository.findById(dtCategory.getCategoryParent().getId());
+        if(dtCategory.getCategoryParent().getId() != null) {
+            categoryParent = categoryRepository.findById(dtCategory.getCategoryParent().getId());
 
-        if(categoryParent.isPresent()) {
-            categoryParent.get().addSubcategory(newCategory);
-            newCategory.setCategoryParent(categoryParent.get());
+            if(categoryParent.isPresent()) {
+                categoryParent.get().addSubcategory(newCategory);
+                newCategory.setCategoryParent(categoryParent.get());
 
-            categoryRepository.save(categoryParent.get());
+                categoryRepository.save(categoryParent.get());
+            }
+            else throw new InvalidCategoryException("La categoria padre no existe.");
         }
         categoryRepository.save(newCategory);
     }
