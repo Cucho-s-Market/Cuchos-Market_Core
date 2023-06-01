@@ -86,12 +86,11 @@ public class ProductController {
                 .build();
     }
 
-    @PutMapping("/employee/update-stock")
-    public DtResponse updateStock(@RequestHeader("Authorization") String authorizationHeader, @RequestBody DtStock stockProduct) {
+    @PutMapping("/employee/{user_id}/update-stock")
+    public DtResponse updateStock(@PathVariable("user_id") Long user_id, @RequestBody DtStock stockProduct) {
         try {
-            String userEmail = jwtService.extractUsername(authorizationHeader.substring(7));
-            productService.updateStockProduct(userEmail, stockProduct);
-        } catch (EmployeeNotWorksInException | ProductNotExistException e) {
+            productService.updateStockProduct(user_id, stockProduct);
+        } catch (EmployeeNotWorksInException | ProductNotExistException | UserNotExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
