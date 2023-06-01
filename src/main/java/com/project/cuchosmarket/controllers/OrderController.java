@@ -18,7 +18,7 @@ public class OrderController {
     private final OrderService orderService;
     private final JwtService jwtService;
 
-    @GetMapping("/get-orders/{branch_id}")
+    @GetMapping("/employee/get-orders/{branch_id}")
     public DtResponse getOrdersHistory(@RequestHeader("Authorization") String authorizationHeader,
                                        @PathVariable("branch_id") Long branch_id,
                                        @RequestParam(value = "orderStatus", required = false) String orderStatus,

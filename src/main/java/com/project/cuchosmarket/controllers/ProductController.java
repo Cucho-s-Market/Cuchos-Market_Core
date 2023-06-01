@@ -19,7 +19,7 @@ public class ProductController {
     private final ProductService productService;
     private final JwtService jwtService;
 
-    @PostMapping("/add-product")
+    @PostMapping("/admin/add-product")
     public DtResponse addProduct(@RequestBody DtProduct newProduct) {
         try {
             productService.addProduct(newProduct);
@@ -37,7 +37,7 @@ public class ProductController {
                 .build();
     }
 
-    @PutMapping("/update-product")
+    @PutMapping("/admin/update-product")
     public DtResponse updateProduct(@RequestBody DtProduct updatedProduct) {
         try {
             productService.updateProduct(updatedProduct);
@@ -55,7 +55,7 @@ public class ProductController {
                 .build();
     }
 
-    @DeleteMapping("/delete-product")
+    @DeleteMapping("/admin/delete-product")
     public DtResponse deleteProduct(@RequestBody DtProduct productToDelete) {
         try {
             productService.deleteProduct(productToDelete);
@@ -86,7 +86,7 @@ public class ProductController {
                 .build();
     }
 
-    @PutMapping("/update-stock")
+    @PutMapping("/employee/update-stock")
     public DtResponse updateStock(@RequestHeader("Authorization") String authorizationHeader, @RequestBody DtStock stockProduct) {
         try {
             String userEmail = jwtService.extractUsername(authorizationHeader.substring(7));

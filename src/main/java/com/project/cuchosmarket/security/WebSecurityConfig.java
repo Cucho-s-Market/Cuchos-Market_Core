@@ -12,8 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.project.cuchosmarket.enums.Role.ADMIN;
-import static com.project.cuchosmarket.enums.Role.EMPLOYEE;
+import static com.project.cuchosmarket.enums.Role.*;
 
 @Configuration
 @EnableWebSecurity
@@ -37,18 +36,42 @@ public class WebSecurityConfig {
                 )
                     .permitAll()
 
-                .requestMatchers(HttpMethod.POST, "/users/auth/**", "users/add-customer")
-                    .permitAll()
+                //All users
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/users/auth/**",
+                        "/users/add-customer"
+                ).permitAll()
 
-                .requestMatchers(HttpMethod.GET, "/users/**", "/category/**", "/marketBranches", "/products")
-                    .permitAll()
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/categories/get-categories",
+                        "/branches/get-branches",
+                        "/products"
+                ).permitAll()
 
-                .requestMatchers(HttpMethod.POST, "/users/employees/**", "/product/**").hasRole(ADMIN.name())
-                .requestMatchers(HttpMethod.GET, "/users/user-list").hasRole(ADMIN.name())
-                .requestMatchers(HttpMethod.DELETE, "/users/employees/**").hasRole(ADMIN.name())
+                //Admin users
+                .requestMatchers(
+                        "/branches/admin/**",
+                        "/categories/admin/**",
+                        "/orders/admin/**",
+                        "/products/admin/**",
+                        "/users/admin/**"
+                ).hasRole(ADMIN.name())
 
-                .requestMatchers(HttpMethod.GET, "/orders/market_branches/**").hasRole(EMPLOYEE.name())
-                .requestMatchers(HttpMethod.PUT, "/products/update-stock").hasRole(EMPLOYEE.name())
+                //Employees users
+                .requestMatchers(
+                        "/products/employee/**",
+                        "/orders/employee/**"
+                ).hasRole(EMPLOYEE.name())
+
+                //Customers users
+
+                //Admin & Customers users
+                .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/users/delete-user/**"
+                ).hasAnyRole(ADMIN.name(), CUSTOMER.name())
 
                 .anyRequest()
                     .authenticated()
