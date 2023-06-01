@@ -16,6 +16,7 @@ public class CategoryService {
 
     private void validateCategory(DtCategory dtCategory) throws InvalidCategoryException {
         if(dtCategory.getName() == null) throw new InvalidCategoryException();
+        if(categoryRepository.existsByName(dtCategory.getName())) throw  new InvalidCategoryException("La categoria ya existe.");
     }
 
     public void addCategory(DtCategory dtCategory) throws InvalidCategoryException {
@@ -31,8 +32,8 @@ public class CategoryService {
                 dtCategory.getImage()
         );
 
-        if(dtCategory.getCategoryParent().getId() != null) {
-            categoryParent = categoryRepository.findById(dtCategory.getCategoryParent().getId());
+        if(dtCategory.getCategoryParent() != null) {
+            categoryParent = categoryRepository.findById(dtCategory.getCategoryParent());
 
             if(categoryParent.isPresent()) {
                 categoryParent.get().addSubcategory(newCategory);
