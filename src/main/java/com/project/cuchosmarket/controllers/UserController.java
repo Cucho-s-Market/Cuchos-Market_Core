@@ -33,7 +33,7 @@ public class UserController {
         return token;
     }
 
-    @PostMapping("/add-employee/{branch_id}")
+    @PostMapping("/admin/add-employee/{branch_id}")
     public DtResponse addEmployee(@PathVariable("branch_id") Long branch_id, @RequestBody DtUser employee) {
         try {
             userService.addEmployee(branch_id, employee);
@@ -68,7 +68,7 @@ public class UserController {
         return response;
     }
 
-    @GetMapping("/get-users")
+    @GetMapping("/admin/get-users")
     public DtResponse getUsers() {
         return DtResponse.builder()
                 .error(false)
@@ -93,7 +93,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/add-address/{user_id}")
+    @PostMapping("/customer/add-address/{user_id}")
     public DtResponse addAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
         try {
             addressService.addAddress(address, id);
@@ -110,7 +110,7 @@ public class UserController {
                 .build();
     }
 
-    @DeleteMapping("/delete-address/{user_id}")
+    @DeleteMapping("/customer/delete-address/{user_id}")
     public DtResponse deleteAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
         try {
             addressService.deleteAddress(id, address);
