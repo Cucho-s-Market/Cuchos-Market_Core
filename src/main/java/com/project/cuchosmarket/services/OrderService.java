@@ -3,10 +3,7 @@ package com.project.cuchosmarket.services;
 import com.project.cuchosmarket.dto.DtItem;
 import com.project.cuchosmarket.dto.DtOrder;
 import com.project.cuchosmarket.enums.OrderStatus;
-import com.project.cuchosmarket.exceptions.BranchNotExistException;
-import com.project.cuchosmarket.exceptions.EmployeeNotWorksInException;
-import com.project.cuchosmarket.exceptions.ProductNotExistException;
-import com.project.cuchosmarket.exceptions.UserNotExistException;
+import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.*;
 import com.project.cuchosmarket.repositories.*;
 import com.project.cuchosmarket.repositories.specifications.OrderSpecifications;
@@ -17,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @AllArgsConstructor
@@ -53,34 +49,44 @@ public class OrderService {
     }
 
     @Transactional
-    public void buyProducts(Long userId, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException {
+    public void buyProducts(Long userId, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException {
         Customer customer = customerRepository.findById(userId).orElseThrow(UserNotExistException::new);
-        Branch marketBranch = marketBranchRepository.findById(dtOrder.getId())
+        Branch marketBranch = marketBranchRepository.findById(dtOrder.getBranchId())
                 .orElseThrow(() -> new BranchNotExistException(dtOrder.getBranchId()));
 
         if (dtOrder.getProducts().isEmpty()) {
-            throw new IllegalArgumentException("No se seleccionaron ningun producto para comprar.");
+            throw new IllegalArgumentException("No se selecciono ningun producto para comprar.");
         }
 
         List<Item> items = new ArrayList<>();
         Order order = null;
+        float totalPrice = 0;
+
         for (DtItem dtItem : dtOrder.getProducts()) {
             if (dtItem.getQuantity() < 1) throw new IllegalArgumentException("La cantidad del producto que se encarga ha de ser mayor a 0.");
-            Product product = productRepository.findById(dtItem.getName()).orElseThrow(() -> new ProductNotExistException()); //TODO check si es mejor ir guardando los objetos que tiren excepcion o que el 1ero que este mal pare la funcion
+
+            Product product = productRepository.findById(dtItem.getName()).orElseThrow(() -> new ProductNotExistException(dtItem.getName()));
             Stock productStock = stockRepository.findById(new StockId(product, marketBranch)).get();
 
-            if (productStock.getQuantity() < 1) {
-                //throw new Excepcion de que no hay stock
+            if (productStock.getQuantity() < 1 || productStock.getQuantity() < dtItem.getQuantity()) {
+                throw new NoStockException("Stock insuficiente para " + dtItem.getName() + " en sucursal.");
             } else {
-                productStock.setQuantity(productStock.getQuantity()-1);
+                productStock.setQuantity(productStock.getQuantity() - dtItem.getQuantity());
             }
 
-            Item item = new Item(dtItem.getName(), dtItem.getUnitPrice(), dtItem.getUnitPrice() * dtItem.getQuantity(),
+            Item item = new Item(dtItem.getName(), product.getPrice(), product.getPrice() * dtItem.getQuantity(),
                     dtItem.getQuantity(), product);
             items.add(item);
+            totalPrice+=item.getFinalPrice();
         }
 
-        order = new Order(0, LocalDate.now(), OrderStatus.PENDING, dtOrder.getType(), items);
+        order = new Order(totalPrice, LocalDate.now(), OrderStatus.PENDING, dtOrder.getType(), items);
         orderRepository.save(order);
+
+        customer.addOrder(order);
+        customerRepository.save(customer);
+
+        marketBranch.addOrder(order);
+        marketBranchRepository.save(marketBranch);
     }
 }

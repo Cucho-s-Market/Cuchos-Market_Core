@@ -32,7 +32,7 @@ public class Customer extends User {
 
     @OneToMany
     @JoinColumn(name = "client_id")
-    private Map<String, Order> ordersPlaced;
+    private Map<Long, Order> ordersPlaced;
 
 
     public Customer(String firstName, String lastName, String email, String password, LocalDate birthdate, long telephone,long dni) {
@@ -49,5 +49,9 @@ public class Customer extends User {
 
     public Boolean removeAddress(Long addressId) {
         return this.addresses.removeIf(address -> address.getId().equals(addressId));
+    }
+
+    public void addOrder(Order order){
+        this.ordersPlaced.put(order.getId(), order);
     }
 }

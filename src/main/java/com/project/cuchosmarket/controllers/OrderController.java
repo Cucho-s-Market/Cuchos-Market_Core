@@ -2,10 +2,7 @@ package com.project.cuchosmarket.controllers;
 
 import com.project.cuchosmarket.dto.DtOrder;
 import com.project.cuchosmarket.dto.DtResponse;
-import com.project.cuchosmarket.exceptions.BranchNotExistException;
-import com.project.cuchosmarket.exceptions.EmployeeNotWorksInException;
-import com.project.cuchosmarket.exceptions.ProductNotExistException;
-import com.project.cuchosmarket.exceptions.UserNotExistException;
+import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.Order;
 import com.project.cuchosmarket.security.JwtService;
 import com.project.cuchosmarket.services.OrderService;
@@ -47,11 +44,11 @@ public class OrderController {
                 .build();
     }
 
-    @PostMapping("/customer/{user_id}/buy-products")
+    @PostMapping("/{user_id}")
     public DtResponse purchaseProducts(@PathVariable("user_id") Long user_id, @RequestBody DtOrder order) {
         try {
             orderService.buyProducts(user_id, order);
-        } catch (BranchNotExistException | ProductNotExistException | UserNotExistException e) {
+        } catch (BranchNotExistException | ProductNotExistException | UserNotExistException | NoStockException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
