@@ -14,4 +14,3 @@ public class DtAddress {
     private String location;
     private String state;
 }
-
