@@ -114,6 +114,24 @@ public class UserController {
                 .build();
     }
 
+    @PutMapping("/customer/{user_id}/address")
+    public DtResponse updateAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
+        try {
+            addressService.updateAddress(id, address);
+        }
+        catch (UserNotExistException | AddressNotExistExeption e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Direccion actualizada con exito.")
+                .build();
+    }
+
     @DeleteMapping("/customer/{user_id}/address")
     public DtResponse deleteAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
         try {

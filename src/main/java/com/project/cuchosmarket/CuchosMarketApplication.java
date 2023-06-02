@@ -8,6 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.util.Date;
+
 import static com.project.cuchosmarket.enums.Role.ADMIN;
 
 @SpringBootApplication
@@ -21,6 +23,7 @@ public class CuchosMarketApplication {
 	public CommandLineRunner commandLineRunner(
 			UserService service
 	) {
+		System.out.println(new Date());
 		return args -> {
 			var admin = DtUser.builder()
 					.firstName("Admin")

@@ -35,6 +35,12 @@ public class WebSecurityConfig {
                         "/doc/swagger-ui/**"
                 )
                     .permitAll()
+                //All users
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/users/auth/**",
+                        "/users/add-customer"
+                ).permitAll()
 
                 //All users
                 .requestMatchers(
@@ -80,7 +86,7 @@ public class WebSecurityConfig {
                 ).hasRole(ADMIN.name())
 
                 //Employees users
-                .requestMatchers(
+                .requestMatcher
                         "/products/employee/**",
                         "/orders/employee/**"
                 ).hasRole(EMPLOYEE.name())
