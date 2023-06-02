@@ -32,4 +32,12 @@ public class Order {
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Item> products;
+
+    public Order(float totalPrice, LocalDate creationDate, OrderStatus status, OrderType type, List<Item> products) {
+        this.totalPrice = totalPrice;
+        this.creationDate = creationDate;
+        this.status = status;
+        this.type = type;
+        this.products = products;
+    }
 }

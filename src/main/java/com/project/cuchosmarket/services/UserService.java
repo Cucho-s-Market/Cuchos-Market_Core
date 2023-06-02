@@ -5,6 +5,7 @@ import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtUser;
 import com.project.cuchosmarket.enums.Role;
 import com.project.cuchosmarket.exceptions.BranchNotExistException;
+import com.project.cuchosmarket.exceptions.CustomerDisabledException;
 import com.project.cuchosmarket.exceptions.UserExistException;
 import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.models.*;
@@ -37,21 +38,32 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
-    public DtResponse authenticate(DtUser dtUser) throws UserNotExistException {
+    public DtResponse authenticate(DtUser dtUser) throws UserNotExistException, CustomerDisabledException {
+        User user = userRepository.findByEmail(dtUser.getEmail());
+        if (user == null) {
+            throw new UserNotExistException();
+        }
+
+        if (user.getRole().equals(Role.CUSTOMER)) {
+            if (customerRepository.findById(user.getId()).get().isDisabled()) {
+                throw new CustomerDisabledException("Usuario inhabilitado.");
+            }
+            Customer customer = (Customer) user;
+            customer.setOrdersPlaced(null);
+        }
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         dtUser.getEmail(),
                         dtUser.getPassword()
                 )
         );
-        User user = userRepository.findByEmail(dtUser.getEmail());
-        if (user == null) {
-            throw new UserNotExistException();
-        }
 
         var jwtToken = jwtService.createToken(new HashMap<>(), new UserDetailsImpl(user));
+        user.setPassword(null);
 
         return DtResponse.builder()
+                .data(user)
                 .token(jwtToken)
                 .build();
     }
@@ -75,7 +87,7 @@ public class UserService {
         Optional<Branch> marketBranch = marketBranchRepository.findById(branchId);
 
         if (marketBranch.isEmpty()) {
-            throw new BranchNotExistException("La sucursal con la id " + branchId + " no existe");
+            throw new BranchNotExistException(branchId);
         }
 
         validateUser(user);
@@ -88,7 +100,7 @@ public class UserService {
         employeeRepository.save(employee);
     }
 
-    public DtResponse addCustomer( DtCustomer dtCustomer) throws UserExistException {
+    public DtResponse addCustomer(DtCustomer dtCustomer) throws UserExistException {
         validateUser(dtCustomer);
         if(customerRepository.existsByDni(dtCustomer.getDni())) {
             throw new UserExistException("Usuario con CI " + dtCustomer.getDni() + " ya existe en el sistema.");
@@ -148,5 +160,17 @@ public class UserService {
         }
 
         userRepository.delete(user.get());
+    }
+
+    public void disableCustomer(DtCustomer dtCustomer) throws UserNotExistException {
+        User user = userRepository.findByEmail(dtCustomer.getEmail());
+        if (user == null) {
+            throw new UserNotExistException();
+        }
+
+        Customer customer = customerRepository.findById(user.getId()).get();
+        customer.setDisabled(dtCustomer.isDisabled());
+
+        customerRepository.save(customer);
     }
 }

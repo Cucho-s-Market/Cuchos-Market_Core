@@ -21,11 +21,10 @@ public class AddressService {
     private final UserRepository userRepository;
 
 
-    private Address findAddress(DtAddress dtAddress,Long id) throws AddressNotExistExeption{
-        Optional<Address> address = addressRepository.findById(dtAddress.getAddress());
-        if(address.isEmpty()) {
-            throw new AddressNotExistExeption("no se encuentra la direccion");
-        }
+    private Address findAddress(DtAddress dtAddress,Long id) throws AddressNotExistExeption {
+        Optional<Address> address = addressRepository.findById(dtAddress.getId());
+
+        if(address.isEmpty()) throw new AddressNotExistExeption("Direccion no encontrada.");
 
         return address.get();
     }
@@ -39,8 +38,6 @@ public class AddressService {
             throw  new IllegalArgumentException("Datos invalidos");
         }
 
-
-
         Address address = new Address(dtAddress.getAddress(), dtAddress.getDoorNumber(), dtAddress.getLocation(), dtAddress.getState());
 
         customer.get().addAddress(address);
@@ -49,10 +46,27 @@ public class AddressService {
 
 
     }
-    public void deleteAddress(Long  id, DtAddress dtAddress) throws UserNotExistException, AddressNotExistExeption {
-        Optional<Customer> customer = customerRepository.findById(id);
 
-        if(customer.isEmpty()) throw  new UserNotExistException();
+    public void updateAddress(Long  customerId, DtAddress dtAddress) throws UserNotExistException, AddressNotExistExeption {
+        if(dtAddress.getId() == null) throw new AddressNotExistExeption();
+
+        Optional<Customer> customer = customerRepository.findById(customerId);
+
+        if(customer.isEmpty()) throw new UserNotExistException();
+
+        Address address = findAddress(dtAddress, customerId);
+        address.setAddress(dtAddress.getAddress());
+        address.setDoorNumber(dtAddress.getDoorNumber());
+        address.setLocation(dtAddress.getLocation());
+        address.setState(dtAddress.getState());
+
+        addressRepository.save(address);
+    }
+
+    public void deleteAddress(Long  customerId, DtAddress dtAddress) throws UserNotExistException, AddressNotExistExeption {
+        Optional<Customer> customer = customerRepository.findById(customerId);
+
+        if(customer.isEmpty()) throw new UserNotExistException();
 
         if(!customer.get().removeAddress(dtAddress.getId())) throw new AddressNotExistExeption();
 

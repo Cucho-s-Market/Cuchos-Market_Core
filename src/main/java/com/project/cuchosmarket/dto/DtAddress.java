@@ -3,8 +3,6 @@ package com.project.cuchosmarket.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Getter
 @Setter
 public class DtAddress {
@@ -14,4 +12,3 @@ public class DtAddress {
     private String location;
     private String state;
 }
-
