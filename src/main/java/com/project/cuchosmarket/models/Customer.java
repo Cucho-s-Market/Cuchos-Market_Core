@@ -40,7 +40,7 @@ public class Customer extends User {
         this.birthdate = birthdate;
         this.telephone = telephone;
         this.dni = dni;
-        this.disabled = true;
+        this.disabled = false;
         this.addresses = new ArrayList<>();
     }
     public void addAddress(Address address){

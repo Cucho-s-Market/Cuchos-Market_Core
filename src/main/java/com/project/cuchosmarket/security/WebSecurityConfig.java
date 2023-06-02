@@ -40,7 +40,7 @@ public class WebSecurityConfig {
                 .requestMatchers(
                         HttpMethod.POST,
                         "/users/auth/**",
-                        "/users/add-customer"
+                        "/users"
                 ).permitAll()
 
                 .requestMatchers(
@@ -52,10 +52,30 @@ public class WebSecurityConfig {
 
                 //Admin users
                 .requestMatchers(
+                        HttpMethod.POST,
+                        "/products",
+                        "/users/employee/**"
+                ).hasRole(ADMIN.name())
+
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/products"
+                ).hasRole(ADMIN.name())
+
+                .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/products"
+                ).hasRole(ADMIN.name())
+
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/users"
+                ).hasRole(ADMIN.name())
+
+                .requestMatchers(
                         "/branches/admin/**",
                         "/categories/admin/**",
                         "/orders/admin/**",
-                        "/products/admin/**",
                         "/users/admin/**"
                 ).hasRole(ADMIN.name())
 
@@ -68,13 +88,14 @@ public class WebSecurityConfig {
                 //Customers users
                 .requestMatchers(
                         HttpMethod.POST,
+                        "/users/customer/**",
                         "/orders/**"
                 ).hasRole(CUSTOMER.name())
 
                 //Admin & Customers users
                 .requestMatchers(
                         HttpMethod.DELETE,
-                        "/users/delete-user/**"
+                        "/users/**"
                 ).hasAnyRole(ADMIN.name(), CUSTOMER.name())
 
                 .anyRequest()

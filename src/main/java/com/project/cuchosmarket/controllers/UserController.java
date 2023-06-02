@@ -34,7 +34,7 @@ public class UserController {
         DtResponse token;
         try {
             token = userService.authenticate(user);
-        } catch (UserNotExistException e) {
+        } catch (UserNotExistException | CustomerDisabledException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -128,6 +128,23 @@ public class UserController {
         return DtResponse.builder()
                 .error(false)
                 .message("Direccion eliminada con exito.")
+                .build();
+    }
+
+    @PutMapping("/admin/disable-customer")
+    public DtResponse disableCustomer(@RequestBody DtCustomer customer) {
+        try {
+            userService.disableCustomer(customer);
+        } catch (UserNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Usuario " + (customer.isDisabled() ? "bloqueado" : "desbloqueado") + " con éxito")
                 .build();
     }
 }
