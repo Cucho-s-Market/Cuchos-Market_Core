@@ -19,7 +19,21 @@ public class ProductController {
     private final ProductService productService;
     private final JwtService jwtService;
 
-    @PostMapping("/admin/add-product")
+    @GetMapping
+    public DtResponse getProducts(@RequestParam(value = "name", required = false) String name,
+                                  @RequestParam(value = "brand", required = false) String brand,
+                                  @RequestParam(value = "category_id", required = false) Long category_id,
+                                  @RequestParam(value = "orderBy", required = false) String orderBy,
+                                  @RequestParam(value = "orderDirection", required = false) String orderDirection) {
+        List<Product> productsList = productService.getProductsBy(name, brand, category_id, orderBy, orderDirection);
+        return DtResponse.builder()
+                .error(false)
+                .message(String.valueOf(productsList.size()))
+                .data(productsList)
+                .build();
+    }
+
+    @PostMapping
     public DtResponse addProduct(@RequestBody DtProduct newProduct) {
         try {
             productService.addProduct(newProduct);
@@ -37,7 +51,7 @@ public class ProductController {
                 .build();
     }
 
-    @PostMapping("/admin/update-product")
+    @PutMapping
     public DtResponse updateProduct(@RequestBody DtProduct updatedProduct) {
         try {
             productService.updateProduct(updatedProduct);
@@ -55,7 +69,7 @@ public class ProductController {
                 .build();
     }
 
-    @DeleteMapping("/admin/delete-product")
+    @DeleteMapping
     public DtResponse deleteProduct(@RequestBody DtProduct productToDelete) {
         try {
             productService.deleteProduct(productToDelete);
@@ -71,22 +85,8 @@ public class ProductController {
                 .message("El producto " + productToDelete.getName() + " fue eliminado correctamente.")
                 .build();
     }
-  
-    @GetMapping
-    public DtResponse getProducts(@RequestParam(value = "name", required = false) String name,
-                                  @RequestParam(value = "brand", required = false) String brand,
-                                  @RequestParam(value = "category_id", required = false) Long category_id,
-                                  @RequestParam(value = "orderBy", required = false) String orderBy,
-                                  @RequestParam(value = "orderDirection", required = false) String orderDirection) {
-        List<Product> productsList = productService.getProductsBy(name, brand, category_id, orderBy, orderDirection);
-        return DtResponse.builder()
-                .error(false)
-                .message(String.valueOf(productsList.size()))
-                .data(productsList)
-                .build();
-    }
 
-    @PutMapping("/employee/{user_id}/update-stock")
+    @PutMapping("/employee/{user_id}/stock")
     public DtResponse updateStock(@PathVariable("user_id") Long user_id, @RequestBody DtStock stockProduct) {
         try {
             productService.updateStockProduct(user_id, stockProduct);
