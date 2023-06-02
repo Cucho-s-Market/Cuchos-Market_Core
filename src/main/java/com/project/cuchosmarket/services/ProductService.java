@@ -34,7 +34,7 @@ public class ProductService {
 
     private Product findProduct(DtProduct dtProduct) throws ProductNotExistException {
         Optional<Product> product = productRepository.findById(dtProduct.getName());
-        if(product.isEmpty()) throw new ProductNotExistException();
+        if(product.isEmpty()) throw new ProductNotExistException(dtProduct.getName());
 
         return product.get();
     }
