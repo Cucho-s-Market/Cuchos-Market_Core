@@ -15,11 +15,19 @@ public class Item {
     private String id;
 
     private String name;
-    private Float price;
-    private Float finalPrice;
+    private float unitPrice;
+    private float finalPrice;
     private int quantity;
 
     @ManyToOne
     @JoinColumn(name = "product_code")
     private Product product;
+
+    public Item(String name, float unitPrice, float finalPrice, int quantity, Product product) {
+        this.name = name;
+        this.unitPrice = unitPrice;
+        this.finalPrice = finalPrice;
+        this.quantity = quantity;
+        this.product = product;
+    }
 }

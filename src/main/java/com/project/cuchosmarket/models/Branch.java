@@ -20,5 +20,9 @@ public class Branch {
 
     @OneToMany
     @JoinColumn(name = "branch_id")
-    private Map<String, Order> orders;
+    private Map<Long, Order> orders;
+
+    public void addOrder(Order order){
+        this.orders.put(order.getId(), order);
+    }
 }

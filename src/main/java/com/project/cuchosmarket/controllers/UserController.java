@@ -4,7 +4,10 @@ import com.project.cuchosmarket.dto.DtAddress;
 import com.project.cuchosmarket.dto.DtCustomer;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtUser;
-import com.project.cuchosmarket.exceptions.*;
+import com.project.cuchosmarket.exceptions.AddressNotExistExeption;
+import com.project.cuchosmarket.exceptions.BranchNotExistException;
+import com.project.cuchosmarket.exceptions.UserExistException;
+import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.services.AddressService;
 import com.project.cuchosmarket.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +19,22 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final AddressService addressService;
+    
+    @GetMapping
+    public DtResponse getUsers() {
+        return DtResponse.builder()
+                .error(false)
+                .message(String.valueOf(userService.getUsers().size()))
+                .data(userService.getUsers())
+                .build();
+    }
 
     @PostMapping("/auth/login")
     public DtResponse login(@RequestBody DtUser user) {
         DtResponse token;
         try {
             token = userService.authenticate(user);
-        } catch (UserNotExistException e) {
+        } catch (UserNotExistException | CustomerDisabledException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -33,7 +45,7 @@ public class UserController {
         return token;
     }
 
-    @PostMapping("/add-employee/{branch_id}")
+    @PostMapping("/employee/{branch_id}")
     public DtResponse addEmployee(@PathVariable("branch_id") Long branch_id, @RequestBody DtUser employee) {
         try {
             userService.addEmployee(branch_id, employee);
@@ -50,7 +62,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/add-customer")
+    @PostMapping("/customer")
     public DtResponse addCustomer(@RequestBody DtCustomer customer) {
         DtResponse response;
         try {
@@ -68,16 +80,8 @@ public class UserController {
         return response;
     }
 
-    @GetMapping("/get-users")
-    public DtResponse getUsers() {
-        return DtResponse.builder()
-                .error(false)
-                .message(String.valueOf(userService.getUsers().size()))
-                .data(userService.getUsers())
-                .build();
-    }
 
-    @DeleteMapping("/delete-user/{user_id}")
+    @DeleteMapping("/{user_id}")
     public DtResponse deleteUser(@PathVariable("user_id") Long user_id) {
         try {
             userService.deleteUser(user_id);
@@ -93,7 +97,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/add-address/{user_id}")
+    @PostMapping("/customer/{user_id}/address")
     public DtResponse addAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
         try {
             addressService.addAddress(address, id);
@@ -110,7 +114,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/update-address/{user_id}")
+    @PutMapping("/customer/{user_id}/address")
     public DtResponse updateAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
         try {
             addressService.updateAddress(id, address);
@@ -128,7 +132,7 @@ public class UserController {
                 .build();
     }
 
-    @DeleteMapping("/delete-address/{user_id}")
+    @DeleteMapping("/customer/{user_id}/address")
     public DtResponse deleteAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
         try {
             addressService.deleteAddress(id, address);
@@ -142,6 +146,23 @@ public class UserController {
         return DtResponse.builder()
                 .error(false)
                 .message("Direccion eliminada con exito.")
+                .build();
+    }
+
+    @PutMapping("/admin/disable-customer")
+    public DtResponse disableCustomer(@RequestBody DtCustomer customer) {
+        try {
+            userService.disableCustomer(customer);
+        } catch (UserNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Usuario " + (customer.isDisabled() ? "bloqueado" : "desbloqueado") + " con éxito")
                 .build();
     }
 }
