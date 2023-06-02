@@ -87,7 +87,7 @@ public class UserService {
         Optional<Branch> marketBranch = marketBranchRepository.findById(branchId);
 
         if (marketBranch.isEmpty()) {
-            throw new BranchNotExistException("La sucursal con la id " + branchId + " no existe");
+            throw new BranchNotExistException(branchId);
         }
 
         validateUser(user);

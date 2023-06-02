@@ -87,8 +87,10 @@ public class WebSecurityConfig {
 
                 //Customers users
                 .requestMatchers(
-                        "/users/customer/**"
-                ).hasRole(ADMIN.name())
+                        HttpMethod.POST,
+                        "/users/customer/**",
+                        "/orders/**"
+                ).hasRole(CUSTOMER.name())
 
                 //Admin & Customers users
                 .requestMatchers(
