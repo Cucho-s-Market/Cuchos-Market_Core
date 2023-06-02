@@ -105,11 +105,10 @@ public class ProductService {
         return productRepository.findAll(specification);
     }
 
-    public void updateStockProduct(String userEmail, DtStock stockProduct) throws EmployeeNotWorksInException, ProductNotExistException {
+    public void updateStockProduct(Long user_id, DtStock stockProduct) throws EmployeeNotWorksInException, ProductNotExistException, UserNotExistException {
         Product product = findProduct(DtProduct.builder().name(stockProduct.getProduct_id()).build());
 
-        User user = userRepository.findByEmail(userEmail);
-        Branch branchEmployee = employeeRepository.findById(user.getId()).get().getBranch();
+        Branch branchEmployee = employeeRepository.findById(user_id).orElseThrow(UserNotExistException::new).getBranch();
 
         if (!branchEmployee.getId().equals(stockProduct.getBranch_id())) throw new EmployeeNotWorksInException();
 

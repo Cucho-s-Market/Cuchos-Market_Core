@@ -28,10 +28,9 @@ public class OrderService {
     private final StockRepository stockRepository;
 
 
-    public List<Order> getOrdersBy(String username, Long marketBranchId, String orderStatus, LocalDate startDate,
-                                   LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException {
-        User user = userRepository.findByEmail(username);
-        Branch branchEmployee = employeeRepository.findById(user.getId()).get().getBranch();
+    public List<Order> getOrdersBy(Long user_id, Long marketBranchId, String orderStatus, LocalDate startDate,
+                                   LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException, UserNotExistException {
+        Branch branchEmployee = employeeRepository.findById(user_id).orElseThrow(UserNotExistException::new).getBranch();
 
         if (!branchEmployee.getId().equals(marketBranchId)) throw new EmployeeNotWorksInException();
 
