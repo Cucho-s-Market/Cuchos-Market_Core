@@ -29,4 +29,14 @@ public class Category {
 
     @OneToMany(mappedBy = "category")
     private Map<String, Product> products;
+
+    public Category(String name, String description, String image) {
+        this.name = name;
+        this.description = description;
+        this.image = image;
+    }
+
+    public void addSubcategory(Category subCategory) {
+        this.subcategories.add(subCategory);
+    }
 }

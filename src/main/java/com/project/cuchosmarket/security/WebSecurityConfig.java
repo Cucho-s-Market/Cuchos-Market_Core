@@ -36,19 +36,58 @@ public class WebSecurityConfig {
                         "/doc/swagger-ui/**"
                 )
                     .permitAll()
+                //All users
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/users/auth/**",
+                        "/users/add-customer"
+                ).permitAll()
 
-                .requestMatchers(HttpMethod.POST, "/users/auth/**", "users/add-customer")
-                    .permitAll()
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/categories/**",
+                        "/branches/**",
+                        "/products/**"
+                ).permitAll()
 
-                .requestMatchers(HttpMethod.GET, "/users/**", "/category/**", "/marketBranches", "/products")
-                    .permitAll()
+                //Admin users
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/branches/**",
+                        "/categories/**",
+                        "/orders/**",
+                        "/products/**",
+                        "/users/**"
+                ).hasRole(ADMIN.name())
 
-                .requestMatchers(HttpMethod.POST, "/users/employees/**", "/product/**").hasRole(ADMIN.name())
-                .requestMatchers(HttpMethod.GET, "/users/user-list").hasRole(ADMIN.name())
-                .requestMatchers(HttpMethod.DELETE, "/users/employees/**").hasRole(ADMIN.name())
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/branches/**",
+                        "/categories/**",
+                        "/orders/**",
+                        "/products/**",
+                        "/users/**"
+                ).hasRole(ADMIN.name())
 
-                .requestMatchers(HttpMethod.GET, "/orders/market_branches/**").hasRole(EMPLOYEE.name())
-                .requestMatchers(HttpMethod.PUT, "/products/update-stock").hasRole(EMPLOYEE.name())
+                .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/branches/**",
+                        "/categories/**",
+                        "/orders/**",
+                        "/products/**",
+                        "/users/**"
+                ).hasRole(ADMIN.name())
+
+                //Employees users
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/orders/**"
+                ).hasRole(EMPLOYEE.name())
+
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/products/update-stock"
+                ).hasRole(EMPLOYEE.name())
 
                 .anyRequest()
                     .authenticated()
