@@ -16,6 +16,15 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final AddressService addressService;
+    
+    @GetMapping
+    public DtResponse getUsers() {
+        return DtResponse.builder()
+                .error(false)
+                .message(String.valueOf(userService.getUsers().size()))
+                .data(userService.getUsers())
+                .build();
+    }
 
     @PostMapping("/auth/login")
     public DtResponse login(@RequestBody DtUser user) {
@@ -33,7 +42,7 @@ public class UserController {
         return token;
     }
 
-    @PostMapping("/admin/add-employee/{branch_id}")
+    @PostMapping("/employee/{branch_id}")
     public DtResponse addEmployee(@PathVariable("branch_id") Long branch_id, @RequestBody DtUser employee) {
         try {
             userService.addEmployee(branch_id, employee);
@@ -50,7 +59,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/add-customer")
+    @PostMapping("/customer")
     public DtResponse addCustomer(@RequestBody DtCustomer customer) {
         DtResponse response;
         try {
@@ -68,16 +77,8 @@ public class UserController {
         return response;
     }
 
-    @GetMapping("/admin/get-users")
-    public DtResponse getUsers() {
-        return DtResponse.builder()
-                .error(false)
-                .message(String.valueOf(userService.getUsers().size()))
-                .data(userService.getUsers())
-                .build();
-    }
 
-    @DeleteMapping("/delete-user/{user_id}")
+    @DeleteMapping("/{user_id}")
     public DtResponse deleteUser(@PathVariable("user_id") Long user_id) {
         try {
             userService.deleteUser(user_id);
@@ -93,7 +94,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/customer/add-address/{user_id}")
+    @PostMapping("/customer/{user_id}/address")
     public DtResponse addAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
         try {
             addressService.addAddress(address, id);
@@ -110,7 +111,7 @@ public class UserController {
                 .build();
     }
 
-    @DeleteMapping("/customer/delete-address/{user_id}")
+    @DeleteMapping("/customer/{user_id}/address")
     public DtResponse deleteAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
         try {
             addressService.deleteAddress(id, address);

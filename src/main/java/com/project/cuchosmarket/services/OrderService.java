@@ -2,6 +2,7 @@ package com.project.cuchosmarket.services;
 
 import com.project.cuchosmarket.enums.OrderStatus;
 import com.project.cuchosmarket.exceptions.EmployeeNotWorksInException;
+import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.models.Branch;
 import com.project.cuchosmarket.models.Order;
 import com.project.cuchosmarket.models.User;
@@ -24,10 +25,9 @@ public class OrderService {
     private final EmployeeRepository employeeRepository;
 
 
-    public List<Order> getOrdersBy(String username, Long marketBranchId, String orderStatus, LocalDate startDate,
-                                   LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException {
-        User user = userRepository.findByEmail(username);
-        Branch branchEmployee = employeeRepository.findById(user.getId()).get().getBranch();
+    public List<Order> getOrdersBy(Long user_id, Long marketBranchId, String orderStatus, LocalDate startDate,
+                                   LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException, UserNotExistException {
+        Branch branchEmployee = employeeRepository.findById(user_id).orElseThrow(UserNotExistException::new).getBranch();
 
         if (!branchEmployee.getId().equals(marketBranchId)) throw new EmployeeNotWorksInException();
 
