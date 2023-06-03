@@ -28,9 +28,10 @@ public class OrderService {
     private final StockRepository stockRepository;
 
 
-    public List<Order> getOrdersBy(Long user_id, Long marketBranchId, String orderStatus, LocalDate startDate,
+    public List<Order> getOrdersBy(String userEmail, Long marketBranchId, String orderStatus, LocalDate startDate,
                                    LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException, UserNotExistException {
-        Branch branchEmployee = employeeRepository.findById(user_id).orElseThrow(UserNotExistException::new).getBranch();
+        User user = userRepository.findByEmail(userEmail);
+        Branch branchEmployee = employeeRepository.findById(user.getId()).orElseThrow(UserNotExistException::new).getBranch();
 
         if (!branchEmployee.getId().equals(marketBranchId)) throw new EmployeeNotWorksInException();
 
@@ -48,8 +49,9 @@ public class OrderService {
     }
 
     @Transactional
-    public void buyProducts(Long userId, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException {
-        Customer customer = customerRepository.findById(userId).orElseThrow(UserNotExistException::new);
+    public void buyProducts(String userEmail, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException {
+        User user = userRepository.findByEmail(userEmail);
+        Customer customer = customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
         Branch marketBranch = marketBranchRepository.findById(dtOrder.getBranchId())
                 .orElseThrow(() -> new BranchNotExistException(dtOrder.getBranchId()));
 

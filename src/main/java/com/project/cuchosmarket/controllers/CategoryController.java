@@ -1,7 +1,5 @@
 package com.project.cuchosmarket.controllers;
 
-
-
 import com.project.cuchosmarket.dto.DtCategory;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.exceptions.InvalidCategoryException;
@@ -18,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @PostMapping("/add-category")
+    @PostMapping
     public DtResponse addCategory(@RequestBody DtCategory newCategory) {
         try {
             categoryService.addCategory(newCategory);

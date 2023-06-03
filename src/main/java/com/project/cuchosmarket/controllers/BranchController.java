@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BranchController {
     private final BranchService branchService;
 
-    @GetMapping("/get-branches")
+    @GetMapping
     public DtResponse listMarketBranches() {
         return DtResponse.builder()
                 .error(false)

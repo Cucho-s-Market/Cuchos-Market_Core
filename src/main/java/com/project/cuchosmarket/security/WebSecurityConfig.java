@@ -35,11 +35,12 @@ public class WebSecurityConfig {
                         "/doc/swagger-ui/**"
                 )
                     .permitAll()
+
                 //All users
                 .requestMatchers(
                         HttpMethod.POST,
                         "/users/auth/**",
-                        "/users/add-customer"
+                        "/users/customer"
                 ).permitAll()
 
                 //All users
@@ -52,7 +53,7 @@ public class WebSecurityConfig {
                 .requestMatchers(
                         HttpMethod.GET,
                         "/categories/get-categories",
-                        "/branches/get-branches",
+                        "/branches",
                         "/products"
                 ).permitAll()
 
@@ -60,7 +61,8 @@ public class WebSecurityConfig {
                 .requestMatchers(
                         HttpMethod.POST,
                         "/products",
-                        "/users/employee/**"
+                        "/categories",
+                        "/users/{branch_id}/employee"
                 ).hasRole(ADMIN.name())
 
                 .requestMatchers(
@@ -79,16 +81,16 @@ public class WebSecurityConfig {
                 ).hasRole(ADMIN.name())
 
                 .requestMatchers(
+                        "/users/admin/**",
                         "/branches/admin/**",
                         "/categories/admin/**",
-                        "/orders/admin/**",
-                        "/users/admin/**"
+                        "/orders/admin/**"
                 ).hasRole(ADMIN.name())
 
                 //Employees users
-                .requestMatcher
-                        "/products/employee/**",
-                        "/orders/employee/**"
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/orders/**"
                 ).hasRole(EMPLOYEE.name())
 
                 //Customers users
@@ -96,6 +98,16 @@ public class WebSecurityConfig {
                         HttpMethod.POST,
                         "/users/customer/**",
                         "/orders/**"
+                ).hasRole(CUSTOMER.name())
+
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/users/customer/**"
+                ).hasRole(CUSTOMER.name())
+
+                .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/users/customer/**"
                 ).hasRole(CUSTOMER.name())
 
                 //Admin & Customers users

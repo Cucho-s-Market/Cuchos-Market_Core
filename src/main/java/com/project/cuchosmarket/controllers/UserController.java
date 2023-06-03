@@ -4,13 +4,11 @@ import com.project.cuchosmarket.dto.DtAddress;
 import com.project.cuchosmarket.dto.DtCustomer;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtUser;
-import com.project.cuchosmarket.exceptions.AddressNotExistExeption;
-import com.project.cuchosmarket.exceptions.BranchNotExistException;
-import com.project.cuchosmarket.exceptions.UserExistException;
-import com.project.cuchosmarket.exceptions.UserNotExistException;
+import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.services.AddressService;
 import com.project.cuchosmarket.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -45,7 +43,7 @@ public class UserController {
         return token;
     }
 
-    @PostMapping("/employee/{branch_id}")
+    @PostMapping("/{branch_id}/employee")
     public DtResponse addEmployee(@PathVariable("branch_id") Long branch_id, @RequestBody DtUser employee) {
         try {
             userService.addEmployee(branch_id, employee);
@@ -97,10 +95,11 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/customer/{user_id}/address")
-    public DtResponse addAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
+    @PostMapping("/customer/address")
+    public DtResponse addAddress(@RequestBody DtAddress address) {
         try {
-            addressService.addAddress(address, id);
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            addressService.addAddress(address, userEmail);
         }  catch (UserNotExistException | IllegalArgumentException | AddressNotExistExeption e) {
             return DtResponse.builder()
                     .error(true)
@@ -114,10 +113,11 @@ public class UserController {
                 .build();
     }
 
-    @PutMapping("/customer/{user_id}/address")
-    public DtResponse updateAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
+    @PutMapping("/customer/address")
+    public DtResponse updateAddress(@RequestBody DtAddress address) {
         try {
-            addressService.updateAddress(id, address);
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            addressService.updateAddress(userEmail, address);
         }
         catch (UserNotExistException | AddressNotExistExeption e) {
             return DtResponse.builder()
@@ -132,10 +132,11 @@ public class UserController {
                 .build();
     }
 
-    @DeleteMapping("/customer/{user_id}/address")
-    public DtResponse deleteAddress(@PathVariable("user_id") Long id, @RequestBody DtAddress address) {
+    @DeleteMapping("/customer/address")
+    public DtResponse deleteAddress(@RequestBody DtAddress address) {
         try {
-            addressService.deleteAddress(id, address);
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            addressService.deleteAddress(userEmail, address);
         } catch (UserNotExistException | AddressNotExistExeption e) {
             return DtResponse.builder()
                     .error(true)

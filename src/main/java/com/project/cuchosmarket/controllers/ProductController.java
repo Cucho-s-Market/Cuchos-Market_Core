@@ -8,6 +8,7 @@ import com.project.cuchosmarket.models.Product;
 import com.project.cuchosmarket.security.JwtService;
 import com.project.cuchosmarket.services.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -86,10 +87,11 @@ public class ProductController {
                 .build();
     }
 
-    @PutMapping("/employee/{user_id}/stock")
-    public DtResponse updateStock(@PathVariable("user_id") Long user_id, @RequestBody DtStock stockProduct) {
+    @PutMapping("/employee/stock")
+    public DtResponse updateStock(@RequestBody DtStock stockProduct) {
         try {
-            productService.updateStockProduct(user_id, stockProduct);
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            productService.updateStockProduct(userEmail, stockProduct);
         } catch (EmployeeNotWorksInException | ProductNotExistException | UserNotExistException e) {
             return DtResponse.builder()
                     .error(true)

@@ -5,6 +5,7 @@ import com.project.cuchosmarket.exceptions.AddressNotExistExeption;
 import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.models.Address;
 import com.project.cuchosmarket.models.Customer;
+import com.project.cuchosmarket.models.User;
 import com.project.cuchosmarket.repositories.AddressRepository;
 import com.project.cuchosmarket.repositories.CustomerRepository;
 import com.project.cuchosmarket.repositories.UserRepository;
@@ -20,7 +21,6 @@ public class AddressService {
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
 
-
     private Address findAddress(DtAddress dtAddress,Long id) throws AddressNotExistExeption {
         Optional<Address> address = addressRepository.findById(dtAddress.getId());
 
@@ -29,32 +29,30 @@ public class AddressService {
         return address.get();
     }
 
-    public void  addAddress(DtAddress dtAddress,Long  id) throws UserNotExistException, AddressNotExistExeption {
-        Optional<Customer> customer = customerRepository.findById(id);
-        if(customer.isEmpty()){
-           throw  new UserNotExistException();
-        }
+    private Customer validateCustomer(String userEmail) throws UserNotExistException {
+        User user = userRepository.findByEmail(userEmail);
+        if (user == null) throw new UserNotExistException();
+        return customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
+    }
+
+    public void addAddress(DtAddress dtAddress,String userEmail) throws UserNotExistException, AddressNotExistExeption {
+        Customer customer = validateCustomer(userEmail);
         if(dtAddress.getAddress().length() > 50 || dtAddress.getLocation() == null || dtAddress.getState() == null){
             throw  new IllegalArgumentException("Datos invalidos");
         }
 
         Address address = new Address(dtAddress.getAddress(), dtAddress.getDoorNumber(), dtAddress.getLocation(), dtAddress.getState());
+        customer.addAddress(address);
 
-        customer.get().addAddress(address);
-
-        customerRepository.save(customer.get());
+        customerRepository.save(customer);
 
 
     }
 
-    public void updateAddress(Long  customerId, DtAddress dtAddress) throws UserNotExistException, AddressNotExistExeption {
-        if(dtAddress.getId() == null) throw new AddressNotExistExeption();
+    public void updateAddress(String userEmail, DtAddress dtAddress) throws UserNotExistException, AddressNotExistExeption {
+        Customer customer = validateCustomer(userEmail);
 
-        Optional<Customer> customer = customerRepository.findById(customerId);
-
-        if(customer.isEmpty()) throw new UserNotExistException();
-
-        Address address = findAddress(dtAddress, customerId);
+        Address address = findAddress(dtAddress, customer.getId());
         address.setAddress(dtAddress.getAddress());
         address.setDoorNumber(dtAddress.getDoorNumber());
         address.setLocation(dtAddress.getLocation());
@@ -63,14 +61,12 @@ public class AddressService {
         addressRepository.save(address);
     }
 
-    public void deleteAddress(Long  customerId, DtAddress dtAddress) throws UserNotExistException, AddressNotExistExeption {
-        Optional<Customer> customer = customerRepository.findById(customerId);
+    public void deleteAddress(String userEmail, DtAddress dtAddress) throws UserNotExistException, AddressNotExistExeption {
+        Customer customer = validateCustomer(userEmail);
 
-        if(customer.isEmpty()) throw new UserNotExistException();
+        if(!customer.removeAddress(dtAddress.getId())) throw new AddressNotExistExeption();
 
-        if(!customer.get().removeAddress(dtAddress.getId())) throw new AddressNotExistExeption();
-
-        userRepository.save(customer.get());
+        userRepository.save(customer);
     }
 
   }
