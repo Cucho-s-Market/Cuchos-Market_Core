@@ -5,6 +5,7 @@ import com.project.cuchosmarket.exceptions.AddressNotExistException;
 import com.project.cuchosmarket.exceptions.InvalidAddressException;
 import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.models.Address;
+import com.project.cuchosmarket.dto.DtAddress;
 import com.project.cuchosmarket.models.Customer;
 import com.project.cuchosmarket.models.User;
 import com.project.cuchosmarket.repositories.AddressRepository;
@@ -13,6 +14,8 @@ import com.project.cuchosmarket.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -34,6 +37,19 @@ public class AddressService {
         User user = userRepository.findByEmail(userEmail);
         if (user == null) throw new UserNotExistException();
         return customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
+    }
+
+    public List<DtAddress> getAddress(String userEmail) throws UserNotExistException {
+        // Validating user
+        Customer customer = validateCustomer(userEmail);
+        if(customer == null) throw new UserNotExistException();
+
+        List<DtAddress> dtAddresses = new ArrayList<>();
+        List<Address> addresses = customer.getAddresses();
+
+        addresses.forEach(address -> dtAddresses.add(new DtAddress(address.getId(), address.getAddress(), address.getDoorNumber(), address.getLocation(), address.getState())));
+
+        return dtAddresses;
     }
 
     public void addAddress(DtAddress dtAddress,String userEmail) throws UserNotExistException, InvalidAddressException {

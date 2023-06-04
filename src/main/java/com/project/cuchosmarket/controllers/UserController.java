@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final AddressService addressService;
-    
+
     @GetMapping
     public DtResponse getUsers() {
         return DtResponse.builder()
@@ -65,7 +65,7 @@ public class UserController {
         DtResponse response;
         try {
             response = userService.addCustomer(customer);
-        }  catch ( UserExistException | IllegalArgumentException  e) {
+        } catch (UserExistException | IllegalArgumentException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -77,7 +77,6 @@ public class UserController {
         response.setMessage("Cliente añadido con exito.");
         return response;
     }
-
 
     @DeleteMapping("/{user_id}")
     public DtResponse deleteUser(@PathVariable("user_id") Long user_id) {
@@ -95,13 +94,33 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/customer/address")
+    public DtResponse getAddress() {
+
+        try {
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+            return DtResponse.builder()
+                    .error(false)
+                    .message(String.valueOf(addressService.getAddress(userEmail).size()))
+                    .data(addressService.getAddress(userEmail))
+                    .build();
+
+        } catch (UserNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+    }
+
     @PostMapping("/customer/address")
     public DtResponse addAddress(@RequestBody DtAddress address) {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             addressService.addAddress(address, userEmail);
-        }
-        catch (UserNotExistException | InvalidAddressException e) {
+        } catch (UserNotExistException | InvalidAddressException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -119,8 +138,7 @@ public class UserController {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             addressService.updateAddress(userEmail, address);
-        }
-        catch (UserNotExistException | AddressNotExistException e) {
+        } catch (UserNotExistException | AddressNotExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
