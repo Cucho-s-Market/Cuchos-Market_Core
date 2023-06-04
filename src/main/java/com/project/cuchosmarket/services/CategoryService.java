@@ -7,6 +7,8 @@ import com.project.cuchosmarket.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,13 +38,26 @@ public class CategoryService {
             categoryParent = categoryRepository.findById(dtCategory.getCategoryParent());
 
             if(categoryParent.isPresent()) {
-                categoryParent.get().addSubcategory(newCategory);
-                newCategory.setCategoryParent(categoryParent.get());
+                newCategory.setCategoryParent(categoryParent.get().getId());
 
                 categoryRepository.save(categoryParent.get());
             }
             else throw new InvalidCategoryException("La categoria padre no existe.");
         }
+        else {
+            newCategory.setCategoryParent(0L);
+        }
         categoryRepository.save(newCategory);
+    }
+
+    public List<DtCategory> getCategories() {
+        List<DtCategory> dtCategories = new ArrayList<>();
+        List<Category> categories = categoryRepository.findAll();
+
+        categories.forEach(
+                category -> dtCategories.add(new DtCategory(category.getId(), category.getName(), category.getDescription(), category.getImage(), category.getCategoryParent()))
+        );
+
+        return  dtCategories;
     }
 }
