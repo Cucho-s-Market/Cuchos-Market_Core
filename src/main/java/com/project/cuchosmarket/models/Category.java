@@ -19,13 +19,7 @@ public class Category {
     private String name;
     private String description;
     private String image;
-
-    @ManyToOne
-    @JoinColumn(name = "category_parent_id")
-    private Category categoryParent;
-
-    @OneToMany(mappedBy = "categoryParent", cascade = CascadeType.ALL)
-    private List<Category> subcategories;
+    private Long categoryParent;
 
     @OneToMany(mappedBy = "category")
     private Map<String, Product> products;
@@ -34,9 +28,5 @@ public class Category {
         this.name = name;
         this.description = description;
         this.image = image;
-    }
-
-    public void addSubcategory(Category subCategory) {
-        this.subcategories.add(subCategory);
     }
 }
