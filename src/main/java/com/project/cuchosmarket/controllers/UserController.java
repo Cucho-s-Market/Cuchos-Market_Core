@@ -100,7 +100,8 @@ public class UserController {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             addressService.addAddress(address, userEmail);
-        }  catch (UserNotExistException | IllegalArgumentException | AddressNotExistExeption e) {
+        }
+        catch (UserNotExistException | InvalidAddressException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -119,7 +120,7 @@ public class UserController {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             addressService.updateAddress(userEmail, address);
         }
-        catch (UserNotExistException | AddressNotExistExeption e) {
+        catch (UserNotExistException | AddressNotExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -137,7 +138,7 @@ public class UserController {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             addressService.deleteAddress(userEmail, address);
-        } catch (UserNotExistException | AddressNotExistExeption e) {
+        } catch (UserNotExistException | AddressNotExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
