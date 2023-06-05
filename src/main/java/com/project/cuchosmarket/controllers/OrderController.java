@@ -47,7 +47,8 @@ public class OrderController {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             orderService.buyProducts(userEmail, order);
-        } catch (BranchNotExistException | ProductNotExistException | UserNotExistException | NoStockException e) {
+        } catch (BranchNotExistException | ProductNotExistException | UserNotExistException | NoStockException |
+                 IllegalArgumentException | AddressNotExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
