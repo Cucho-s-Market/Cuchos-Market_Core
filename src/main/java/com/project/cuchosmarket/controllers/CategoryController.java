@@ -5,10 +5,9 @@ import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.exceptions.InvalidCategoryException;
 import com.project.cuchosmarket.services.CategoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -31,6 +30,17 @@ public class CategoryController {
         return  DtResponse.builder()
                 .error(false)
                 .message("Categoria agregada correctamente.")
+                .build();
+    }
+
+    @GetMapping
+    public DtResponse getCategories() {
+        List<DtCategory> categories = categoryService.getCategories();
+
+        return DtResponse.builder()
+                .error(false)
+                .message(String.valueOf(categories.size()))
+                .data(categories)
                 .build();
     }
 }

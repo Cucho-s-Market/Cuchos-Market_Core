@@ -15,5 +15,4 @@ public class DtCategory {
     private String description;
     private String image;
     private Long categoryParent;
-    private List<DtCategory> subcategories;
 }
