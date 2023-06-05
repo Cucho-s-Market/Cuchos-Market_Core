@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class OrderService {
     }
 
     public List<Order> getOrdersBy(String userEmail, Long marketBranchId, String orderStatus, LocalDate startDate,
-                                   LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException, UserNotExistException {
+                                   LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException, UserNotExistException, InvalidOrderException {
         employeeWorksInBranch(userEmail, marketBranchId);
 
         OrderStatus status = null;
@@ -43,7 +45,7 @@ public class OrderService {
             try {
                 status = OrderStatus.valueOf(orderStatus.toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Estado de la compra invalido.");
+                throw new InvalidOrderException("Estado de la compra invalido.");
             }
         }
 
@@ -52,14 +54,14 @@ public class OrderService {
     }
 
     @Transactional
-    public void buyProducts(String userEmail, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException {
+    public void buyProducts(String userEmail, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException, InvalidOrderException {
         User user = userRepository.findByEmail(userEmail);
         Customer customer = customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
         Branch marketBranch = branchRepository.findById(dtOrder.getBranchId())
                 .orElseThrow(() -> new BranchNotExistException(dtOrder.getBranchId()));
 
-        if (dtOrder.getStatus() == null || dtOrder.getType() == null) throw new IllegalArgumentException("Informacion de orden invalida.");
-        if (dtOrder.getProducts().isEmpty()) throw new IllegalArgumentException("No se selecciono ningun producto para comprar.");
+        if (dtOrder.getStatus() == null || dtOrder.getType() == null) throw new InvalidOrderException("Informacion de orden invalida.");
+        if (dtOrder.getProducts().isEmpty()) throw new InvalidOrderException("No se selecciono ningun producto para comprar.");
 
 
         List<Item> items = new ArrayList<>();
@@ -67,7 +69,7 @@ public class OrderService {
         float totalPrice = 0;
 
         for (DtItem dtItem : dtOrder.getProducts()) {
-            if (dtItem.getQuantity() < 1) throw new IllegalArgumentException("La cantidad del producto que se encarga ha de ser mayor a 0.");
+            if (dtItem.getQuantity() < 1) throw new InvalidOrderException("La cantidad del producto que se encarga ha de ser mayor a 0.");
 
             Product product = productRepository.findById(dtItem.getName()).orElseThrow(() -> new ProductNotExistException(dtItem.getName()));
             Stock productStock = stockRepository.findById(new StockId(product, marketBranch)).get();
@@ -94,17 +96,33 @@ public class OrderService {
         branchRepository.save(marketBranch);
     }
 
-    public void updateStatus(String userEmail, DtOrder dtOrder) throws EmployeeNotWorksInException, OrderNotExistException {
+    private Order validateOrder(Long orderId) throws OrderNotExistException, InvalidOrderException {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotExistException(orderId));
+
+        if (order.getStatus().equals(OrderStatus.CANCELLED)) throw new InvalidOrderException("Orden ya cancelada.");
+        if (order.getStatus().equals(OrderStatus.DELIVERED)) throw new InvalidOrderException("Orden ya entregada.");
+
+        return order;
+    }
+
+    public void updateStatus(String userEmail, DtOrder dtOrder) throws EmployeeNotWorksInException, OrderNotExistException, InvalidOrderException {
         employeeWorksInBranch(userEmail, dtOrder.getBranchId());
 
-        Order order = orderRepository.findById(dtOrder.getId()).orElseThrow(() -> new OrderNotExistException(dtOrder.getId()));
-
-        if (order.getStatus().equals(OrderStatus.CANCELLED)) throw new IllegalArgumentException("Orden ya cancelada.");
-        if (order.getStatus().equals(OrderStatus.DELIVERED)) throw new IllegalArgumentException("Orden ya entregada.");
-
+        Order order = validateOrder(dtOrder.getId());
         if (dtOrder.getStatus().equals(OrderStatus.CANCELLED) || dtOrder.getStatus().equals(OrderStatus.DELIVERED)) order.setEndDate(LocalDate.now());
 
         order.setStatus(dtOrder.getStatus());
+        orderRepository.save(order);
+    }
+
+    public void cancelOrder(String userEmail, Long order_id) throws OrderNotExistException, InvalidOrderException {
+        Customer customer = (Customer) userRepository.findByEmail(userEmail);
+        if (customer.getOrdersPlaced().get(order_id) == null) throw new InvalidOrderException("Este pedido no pertence al cliente.");
+
+        Order order = validateOrder(order_id);
+        if (order.getStatus().equals(OrderStatus.PENDING)) order.setStatus(OrderStatus.CANCELLED);
+        else throw new InvalidOrderException("La orden " + order_id + " no se puede cancelar. Verifique estado de compra.");
+
         orderRepository.save(order);
     }
 }
