@@ -101,8 +101,8 @@ public class ProductService {
         productRepository.delete(product);
     }
   
-    public List<Product> getProductsBy(String name, String brand, Long category_id, String orderBy, String orderDirection) {
-        Specification<Product> specification = ProductSpecifications.filterByAttributes(name, brand, orderBy, orderDirection, category_id);
+    public List<Product> getProductsBy(Long branchId, String name, String brand, Long category_id, String orderBy, String orderDirection) {
+        Specification<Product> specification = ProductSpecifications.filterByAttributes(branchId, name, brand, orderBy, orderDirection, category_id);
         return productRepository.findAll(specification);
     }
 

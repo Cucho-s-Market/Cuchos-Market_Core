@@ -19,12 +19,13 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public DtResponse getProducts(@RequestParam(value = "name", required = false) String name,
+    public DtResponse getProducts(@RequestParam(value = "branchId", required = false) Long branchId,
+                                  @RequestParam(value = "name", required = false) String name,
                                   @RequestParam(value = "brand", required = false) String brand,
                                   @RequestParam(value = "category_id", required = false) Long category_id,
                                   @RequestParam(value = "orderBy", required = false) String orderBy,
                                   @RequestParam(value = "orderDirection", required = false) String orderDirection) {
-        List<Product> productsList = productService.getProductsBy(name, brand, category_id, orderBy, orderDirection);
+        List<Product> productsList = productService.getProductsBy(branchId, name, brand, category_id, orderBy, orderDirection);
         return DtResponse.builder()
                 .error(false)
                 .message(String.valueOf(productsList.size()))

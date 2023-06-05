@@ -1,8 +1,9 @@
 package com.project.cuchosmarket.repositories.specifications;
 
 import com.project.cuchosmarket.enums.OrderStatus;
+import com.project.cuchosmarket.models.Branch;
 import com.project.cuchosmarket.models.Order;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
@@ -10,10 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderSpecifications {
-    public static Specification<Order> filterByAttributes(OrderStatus orderStatus, LocalDate startDate, LocalDate endDate,
-                                                          String orderDirection) {
+    public static Specification<Order> filterByAttributes(List<Long> orderIdsFromBranch, OrderStatus orderStatus, LocalDate startDate,
+                                                          LocalDate endDate, String orderDirection) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            if (!orderIdsFromBranch.isEmpty()) {
+                predicates.add(root.get("id").in(orderIdsFromBranch));
+            }
 
             if (orderStatus != null) {
                 predicates.add(criteriaBuilder.equal(root.get("orderStatus"), orderStatus));

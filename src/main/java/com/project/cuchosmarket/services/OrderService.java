@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -49,8 +50,15 @@ public class OrderService {
                 throw new InvalidOrderException("Estado de la compra invalido.");
             }
         }
+        List<Order> ordersFromBranch = marketBranchRepository.findById(marketBranchId).get().getOrders();
 
-        Specification<Order> specification = OrderSpecifications.filterByAttributes(status, startDate, endDate, orderDirection);
+        if (ordersFromBranch.isEmpty()) return ordersFromBranch;
+
+        List<Long> orderIdsFromBranch = ordersFromBranch.stream()
+                .map(Order::getId)
+                .collect(Collectors.toList());
+
+        Specification<Order> specification = OrderSpecifications.filterByAttributes(orderIdsFromBranch, status, startDate, endDate, orderDirection);
         return orderRepository.findAll(specification);
     }
 
