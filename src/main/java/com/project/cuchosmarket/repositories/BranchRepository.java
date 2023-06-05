@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface MarketBranchRepository extends JpaRepository<Branch, Long> {
+public interface BranchRepository extends JpaRepository<Branch, Long> {
     @Query("""
     SELECT new com.project.cuchosmarket.dto.DtMarketBranch(
         mb.id,

@@ -23,7 +23,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
     private final CustomerRepository customerRepository;
-    private final MarketBranchRepository marketBranchRepository;
+    private final BranchRepository branchRepository;
     private final ProductRepository productRepository;
     private final StockRepository stockRepository;
 
@@ -52,7 +52,7 @@ public class OrderService {
     public void buyProducts(String userEmail, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException {
         User user = userRepository.findByEmail(userEmail);
         Customer customer = customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
-        Branch marketBranch = marketBranchRepository.findById(dtOrder.getBranchId())
+        Branch marketBranch = branchRepository.findById(dtOrder.getBranchId())
                 .orElseThrow(() -> new BranchNotExistException(dtOrder.getBranchId()));
 
         if (dtOrder.getProducts().isEmpty()) {
@@ -88,6 +88,6 @@ public class OrderService {
         customerRepository.save(customer);
 
         marketBranch.addOrder(order);
-        marketBranchRepository.save(marketBranch);
+        branchRepository.save(marketBranch);
     }
 }

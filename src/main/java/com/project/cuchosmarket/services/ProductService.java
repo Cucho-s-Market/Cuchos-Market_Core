@@ -19,7 +19,7 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final MarketBranchRepository marketBranchRepository;
+    private final BranchRepository branchRepository;
     private final StockRepository stockRepository;
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
@@ -69,7 +69,7 @@ public class ProductService {
     }
 
     private void createStock(Product product) {
-        List<Branch> branches = marketBranchRepository.findAll();
+        List<Branch> branches = branchRepository.findAll();
         for (Branch branch : branches) {
             Stock stock = new Stock(new StockId(product, branch), 0);
             stockRepository.save(stock);
@@ -94,9 +94,9 @@ public class ProductService {
     }
 
     public void deleteProduct(DtProduct dtProduct) throws ProductNotExistException {
-        Product product;
-        product = findProduct(dtProduct);
+        Product product = findProduct(dtProduct);
 
+        branchRepository.findAll().forEach(branch -> stockRepository.findById(new StockId(product, branch)).ifPresent(stockRepository::delete));
         productRepository.delete(product);
     }
   
@@ -105,7 +105,7 @@ public class ProductService {
         return productRepository.findAll(specification);
     }
 
-    public void updateStockProduct(String userEmail, DtStock stockProduct) throws EmployeeNotWorksInException, ProductNotExistException, UserNotExistException {
+    public void updateStockProduct(String userEmail, DtStock stockProduct) throws EmployeeNotWorksInException, ProductNotExistException, UserNotExistException, NoStockException {
         Product product = findProduct(DtProduct.builder().name(stockProduct.getProduct_id()).build());
 
         User employee = userRepository.findByEmail(userEmail);
@@ -115,8 +115,12 @@ public class ProductService {
 
         if (stockProduct.getQuantity() < 0) throw new IllegalArgumentException("Cantidad de producto invalida.");
 
-        Stock stock = stockRepository.findById(new StockId(product, branchEmployee)).get();
-        stock.setQuantity(stockProduct.getQuantity());
-        stockRepository.save(stock);
+        Optional<Stock> stock = stockRepository.findById(new StockId(product, branchEmployee));
+
+        if(stock.isPresent()) {
+            stock.get().setQuantity(stockProduct.getQuantity());
+            stockRepository.save(stock.get());
+        }
+        else throw new NoStockException("No se encontró el stock del producto.");
     }
 }

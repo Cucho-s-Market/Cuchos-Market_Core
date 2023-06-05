@@ -32,7 +32,7 @@ public class UserService {
     private final EmployeeRepository employeeRepository;
     private final AdminRepository adminRepository;
     private final CustomerRepository customerRepository;
-    private final MarketBranchRepository marketBranchRepository;
+    private final BranchRepository branchRepository;
 
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -84,7 +84,7 @@ public class UserService {
     }
 
     public void addEmployee(Long branchId, DtUser user) throws BranchNotExistException, UserExistException {
-        Optional<Branch> marketBranch = marketBranchRepository.findById(branchId);
+        Optional<Branch> marketBranch = branchRepository.findById(branchId);
 
         if (marketBranch.isEmpty()) {
             throw new BranchNotExistException(branchId);

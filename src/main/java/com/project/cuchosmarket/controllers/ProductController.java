@@ -18,7 +18,6 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
-    private final JwtService jwtService;
 
     @GetMapping
     public DtResponse getProducts(@RequestParam(value = "name", required = false) String name,
@@ -92,7 +91,7 @@ public class ProductController {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             productService.updateStockProduct(userEmail, stockProduct);
-        } catch (EmployeeNotWorksInException | ProductNotExistException | UserNotExistException e) {
+        } catch (EmployeeNotWorksInException | ProductNotExistException | UserNotExistException | NoStockException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
