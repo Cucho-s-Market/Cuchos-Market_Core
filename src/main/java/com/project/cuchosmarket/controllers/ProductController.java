@@ -5,7 +5,6 @@ import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtStock;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.Product;
-import com.project.cuchosmarket.security.JwtService;
 import com.project.cuchosmarket.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +17,6 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
-    private final JwtService jwtService;
 
     @GetMapping
     public DtResponse getProducts(@RequestParam(value = "name", required = false) String name,

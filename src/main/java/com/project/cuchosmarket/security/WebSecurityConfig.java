@@ -95,6 +95,11 @@ public class WebSecurityConfig {
                         "/orders/**"
                 ).hasRole(EMPLOYEE.name())
 
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/orders/employee"
+                ).hasRole(EMPLOYEE.name())
+
                 //Customers users
                 .requestMatchers(
                         HttpMethod.POST,

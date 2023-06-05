@@ -5,7 +5,6 @@ import com.project.cuchosmarket.exceptions.AddressNotExistException;
 import com.project.cuchosmarket.exceptions.InvalidAddressException;
 import com.project.cuchosmarket.exceptions.UserNotExistException;
 import com.project.cuchosmarket.models.Address;
-import com.project.cuchosmarket.dto.DtAddress;
 import com.project.cuchosmarket.models.Customer;
 import com.project.cuchosmarket.models.User;
 import com.project.cuchosmarket.repositories.AddressRepository;
