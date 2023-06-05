@@ -50,7 +50,7 @@ public class OrderService {
                 throw new InvalidOrderException("Estado de la compra invalido.");
             }
         }
-        List<Order> ordersFromBranch = marketBranchRepository.findById(marketBranchId).get().getOrders();
+        List<Order> ordersFromBranch = branchRepository.findById(marketBranchId).get().getOrders();
 
         if (ordersFromBranch.isEmpty()) return ordersFromBranch;
 

@@ -1,9 +1,6 @@
 package com.project.cuchosmarket.repositories.specifications;
 
-import com.project.cuchosmarket.models.Category;
-import com.project.cuchosmarket.models.Product;
-import com.project.cuchosmarket.models.Stock;
-import com.project.cuchosmarket.models.StockId;
+import com.project.cuchosmarket.models.*;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -28,10 +25,15 @@ public class ProductSpecifications {
                 Join<Product, Category> categoryJoin = root.join("category");
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(categoryJoin.get("id"), categoryId));
             }
-//            if (branchId != null) {
-//                Join<Product, StockId> productStockIdJoin =
-//                Join<Stock, StockId>
-//            }
+            if (branchId != null) {
+                Subquery<Long> subquery = query.subquery(Long.class);
+                Root<Stock> stockRoot = subquery.from(Stock.class);
+                Join<Stock, StockId> stockIdJoin = stockRoot.join("id");
+                Join<StockId, Branch> branchJoin = stockIdJoin.join("branch");
+                subquery.select(stockIdJoin.get("product").get("name"))
+                        .where(criteriaBuilder.equal(branchJoin.get("id"), branchId));
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.in(root.get("name")).value(subquery));
+            }
             if (orderBy != null) {
                 query.orderBy(criteriaBuilder.asc(root.get(orderBy)));
                 if (orderDirection == null || orderDirection.equalsIgnoreCase("desc")) {

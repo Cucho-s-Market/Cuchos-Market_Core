@@ -1,6 +1,7 @@
 package com.project.cuchosmarket.services;
 
 import com.project.cuchosmarket.dto.DtProduct;
+import com.project.cuchosmarket.dto.DtProductStock;
 import com.project.cuchosmarket.dto.DtStock;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.*;
@@ -101,7 +102,7 @@ public class ProductService {
         productRepository.delete(product);
     }
   
-    public List<Product> getProductsBy(Long branchId, String name, String brand, Long category_id, String orderBy, String orderDirection) {
+    public List<Product> getProductsByBranch(Long branchId, String name, String brand, Long category_id, String orderBy, String orderDirection) {
         Specification<Product> specification = ProductSpecifications.filterByAttributes(branchId, name, brand, orderBy, orderDirection, category_id);
         return productRepository.findAll(specification);
     }
@@ -123,5 +124,14 @@ public class ProductService {
             stockRepository.save(stock.get());
         }
         else throw new NoStockException("No se encontró el stock del producto.");
+    }
+
+    public DtProductStock getProduct(String productName, Long branchId) throws BranchNotExistException, ProductNotExistException {
+        if (!branchRepository.existsById(branchId)) throw new BranchNotExistException(branchId);
+
+        DtProductStock productStock = stockRepository.findProductAndQuantityByBranch(productName, branchId);
+
+        if (productStock == null) throw new ProductNotExistException(productName);
+        else return productStock;
     }
 }

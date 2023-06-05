@@ -18,19 +18,35 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
-    @GetMapping
-    public DtResponse getProducts(@RequestParam(value = "branchId", required = false) Long branchId,
+    @GetMapping("/{branch_id}")
+    public DtResponse getProducts(@PathVariable("branch_id") Long branch_id,
                                   @RequestParam(value = "name", required = false) String name,
                                   @RequestParam(value = "brand", required = false) String brand,
                                   @RequestParam(value = "category_id", required = false) Long category_id,
                                   @RequestParam(value = "orderBy", required = false) String orderBy,
                                   @RequestParam(value = "orderDirection", required = false) String orderDirection) {
-        List<Product> productsList = productService.getProductsBy(branchId, name, brand, category_id, orderBy, orderDirection);
+        List<Product> productsList = productService.getProductsByBranch(branch_id, name, brand, category_id, orderBy, orderDirection);
         return DtResponse.builder()
                 .error(false)
                 .message(String.valueOf(productsList.size()))
                 .data(productsList)
                 .build();
+    }
+
+    @GetMapping("/{product_id}/{branch_id}")
+    public DtResponse getProduct(@PathVariable("product_id") String product_id,
+                                 @PathVariable("branch_id") Long branch_id) {
+        try {
+            return DtResponse.builder()
+                    .error(false)
+                    .data(productService.getProduct(product_id, branch_id))
+                    .build();
+        } catch (BranchNotExistException | ProductNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .data(e.getMessage())
+                    .build();
+        }
     }
 
     @PostMapping
