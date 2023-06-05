@@ -27,13 +27,16 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final StockRepository stockRepository;
 
+    private void employeeWorksInBranch(String username, Long marketBranchId) throws EmployeeNotWorksInException {
+        User user = userRepository.findByEmail(username);
+        Branch branchEmployee = employeeRepository.findById(user.getId()).get().getBranch();
+
+        if (!branchEmployee.getId().equals(marketBranchId)) throw new EmployeeNotWorksInException();
+    }
 
     public List<Order> getOrdersBy(String userEmail, Long marketBranchId, String orderStatus, LocalDate startDate,
                                    LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException, UserNotExistException {
-        User user = userRepository.findByEmail(userEmail);
-        Branch branchEmployee = employeeRepository.findById(user.getId()).orElseThrow(UserNotExistException::new).getBranch();
-
-        if (!branchEmployee.getId().equals(marketBranchId)) throw new EmployeeNotWorksInException();
+        employeeWorksInBranch(userEmail, marketBranchId);
 
         OrderStatus status = null;
         if (orderStatus != null) {
@@ -89,5 +92,19 @@ public class OrderService {
 
         marketBranch.addOrder(order);
         branchRepository.save(marketBranch);
+    }
+
+    public void updateStatus(String userEmail, DtOrder dtOrder) throws EmployeeNotWorksInException, OrderNotExistException {
+        employeeWorksInBranch(userEmail, dtOrder.getBranchId());
+
+        Order order = orderRepository.findById(dtOrder.getId()).orElseThrow(() -> new OrderNotExistException(dtOrder.getId()));
+
+        if (order.getStatus().equals(OrderStatus.CANCELLED)) throw new IllegalArgumentException("Orden ya cancelada.");
+        if (order.getStatus().equals(OrderStatus.DELIVERED)) throw new IllegalArgumentException("Orden ya entregada.");
+
+        if (dtOrder.getStatus().equals(OrderStatus.CANCELLED) || dtOrder.getStatus().equals(OrderStatus.DELIVERED)) order.setEndDate(LocalDate.now());
+
+        order.setStatus(dtOrder.getStatus());
+        orderRepository.save(order);
     }
 }

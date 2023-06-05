@@ -4,7 +4,6 @@ import com.project.cuchosmarket.dto.DtOrder;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.Order;
-import com.project.cuchosmarket.security.JwtService;
 import com.project.cuchosmarket.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +17,6 @@ import java.util.List;
 @RequestMapping("/orders")
 public class OrderController {
     private final OrderService orderService;
-    private final JwtService jwtService;
 
     @GetMapping("/{branch_id}")
     public DtResponse getOrdersHistory(@PathVariable("branch_id") Long branch_id,
@@ -59,6 +57,24 @@ public class OrderController {
         return DtResponse.builder()
                 .error(false)
                 .message("Compra realizada con exito")
+                .build();
+    }
+
+    @PutMapping("/employee")
+    public DtResponse updateOrderStatus(@RequestBody DtOrder order) {
+        try {
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            orderService.updateStatus(userEmail, order);
+        } catch (EmployeeNotWorksInException | IllegalArgumentException | OrderNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Estado de orden " + order.getId() + " actualizada: " + order.getStatus().name())
                 .build();
     }
 }
