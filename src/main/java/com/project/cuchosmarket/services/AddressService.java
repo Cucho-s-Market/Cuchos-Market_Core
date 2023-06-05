@@ -53,7 +53,8 @@ public class AddressService {
 
     public void addAddress(DtAddress dtAddress,String userEmail) throws UserNotExistException, InvalidAddressException {
         Customer customer = validateCustomer(userEmail);
-        if(dtAddress.getAddress() == null || dtAddress.getLocation() == null || dtAddress.getState() == null) throw new InvalidAddressException();
+        if(dtAddress.getAddress() == null || dtAddress.getAddress().length() > 50
+                || dtAddress.getLocation() == null || dtAddress.getState() == null) throw new InvalidAddressException();
 
         Address address = new Address(dtAddress.getAddress(), dtAddress.getDoorNumber(), dtAddress.getLocation(), dtAddress.getState());
 
@@ -61,8 +62,10 @@ public class AddressService {
         customerRepository.save(customer);
     }
 
-    public void updateAddress(String userEmail, DtAddress dtAddress) throws UserNotExistException, AddressNotExistException {
+    public void updateAddress(String userEmail, DtAddress dtAddress) throws UserNotExistException, AddressNotExistException, InvalidAddressException {
         Customer customer = validateCustomer(userEmail);
+        if(dtAddress.getAddress() == null || dtAddress.getAddress().length() > 50
+                || dtAddress.getLocation() == null || dtAddress.getState() == null) throw new InvalidAddressException();
 
         Address address = findAddress(dtAddress, customer.getId());
         address.setAddress(dtAddress.getAddress());

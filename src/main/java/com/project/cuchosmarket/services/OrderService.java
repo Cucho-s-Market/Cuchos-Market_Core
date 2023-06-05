@@ -58,9 +58,9 @@ public class OrderService {
         Branch marketBranch = branchRepository.findById(dtOrder.getBranchId())
                 .orElseThrow(() -> new BranchNotExistException(dtOrder.getBranchId()));
 
-        if (dtOrder.getProducts().isEmpty()) {
-            throw new IllegalArgumentException("No se selecciono ningun producto para comprar.");
-        }
+        if (dtOrder.getStatus() == null || dtOrder.getType() == null) throw new IllegalArgumentException("Informacion de orden invalida.");
+        if (dtOrder.getProducts().isEmpty()) throw new IllegalArgumentException("No se selecciono ningun producto para comprar.");
+
 
         List<Item> items = new ArrayList<>();
         Order order = null;

@@ -84,27 +84,20 @@ public class UserService {
     }
 
     public void addEmployee(Long branchId, DtUser user) throws BranchNotExistException, UserExistException {
-        Optional<Branch> marketBranch = branchRepository.findById(branchId);
-
-        if (marketBranch.isEmpty()) {
-            throw new BranchNotExistException(branchId);
-        }
-
+        Branch marketBranch = branchRepository.findById(branchId).orElseThrow(() -> new BranchNotExistException(branchId));
         validateUser(user);
 
         Employee employee = new Employee(user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
                 passwordEncoder.encode(user.getPassword()),
-                marketBranch.get());
+                marketBranch);
         employeeRepository.save(employee);
     }
 
     public DtResponse addCustomer(DtCustomer dtCustomer) throws UserExistException {
         validateUser(dtCustomer);
-        if(customerRepository.existsByDni(dtCustomer.getDni())) {
-            throw new UserExistException("Usuario con CI " + dtCustomer.getDni() + " ya existe en el sistema.");
-        }
+        if(customerRepository.existsByDni(dtCustomer.getDni())) throw new UserExistException("Usuario con CI " + dtCustomer.getDni() + " ya existe en el sistema.");
 
         Customer customer = new Customer(dtCustomer.getFirstName(),
                 dtCustomer.getLastName(),
@@ -126,7 +119,7 @@ public class UserService {
         List<DtUser> dtUsers = new ArrayList<>();
         List<User> users = userRepository.findAll();
 
-        users.forEach(user -> dtUsers.add(new DtUser(user.getFirstName(), user.getLastName(), user.getEmail(), null, user.getRole().name())));
+        users.forEach(user -> dtUsers.add(new DtUser(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), null, user.getRole().name())));
 
         return dtUsers;
     }
@@ -164,9 +157,7 @@ public class UserService {
 
     public void disableCustomer(DtCustomer dtCustomer) throws UserNotExistException {
         User user = userRepository.findByEmail(dtCustomer.getEmail());
-        if (user == null) {
-            throw new UserNotExistException();
-        }
+        if (user == null) throw new UserNotExistException();
 
         Customer customer = customerRepository.findById(user.getId()).get();
         customer.setDisabled(dtCustomer.isDisabled());

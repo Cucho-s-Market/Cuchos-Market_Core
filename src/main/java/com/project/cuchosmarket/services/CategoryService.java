@@ -4,6 +4,7 @@ import com.project.cuchosmarket.dto.DtCategory;
 import com.project.cuchosmarket.exceptions.InvalidCategoryException;
 import com.project.cuchosmarket.models.Category;
 import com.project.cuchosmarket.repositories.CategoryRepository;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,10 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     private void validateCategory(DtCategory dtCategory) throws InvalidCategoryException {
-        if(dtCategory.getName() == null) throw new InvalidCategoryException();
-        if(categoryRepository.existsByName(dtCategory.getName())) throw  new InvalidCategoryException("La categoria ya existe.");
+        if(StringUtils.isBlank(dtCategory.getName()) || dtCategory.getName().length() > 50) throw new InvalidCategoryException();
+        if(categoryRepository.existsByName(dtCategory.getName())) throw new InvalidCategoryException("La categoria ya existe.");
+        if(StringUtils.isBlank(dtCategory.getDescription()) || dtCategory.getDescription().length() > 255
+                || dtCategory.getDescription().length() < 5) throw new InvalidCategoryException();
     }
 
     public void addCategory(DtCategory dtCategory) throws InvalidCategoryException {
