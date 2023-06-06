@@ -50,6 +50,9 @@ public class UserService {
             }
             Customer customer = (Customer) user;
             customer.setOrdersPlaced(null);
+        } else if (user.getRole().equals(Role.EMPLOYEE)) {
+            Employee employee = (Employee) user;
+            employee.getBranch().setOrders(null);
         }
 
         authenticationManager.authenticate(

@@ -13,6 +13,7 @@ public class DtOrder {
     private Long branchId;
     private Long id;
     private OrderStatus status;
+    private Long addressId;
     private OrderType type;
     private List<DtItem> products;
 }

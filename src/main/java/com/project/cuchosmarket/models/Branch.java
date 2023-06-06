@@ -3,6 +3,7 @@ package com.project.cuchosmarket.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Builder
@@ -20,9 +21,9 @@ public class Branch {
 
     @OneToMany
     @JoinColumn(name = "branch_id")
-    private Map<Long, Order> orders;
+    private List<Order> orders;
 
     public void addOrder(Order order){
-        this.orders.put(order.getId(), order);
+        this.orders.add(order);
     }
 }

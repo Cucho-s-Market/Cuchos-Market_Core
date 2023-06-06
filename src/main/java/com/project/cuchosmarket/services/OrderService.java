@@ -3,6 +3,7 @@ package com.project.cuchosmarket.services;
 import com.project.cuchosmarket.dto.DtItem;
 import com.project.cuchosmarket.dto.DtOrder;
 import com.project.cuchosmarket.enums.OrderStatus;
+import com.project.cuchosmarket.enums.OrderType;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.*;
 import com.project.cuchosmarket.repositories.*;
@@ -87,6 +88,17 @@ public class OrderService {
         }
 
         order = new Order(totalPrice, LocalDate.now(), OrderStatus.PENDING, dtOrder.getType(), items);
+        if (order.getType().equals(OrderType.DELIVERY)) {
+
+            if (dtOrder.getAddressId() == null) throw new IllegalArgumentException("No se ha seleccionado ninguna direccion.");
+            Address address = customer.getAddresses()
+                    .stream()
+                    .filter(address1 -> address1.getId().equals(dtOrder.getAddressId()))
+                    .findFirst()
+                    .orElseThrow(AddressNotExistException::new);
+            order.setClientAddress(address);
+        }
+
         orderRepository.save(order);
 
         customer.addOrder(order);
