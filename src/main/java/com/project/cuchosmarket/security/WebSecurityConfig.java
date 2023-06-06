@@ -45,13 +45,6 @@ public class WebSecurityConfig {
                         "/users/customer"
                 ).permitAll()
 
-                //All users
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/users/auth/**",
-                        "/users"
-                ).permitAll()
-
                 .requestMatchers(
                         HttpMethod.GET,
                         "/categories",
