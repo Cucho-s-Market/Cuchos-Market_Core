@@ -28,7 +28,8 @@ public class ProductService {
         if(dtProduct.getCode() == null | dtProduct.getName() == null | dtProduct.getCategoryId() == null | dtProduct.getEntryDate() == null) throw new InvalidProductException();
 
         if(dtProduct.getCode().isBlank()) throw new InvalidProductException("Codigo de producto invalido.");
-        if(dtProduct.getName().isBlank()) throw new InvalidProductException("Nombre de producto invalido.");
+        if(dtProduct.getName().isBlank() || dtProduct.getName().length() > 50) throw new InvalidProductException("Nombre de producto invalido.");
+        if(dtProduct.getDescription().isBlank() || dtProduct.getDescription().length() > 50) throw new InvalidProductException("Descripcion de producto invalido.");
         if(dtProduct.getPrice() <= 0) throw new InvalidProductException("Precio de producto invalido.");
     }
 

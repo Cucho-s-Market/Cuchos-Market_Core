@@ -99,7 +99,6 @@ public class UserController {
 
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-
             return DtResponse.builder()
                     .error(false)
                     .message(String.valueOf(addressService.getAddress(userEmail).size()))
@@ -138,7 +137,7 @@ public class UserController {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             addressService.updateAddress(userEmail, address);
-        } catch (UserNotExistException | AddressNotExistException e) {
+        } catch (UserNotExistException | AddressNotExistException | InvalidAddressException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())

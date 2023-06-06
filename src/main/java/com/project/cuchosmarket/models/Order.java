@@ -3,6 +3,7 @@ package com.project.cuchosmarket.models;
 import com.project.cuchosmarket.enums.OrderStatus;
 import com.project.cuchosmarket.enums.OrderType;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.List;
 
+@EqualsAndHashCode
 @Getter
 @Setter
 @NoArgsConstructor
