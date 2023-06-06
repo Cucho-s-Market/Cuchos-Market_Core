@@ -20,10 +20,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -71,24 +71,32 @@ public class UserService {
                 .build();
     }
 
-    private void validateUser(DtUser user) throws UserExistException {
-        if(userRepository.existsByEmail(user.getEmail())) {
-            throw new UserExistException("Usuario con email " + user.getEmail() + " ya se encuentra en el sistema");
+    private void validateUser(User user, DtUser dtUser) throws UserExistException {
+        if((user == null || !user.getEmail().equals(dtUser.getEmail())) && userRepository.existsByEmail(dtUser.getEmail())) {
+            throw new UserExistException("Usuario con email " + dtUser.getEmail() + " ya se encuentra en el sistema.");
         }
 
-        if (StringUtils.isBlank(user.getPassword())) {
-            throw new IllegalArgumentException("La contraseña no puede estar vacia");
+        if (StringUtils.isBlank(dtUser.getPassword())) {
+            throw new IllegalArgumentException("La contraseña no puede estar vacia.");
         }
 
-        if (StringUtils.isBlank(user.getFirstName()) || StringUtils.isBlank(user.getLastName()) ||
-                user.getFirstName().length() > 25 || user.getLastName().length() > 25 ) {
-            throw new IllegalArgumentException("Datos invalidos");
+        if (StringUtils.isBlank(dtUser.getFirstName()) || StringUtils.isBlank(dtUser.getLastName()) ||
+                dtUser.getFirstName().length() > 25 || dtUser.getLastName().length() > 25 ) {
+            throw new IllegalArgumentException("Datos invalidos: Nombre invalido.");
         }
+    }
+
+    private void validateCustomer(Customer customer, DtCustomer dtCustomer) throws UserExistException {
+        if((customer == null || customer.getDni() != dtCustomer.getDni()) && customerRepository.existsByDni(dtCustomer.getDni())) {
+            throw new UserExistException("Usuario con CI " + dtCustomer.getDni() + " ya existe en el sistema.");
+        }
+        if(String.valueOf(dtCustomer.getTelephone()).length() < 8) throw new IllegalArgumentException("Datos invalidos: Telefono invalido.");
+        if(dtCustomer.getBirthdate() != null && dtCustomer.getBirthdate().isAfter(LocalDate.now())) throw new IllegalArgumentException("Datos invalidos: Fecha de nacimiento invalida.");
     }
 
     public void addEmployee(Long branchId, DtUser user) throws BranchNotExistException, UserExistException {
         Branch marketBranch = branchRepository.findById(branchId).orElseThrow(() -> new BranchNotExistException(branchId));
-        validateUser(user);
+        validateUser(null, user);
 
         Employee employee = new Employee(user.getFirstName(),
                 user.getLastName(),
@@ -99,8 +107,8 @@ public class UserService {
     }
 
     public DtResponse addCustomer(DtCustomer dtCustomer) throws UserExistException {
-        validateUser(dtCustomer);
-        if(customerRepository.existsByDni(dtCustomer.getDni())) throw new UserExistException("Usuario con CI " + dtCustomer.getDni() + " ya existe en el sistema.");
+        validateUser(null, dtCustomer);
+        validateCustomer(null, dtCustomer);
 
         Customer customer = new Customer(dtCustomer.getFirstName(),
                 dtCustomer.getLastName(),
@@ -118,6 +126,31 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
+    public void updateUser(String userEmail, DtCustomer dtUser) throws UserNotExistException, UserExistException {
+        User user = userRepository.findByEmail(userEmail);
+        if (user == null) throw new UserNotExistException();
+        validateUser(user, dtUser);
+
+        if (user.getRole().equals(Role.CUSTOMER)) {
+            Customer customer = customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
+
+            validateCustomer(customer, dtUser);
+            customer.setBirthdate(dtUser.getBirthdate());
+            customer.setDni(dtUser.getDni());
+            customer.setTelephone(dtUser.getTelephone());
+
+            customerRepository.save(customer);
+        }
+
+        user.setEmail(dtUser.getEmail());
+        user.setFirstName(dtUser.getFirstName());
+        user.setLastName(dtUser.getLastName());
+        user.setPassword(passwordEncoder.encode(dtUser.getPassword()));
+
+        userRepository.save(user);
+    }
+
     public List<DtUser> getUsers() {
         List<DtUser> dtUsers = new ArrayList<>();
         List<User> users = userRepository.findAll();
@@ -128,7 +161,7 @@ public class UserService {
     }
 
     public DtResponse addAdmin(DtUser admin) throws UserExistException {
-        validateUser(admin);
+        validateUser(null, admin);
         Admin administrator = new Admin(admin.getFirstName(),
                 admin.getLastName(),
                 admin.getEmail(),
@@ -144,25 +177,22 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) throws UserNotExistException {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new UserNotExistException();
-        }
+        User user = userRepository.findById(id).orElseThrow(UserNotExistException::new);
 
-        if (user.get().getRole().equals(Role.EMPLOYEE)) {
+        if (user.getRole().equals(Role.EMPLOYEE)) {
             employeeRepository.deleteById(id);
-        } else if (user.get().getRole().equals(Role.CUSTOMER)) {
+        } else if (user.getRole().equals(Role.CUSTOMER)) {
             customerRepository.deleteById(id);
         }
 
-        userRepository.delete(user.get());
+        userRepository.delete(user);
     }
 
     public void disableCustomer(DtCustomer dtCustomer) throws UserNotExistException {
         User user = userRepository.findByEmail(dtCustomer.getEmail());
         if (user == null) throw new UserNotExistException();
 
-        Customer customer = customerRepository.findById(user.getId()).get();
+        Customer customer = customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);;
         customer.setDisabled(dtCustomer.isDisabled());
 
         customerRepository.save(customer);

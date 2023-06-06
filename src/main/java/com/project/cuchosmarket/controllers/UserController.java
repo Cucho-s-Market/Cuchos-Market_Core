@@ -78,6 +78,24 @@ public class UserController {
         return response;
     }
 
+    @PutMapping
+    public DtResponse updateUser(@RequestBody DtCustomer dtUser) {
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        try {
+            userService.updateUser(userEmail, dtUser);
+        } catch (UserNotExistException | IllegalArgumentException | UserExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Usuario actualizado.")
+                .build();
+    }
+
     @DeleteMapping("/{user_id}")
     public DtResponse deleteUser(@PathVariable("user_id") Long user_id) {
         try {
