@@ -54,7 +54,7 @@ public class WebSecurityConfig {
 
                 .requestMatchers(
                         HttpMethod.GET,
-                        "/categories/get-categories",
+                        "/categories",
                         "/branches",
                         "/products"
                 ).permitAll()
