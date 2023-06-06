@@ -15,7 +15,7 @@ public class DtCustomer extends DtUser{
     private boolean disabled;
 
 
-    public DtCustomer(String firstName, String lastName, String email, String password, String role) {
-        super(firstName, lastName, email, password, role);
+    public DtCustomer(Long id, String firstName, String lastName, String email, String password, String role) {
+        super(id, firstName, lastName, email, password, role);
     }
 }

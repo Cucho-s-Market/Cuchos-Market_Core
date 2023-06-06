@@ -55,7 +55,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void buyProducts(String userEmail, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException, InvalidOrderException {
+    public void buyProducts(String userEmail, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException, InvalidOrderException, AddressNotExistException {
         User user = userRepository.findByEmail(userEmail);
         Customer customer = customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
         Branch marketBranch = branchRepository.findById(dtOrder.getBranchId())
