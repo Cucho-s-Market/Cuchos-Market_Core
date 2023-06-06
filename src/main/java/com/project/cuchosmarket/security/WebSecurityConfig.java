@@ -109,7 +109,8 @@ public class WebSecurityConfig {
 
                 .requestMatchers(
                         HttpMethod.PUT,
-                        "/users/customer/**"
+                        "/users/customer/**",
+                        "/orders/{order_id}"
                 ).hasRole(CUSTOMER.name())
 
                 .requestMatchers(

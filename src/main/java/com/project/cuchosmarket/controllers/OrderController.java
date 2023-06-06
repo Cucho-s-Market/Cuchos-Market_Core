@@ -29,7 +29,7 @@ public class OrderController {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             orderList = orderService.getOrdersBy(userEmail, branch_id, orderStatus,
                     startDate, endDate, orderDirection);
-        } catch (EmployeeNotWorksInException | IllegalArgumentException | UserNotExistException e) {
+        } catch (EmployeeNotWorksInException | UserNotExistException | InvalidOrderException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -47,7 +47,8 @@ public class OrderController {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             orderService.buyProducts(userEmail, order);
-        } catch (BranchNotExistException | ProductNotExistException | UserNotExistException | NoStockException e) {
+        } catch (BranchNotExistException | ProductNotExistException | UserNotExistException | NoStockException |
+                 InvalidOrderException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -65,7 +66,7 @@ public class OrderController {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             orderService.updateStatus(userEmail, order);
-        } catch (EmployeeNotWorksInException | IllegalArgumentException | OrderNotExistException e) {
+        } catch (EmployeeNotWorksInException | InvalidOrderException | OrderNotExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
@@ -75,6 +76,24 @@ public class OrderController {
         return DtResponse.builder()
                 .error(false)
                 .message("Estado de orden " + order.getId() + " actualizada: " + order.getStatus().name())
+                .build();
+    }
+
+    @PutMapping("/{order_id}")
+    public DtResponse cancelOrder(@PathVariable("order_id") Long order_id) {
+        try {
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            orderService.cancelOrder(userEmail, order_id);
+        } catch (InvalidOrderException | OrderNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Orden cancelada")
                 .build();
     }
 }
