@@ -1,6 +1,7 @@
 package com.project.cuchosmarket.controllers;
 
 import com.project.cuchosmarket.dto.DtProduct;
+import com.project.cuchosmarket.dto.DtProductStock;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtStock;
 import com.project.cuchosmarket.exceptions.*;
@@ -116,6 +117,26 @@ public class ProductController {
         return DtResponse.builder()
                 .error(false)
                 .message("Stock del producto " + stockProduct.getProduct_id() + " actualizado con exito.")
+                .build();
+    }
+
+    @GetMapping("/{branch_id}/{category_id}/stock")
+    public DtResponse getStockProductsByBranch(@PathVariable("branch_id") Long branch_id,
+                                               @PathVariable("category_id") Long category_id) {
+        List<DtProductStock> productStocks = null;
+        try {
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            productStocks = productService.getStockProductsByBranch(userEmail, branch_id, category_id);
+        } catch (UserNotExistException | EmployeeNotWorksInException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+        return DtResponse.builder()
+                .error(false)
+                .message(String.valueOf(productStocks.size()))
+                .data(productStocks)
                 .build();
     }
 }

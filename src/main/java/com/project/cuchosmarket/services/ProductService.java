@@ -134,4 +134,13 @@ public class ProductService {
         if (productStock == null) throw new ProductNotExistException(productName);
         else return productStock;
     }
+
+    public List<DtProductStock> getStockProductsByBranch(String userEmail, Long branchId, Long categoryId) throws UserNotExistException, EmployeeNotWorksInException {
+        User employee = userRepository.findByEmail(userEmail);
+        Branch branchEmployee = employeeRepository.findById(employee.getId()).orElseThrow(UserNotExistException::new).getBranch();
+
+        if (!branchEmployee.getId().equals(branchId)) throw new EmployeeNotWorksInException();
+
+        return stockRepository.findProductsAndQuantitiesByBranchAndCategory(branchId, categoryId);
+    }
 }
