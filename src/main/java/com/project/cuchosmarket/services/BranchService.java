@@ -1,6 +1,6 @@
 package com.project.cuchosmarket.services;
 
-import com.project.cuchosmarket.dto.DtMarketBranch;
+import com.project.cuchosmarket.dto.DtBranch;
 import com.project.cuchosmarket.repositories.BranchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import java.util.List;
 public class BranchService {
     private final BranchRepository branchRepository;
 
-    public List<DtMarketBranch> getMarketBranches() {
+    public List<DtBranch> getMarketBranches() {
         return branchRepository.findAllSelected();
     }
 }

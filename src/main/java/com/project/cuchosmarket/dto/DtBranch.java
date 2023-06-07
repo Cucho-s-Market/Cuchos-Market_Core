@@ -7,7 +7,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class DtMarketBranch {
+public class DtBranch {
     private Long id;
     private String name;
     private String address;
