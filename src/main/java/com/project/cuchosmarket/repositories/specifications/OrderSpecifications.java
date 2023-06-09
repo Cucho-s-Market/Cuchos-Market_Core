@@ -1,9 +1,8 @@
 package com.project.cuchosmarket.repositories.specifications;
 
 import com.project.cuchosmarket.enums.OrderStatus;
-import com.project.cuchosmarket.models.Branch;
 import com.project.cuchosmarket.models.Order;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;

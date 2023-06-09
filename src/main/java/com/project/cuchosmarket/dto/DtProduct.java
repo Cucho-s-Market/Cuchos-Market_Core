@@ -19,4 +19,5 @@ public class DtProduct {
     private String brand;
     private Long categoryId;
     private List<String> images;
+    private int quantity;
 }

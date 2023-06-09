@@ -1,17 +1,14 @@
 package com.project.cuchosmarket.controllers;
 
 import com.project.cuchosmarket.dto.DtProduct;
-import com.project.cuchosmarket.dto.DtProductStock;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.dto.DtStock;
 import com.project.cuchosmarket.exceptions.*;
-import com.project.cuchosmarket.models.Product;
 import com.project.cuchosmarket.services.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -19,35 +16,21 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
-    @GetMapping("/{branch_id}")
-    public DtResponse getProducts(@PathVariable("branch_id") Long branch_id,
+    @GetMapping
+    public DtResponse getProducts(@RequestParam(value = "page_number", required = false, defaultValue = "0") int page_number,
+                                  @RequestParam(value = "page_size", required = false, defaultValue = "50") int page_size,
+                                  @RequestParam(value = "branch_id", required = false)  Long branch_id,
+                                  @RequestParam(value = "code", required = false) String code,
                                   @RequestParam(value = "name", required = false) String name,
                                   @RequestParam(value = "brand", required = false) String brand,
                                   @RequestParam(value = "category_id", required = false) Long category_id,
-                                  @RequestParam(value = "orderBy", required = false) String orderBy,
-                                  @RequestParam(value = "orderDirection", required = false) String orderDirection) {
-        List<Product> productsList = productService.getProductsByBranch(branch_id, name, brand, category_id, orderBy, orderDirection);
+                                  @RequestParam(value = "orderBy", required = false, defaultValue = "name") String orderBy,
+                                  @RequestParam(value = "orderDirection", required = false, defaultValue = "asc") String orderDirection) {
+        Page<DtProduct> productsList = productService.getProducts(page_number, page_size, branch_id, code, name, brand, category_id, orderBy, orderDirection);
         return DtResponse.builder()
                 .error(false)
-                .message(String.valueOf(productsList.size()))
                 .data(productsList)
                 .build();
-    }
-
-    @GetMapping("/{product_id}/{branch_id}")
-    public DtResponse getProduct(@PathVariable("product_id") String product_id,
-                                 @PathVariable("branch_id") Long branch_id) {
-        try {
-            return DtResponse.builder()
-                    .error(false)
-                    .data(productService.getProduct(product_id, branch_id))
-                    .build();
-        } catch (BranchNotExistException | ProductNotExistException e) {
-            return DtResponse.builder()
-                    .error(true)
-                    .data(e.getMessage())
-                    .build();
-        }
     }
 
     @PostMapping
@@ -117,26 +100,6 @@ public class ProductController {
         return DtResponse.builder()
                 .error(false)
                 .message("Stock del producto " + stockProduct.getProduct_id() + " actualizado con exito.")
-                .build();
-    }
-
-    @GetMapping("/{branch_id}/{category_id}/stock")
-    public DtResponse getStockProductsByBranch(@PathVariable("branch_id") Long branch_id,
-                                               @PathVariable("category_id") Long category_id) {
-        List<DtProductStock> productStocks = null;
-        try {
-            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-            productStocks = productService.getStockProductsByBranch(userEmail, branch_id, category_id);
-        } catch (UserNotExistException | EmployeeNotWorksInException e) {
-            return DtResponse.builder()
-                    .error(true)
-                    .message(e.getMessage())
-                    .build();
-        }
-        return DtResponse.builder()
-                .error(false)
-                .message(String.valueOf(productStocks.size()))
-                .data(productStocks)
                 .build();
     }
 }
