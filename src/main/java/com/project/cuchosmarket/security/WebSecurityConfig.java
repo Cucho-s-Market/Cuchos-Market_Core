@@ -49,7 +49,8 @@ public class WebSecurityConfig {
                         HttpMethod.GET,
                         "/categories",
                         "/branches",
-                        "/products/**"
+                        "/products/**",
+                        "/promotions"
                 ).permitAll()
 
                 //Admin users
@@ -91,7 +92,13 @@ public class WebSecurityConfig {
 
                 .requestMatchers(
                         HttpMethod.PUT,
-                        "/orders/employee"
+                        "/orders/employee",
+                        "/promotions"
+                ).hasRole(EMPLOYEE.name())
+
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/promotions"
                 ).hasRole(EMPLOYEE.name())
 
                 //Customers users

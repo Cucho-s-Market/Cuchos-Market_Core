@@ -23,6 +23,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final BranchRepository branchRepository;
     private final StockRepository stockRepository;
+    private final PromotionRepository promotionRepository;
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
 
@@ -96,9 +97,13 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    @Transactional
     public void deleteProduct(DtProduct dtProduct) throws ProductNotExistException {
         Product product = findProduct(dtProduct);
-
+        product.getPromotions().forEach(promotion -> {
+            promotion.getProducts().remove(product);
+            promotionRepository.save(promotion);
+        });
         branchRepository.findAll().forEach(branch -> stockRepository.findById(new StockId(product, branch)).ifPresent(stockRepository::delete));
         productRepository.delete(product);
     }

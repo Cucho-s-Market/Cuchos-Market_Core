@@ -1,9 +1,7 @@
 package com.project.cuchosmarket.models;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,7 +9,10 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorValue("promotion")
 public abstract class Promotion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +22,19 @@ public abstract class Promotion {
     private LocalDate endDate;
     private String image;
 
-    @OneToMany
+    @ManyToMany
+    @JoinTable(
+            name = "promotion_product",
+            joinColumns = @JoinColumn(name = "promotion_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
     private List<Product> products;
+
+    public Promotion(String name, LocalDate startDate, LocalDate endDate, String image, List<Product> products) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.image = image;
+        this.products = products;
+    }
 }
