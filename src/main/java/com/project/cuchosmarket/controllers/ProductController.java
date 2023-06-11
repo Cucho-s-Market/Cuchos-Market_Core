@@ -20,10 +20,10 @@ public class ProductController {
 
     @GetMapping
     public DtResponse getProducts(@RequestParam(value = "name", required = false) String name,
-                                  @RequestParam(value = "brand", required = false) String brand,
-                                  @RequestParam(value = "category_id", required = false) Long category_id,
-                                  @RequestParam(value = "orderBy", required = false) String orderBy,
-                                  @RequestParam(value = "orderDirection", required = false) String orderDirection) {
+            @RequestParam(value = "brand", required = false) String brand,
+            @RequestParam(value = "category_id", required = false) Long category_id,
+            @RequestParam(value = "orderBy", required = false) String orderBy,
+            @RequestParam(value = "orderDirection", required = false) String orderDirection) {
         List<Product> productsList = productService.getProductsBy(name, brand, category_id, orderBy, orderDirection);
         return DtResponse.builder()
                 .error(false)
@@ -32,19 +32,38 @@ public class ProductController {
                 .build();
     }
 
-    @PostMapping
-    public DtResponse addProduct(@RequestBody DtProduct newProduct) {
+    @GetMapping("/{code}")
+    public DtResponse getProduct(@PathVariable("code") String code) throws ProductNotExistException {
         try {
-            productService.addProduct(newProduct);
-        }
-        catch (CategoryNotExistException | InvalidProductException | ProductExistException e) {
+            Product product = productService.findProductByCode(code);
+
+            return DtResponse.builder()
+                    .error(false)
+                    .message(String.valueOf("Producto encontrado."))
+                    .data(product)
+                    .build();
+
+        } catch (ProductNotExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
                     .build();
         }
 
-        return  DtResponse.builder()
+    }
+
+    @PostMapping
+    public DtResponse addProduct(@RequestBody DtProduct newProduct) {
+        try {
+            productService.addProduct(newProduct);
+        } catch (CategoryNotExistException | InvalidProductException | ProductExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
                 .error(false)
                 .message("Producto agregado correctamente.")
                 .build();
@@ -54,15 +73,14 @@ public class ProductController {
     public DtResponse updateProduct(@RequestBody DtProduct updatedProduct) {
         try {
             productService.updateProduct(updatedProduct);
-        }
-        catch (ProductNotExistException | InvalidProductException e) {
-            return  DtResponse.builder()
+        } catch (ProductNotExistException | InvalidProductException e) {
+            return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
                     .build();
         }
 
-        return  DtResponse.builder()
+        return DtResponse.builder()
                 .error(false)
                 .message("La informacion del producto " + updatedProduct.getName() + " fue actualizada correctamente.")
                 .build();
@@ -72,14 +90,13 @@ public class ProductController {
     public DtResponse deleteProduct(@RequestBody DtProduct productToDelete) {
         try {
             productService.deleteProduct(productToDelete);
-        }
-        catch (ProductNotExistException e) {
-            return  DtResponse.builder()
+        } catch (ProductNotExistException e) {
+            return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
                     .build();
         }
-        return  DtResponse.builder()
+        return DtResponse.builder()
                 .error(false)
                 .message("El producto " + productToDelete.getName() + " fue eliminado correctamente.")
                 .build();
