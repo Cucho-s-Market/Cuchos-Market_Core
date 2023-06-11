@@ -13,4 +13,5 @@ public class DtCategory {
     private String description;
     private String image;
     private Long categoryParent;
+    public DtCategory() {}
 }

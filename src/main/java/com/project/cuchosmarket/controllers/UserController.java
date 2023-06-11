@@ -8,6 +8,7 @@ import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.services.AddressService;
 import com.project.cuchosmarket.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final AddressService addressService;
+
 
     @GetMapping
     public DtResponse getUsers() {
