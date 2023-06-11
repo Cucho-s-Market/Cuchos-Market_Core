@@ -1,85 +1,95 @@
 package com.project.cuchosmarket;
 
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.*;
-import static  org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Optional;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.cuchosmarket.controllers.UserController;
 import com.project.cuchosmarket.models.Customer;
 import com.project.cuchosmarket.models.User;
+import com.project.cuchosmarket.services.UserService;
+import com.project.cuchosmarket.dto.DtCustomer;
+import com.project.cuchosmarket.dto.DtResponse;
+import com.project.cuchosmarket.exceptions.UserExistException;
 import com.project.cuchosmarket.repositories.CustomerRepository;
 import com.project.cuchosmarket.repositories.UserRepository;
+import com.project.cuchosmarket.security.JwtService;
 import com.project.cuchosmarket.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.verification.VerificationMode;
-import org.springframework.boot.env.ConfigTreePropertySource;
-import org.junit.jupiter.api.Test;
-import java.util.Optional;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@ExtendWith(MockitoExtension.class)
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+import static org.springframework.test.web.client.ExpectedCount.times;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
-    @Mock
-    private UserRepository userRepository;
+    private MockMvc mockMvc;
+
     @InjectMocks
-    private UserService userService;
+    private UserController lookupController;
+
     @Mock
-    private CustomerRepository customerRepository;
+    UserService userService;
 
-    private Customer customer;
-    private  User user;
+    /**
+     * @throws java.lang.Exception
+     */
     @BeforeEach
-    void setup() {
-    /*    customer = new Customer();
-        customer.setFirstName("Carlos");
-        customer.setLastName("barrera");
-        customer.setEmail("cucho@gmail");
-        customer.setPassword("123");
-        customer.setTelephone(123456);
-        customer.setDni(321);
+    public void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+        this.mockMvc = MockMvcBuilders.standaloneSetup(lookupController).build();
+    }
+
+    @Test
+    void whenSubmitUser_thenUserIdIsGenerated() throws Exception {
+        /*User newUser = new User();
+        newUser.setName("My Refactor");
+
+        User result = new User();
+        result.setName("My Refactor");
+        UUID id = UUID.randomUUID();
+        result.setId(id);
 */
-        user = new Customer();
-        user.setFirstName("Carlos");
-        user.setLastName("barrera");
-        user.setEmail("cucho@gmail");
-        user.setPassword("123");
+      //  Customer cust = new Customer();
+      //  cust.setFirstName("carlos");
+        DtCustomer customer = new DtCustomer(1l,"carlos","barrera","carlos@","123","admin");
 
-        // Configuración del comportamiento simulado del repositorio
-/*
-        when(userRepository.findByEmail(customer.getEmail())).thenReturn(null); // El correo no existe previamente
-        when(userRepository.save(customer)).thenReturn(customer); // El empleado se guarda correctamente
+        //Mockito.when(userService.addCustomer(Mockito.any(DtCustomer.class))).thenReturn(customer);
+        Mockito.verify(userService).addCustomer(Mockito.any(DtCustomer.class));
 
-        // Llamada al método que se está probando
-        Customer savedCustomer = customerRepository.save(customer);
-
-        // Verificaciones
-        assertNotNull(savedCustomer); // Se guarda correctamente
-
-        verify(userRepository,times(1)).findByEmail(customer.getEmail()); // Se verifica la llamada al método findByEmail una vez
-        verify(userRepository,times(1)).save(customer); //
-
-    }
-*/
-    }
-   @DisplayName("Test guardar customer")
-   @Test
-    void testAddCustomer(){
-
-        given(userRepository.findByEmail(user.getEmail()))
-                .willReturn(user);
-        given(userRepository.save(user)).willReturn(user);
-
-       User savedCustomer = userRepository.save(user);
+        this.mockMvc
+                .perform(post("/add-user").content(asJsonString(customer)).contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andDo(print())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(notNullValue())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(equalTo(id.toString()))))
+                .andReturn();
     }
 
+    private static String asJsonString(final Object obj) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
+
+
