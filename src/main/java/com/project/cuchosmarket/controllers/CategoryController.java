@@ -15,7 +15,7 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @PostMapping
+    @PostMapping("add")
     public DtResponse addCategory(@RequestBody DtCategory newCategory) {
         try {
             categoryService.addCategory(newCategory);
