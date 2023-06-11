@@ -49,7 +49,7 @@ public class WebSecurityConfig {
                         HttpMethod.GET,
                         "/categories",
                         "/branches",
-                        "/products"
+                        "/products/**"
                 ).permitAll()
 
                 //Admin users

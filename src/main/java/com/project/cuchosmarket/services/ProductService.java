@@ -1,5 +1,6 @@
 package com.project.cuchosmarket.services;
 
+import com.project.cuchosmarket.controllers.ProductController;
 import com.project.cuchosmarket.dto.DtProduct;
 import com.project.cuchosmarket.dto.DtStock;
 import com.project.cuchosmarket.exceptions.*;
@@ -38,6 +39,13 @@ public class ProductService {
         if(product.isEmpty()) throw new ProductNotExistException(dtProduct.getName());
 
         return product.get();
+    }
+
+    public Product findProductByCode(String code) throws ProductNotExistException {
+        Product product = productRepository.findByCode(code);
+        if(product == null) throw new ProductNotExistException(code.toString());
+
+        return product;
     }
 
     @Transactional
