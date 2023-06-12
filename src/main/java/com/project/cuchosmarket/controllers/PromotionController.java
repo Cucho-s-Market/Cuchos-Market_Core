@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/promotions")
-public class PromotionController { //TODO Las promociones son aplicables para todas las Sucursales? Es un empleado el que las crea
+public class PromotionController {
     private final PromotionService promotionService;
 
     @PostMapping
@@ -53,7 +53,7 @@ public class PromotionController { //TODO Las promociones son aplicables para to
     }
 
     @GetMapping
-    public DtResponse getPromotion(@RequestParam(value = "includeExpired", required = false, defaultValue = "true") boolean includeExpired) {
+    public DtResponse getPromotion(@RequestParam(value = "includeExpired", required = false, defaultValue = "false") boolean includeExpired) {
         List<Promotion> promotions = promotionService.getPromotions(includeExpired);
         return DtResponse.builder()
                 .error(false)

@@ -73,26 +73,22 @@ public class PromotionService {
         promotion.setImage(dtPromotion.getImage());
         promotion.setProducts(products);
 
-        if (dtPromotion.getPromotionType().equalsIgnoreCase("discount")) {
+        if (promotion instanceof Discount discount) {
             validateDiscount(dtPromotion);
 
-            Discount discount = (Discount) promotion;
             discount.setPercentage(dtPromotion.getPercentage());
             promotionRepository.save(discount);
-        } else if (dtPromotion.getPromotionType().equalsIgnoreCase("nxm")) {
+        } else if (promotion instanceof NxM nxM) {
             validateNxM(dtPromotion);
 
-            NxM nxM = (NxM) promotion;
             nxM.setN(dtPromotion.getN());
             nxM.setM(dtPromotion.getM());
             promotionRepository.save(nxM);
-        } else throw new InvalidPromotionException("El sistema no soporta ese tipo de promocion.");
-
+        }
 
     }
 
-    public List<Promotion> getPromotions(boolean includeExpired) {     //TODO Paginable?
-        return promotionRepository.findPromotions(includeExpired);   //TODO Capaz una funcion de listar promociones en general como objetos?
-                                                //TODO Y otra funcion para conseguir los productos de esa promocion o agregar filtro a listar Productos?
+    public List<Promotion> getPromotions(boolean includeExpired) {
+        return promotionRepository.findPromotions(includeExpired);   //TODO Agregar filtro de promociones
     }
 }
