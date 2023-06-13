@@ -1,5 +1,7 @@
 package com.project.cuchosmarket.services;
 
+import com.project.cuchosmarket.models.Order;
+import com.project.cuchosmarket.models.User;
 import com.project.cuchosmarket.enums.OrderStatus;
 import com.project.cuchosmarket.enums.OrderType;
 import com.project.cuchosmarket.models.Order;
