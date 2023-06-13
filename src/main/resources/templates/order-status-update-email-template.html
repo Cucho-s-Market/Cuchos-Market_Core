@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <title th:if="${subject}" th:text="${subject}">Sending Email</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- use the font -->
+    <style>
+      @media screen and (max-width: 768px) {
+        table {
+          min-width: auto;
+          width: 100%;
+          margin-left: auto;
+          margin-right: auto;
+        }
+      }
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+      th {
+        height: 25px;
+        background-color: rgb(245, 121, 59);
+      }
+      td {
+        padding: 30px 60px;
+        font-size: 14px;
+      }
+      h1 {
+        color: rgb(255, 255, 255);
+      }
+
+      .gradientBG {
+        height: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <thead>
+        <tr>
+          <th>
+            <h1>Cucho's Market</h1>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <p>
+              ¡Hola
+              <b
+                ><i><span th:text="${first_name}">,</span></i></b
+              >!
+            </p>
+
+            <span th:if="${order_status == 'PENDING'}">
+              <p>¡Tu pedido ha sido ingresado con éxito!</p>
+              <p>
+                Hemos recibido tu orden de compra la cual ha ingresado a un
+                proceso de validación de datos personales, medio de pago y
+                stock.
+              </p>
+              <p>
+                Una vez finalizada esta verificación se te notificará vía email.
+                De ser exitosa, se procederá a realizar el despacho según las
+                indicaciones que elegiste.
+              </p>
+            </span>
+
+            <span
+              th:if="${order_status == 'PREPARING' || order_status == 'CANCELLED'}"
+            >
+              <p>¡Tu pedido ya está siendo preparado!</p>
+            </span>
+
+            <span th:if="${order_status == 'DELIVERED'}">
+              <span th:switch="${order_type}">
+                <span th:case="'PICK_UP'">
+                  <p>
+                    ¡Tenemos buenas noticias! Tu pedido te está esperando en la
+                    sucursal que elegiste.
+                  </p>
+                  <p>
+                    Deseamos que disfrutes tu compra tanto como nosotros
+                    disfrutamos prepararla para vos.
+                  </p>
+                  <p>
+                    En caso de que necesites que otra persona retire tu compra,
+                    recordá que la misma debe realizarse presentando la Cédula
+                    del titular del pedido.
+                  </p>
+                  <p>Esperamos volver a verte pronto.</p>
+                  <p>¡Que pases un lindo día!</p>
+                </span>
+                <span th:case="'DELIVERY'">
+                  <p>¡Tenemos buenas noticias! Tu pedido está en camino.</p>
+                  <p>
+                    Deseamos que disfrutes tu compra tanto como nosotros
+                    disfrutamos prepararla para vos.
+                  </p>
+                  <p>Esperamos volver a verte pronto.</p>
+                  <p>¡Que pases un lindo día!</p>
+                </span>
+              </span>
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <th>&nbsp;</th>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

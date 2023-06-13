@@ -1,28 +1,70 @@
 package com.project.cuchosmarket.services;
 
+import com.project.cuchosmarket.enums.OrderStatus;
+import com.project.cuchosmarket.enums.OrderType;
+import com.project.cuchosmarket.models.Order;
+import com.project.cuchosmarket.models.User;
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.AddressException;
-import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class EmailService {
     @Autowired
     private JavaMailSender sender;
 
-    public void sendEmail(String to, String subject, String body) throws MessagingException {
+    @Autowired
+    ThymeleafService thymeleafService;
+
+    @Value("${spring.mail.username}")
+    private String setFromEmail;
+
+
+    public void sendEmailUpdateOrderStatus(User user, Order order) throws MessagingException {
         MimeMessage message = sender.createMimeMessage();
-        message.setFrom(new InternetAddress("sender@example.com"));
-        message.setRecipients(MimeMessage.RecipientType.TO, "recipient@example.com");
-        message.setSubject("Test email from Spring");
+        MimeMessageHelper helper = new MimeMessageHelper(
+                message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                StandardCharsets.UTF_8.name()
+        );
 
-        String htmlContent = "<h1>This is a test Spring Boot email</h1>" +
-                "<p>It can contain <strong>HTML</strong> content.</p>";
-        message.setContent(htmlContent, "text/html; charset=utf-8");
+        String subject = setSubjectForUpdateOrderStatus(order.getStatus(), order.getType());
 
+        helper.setTo(user.getEmail());
+        helper.setSubject(subject);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("subject", subject);
+        variables.put("first_name", user.getFirstName());
+        variables.put("order_status", order.getStatus().name());
+        variables.put("order_type", order.getType());
+        helper.setText(thymeleafService.createContent("order-status-update-email-template.html", variables), true);
+        helper.setFrom(setFromEmail);
         sender.send(message);
+    }
+
+    private String setSubjectForUpdateOrderStatus(OrderStatus orderStatus, OrderType orderType) {
+        switch (orderStatus) {
+            case PENDING:
+                return "Tu pedido ha sido realizado con éxito";
+            case PREPARING:
+                return "Tu pedido está siendo preparado";
+            case CANCELLED:
+                return "Tu pedido ha sido cancelado";
+            case DELIVERED:
+                if (orderType.equals(OrderType.PICK_UP))
+                    return "Tu pedido está pronto para ser retirado";
+                else if (orderType.equals(OrderType.DELIVERY))
+                    return "Tu pedido ya está en camino";
+            default:
+                return "Este mensaje es enviado por Cucho's Market";
+        }
     }
 }
