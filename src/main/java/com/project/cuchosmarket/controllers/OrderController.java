@@ -6,6 +6,7 @@ import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.services.IssueService;
 import com.project.cuchosmarket.services.OrderService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -94,6 +95,8 @@ public class OrderController {
                     .error(true)
                     .message(e.getMessage())
                     .build();
+        } catch (MessagingException e) {
+            e.printStackTrace();
         }
 
         return DtResponse.builder()
@@ -112,6 +115,8 @@ public class OrderController {
                     .error(true)
                     .message(e.getMessage())
                     .build();
+        } catch (MessagingException e) {
+            e.printStackTrace();
         }
 
         return DtResponse.builder()
@@ -130,6 +135,8 @@ public class OrderController {
                     .error(true)
                     .message(e.getMessage())
                     .build();
+        } catch (MessagingException e) {
+            e.printStackTrace();
         }
 
         return DtResponse.builder()

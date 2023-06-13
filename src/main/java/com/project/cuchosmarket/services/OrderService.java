@@ -7,6 +7,7 @@ import com.project.cuchosmarket.enums.OrderType;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.*;
 import com.project.cuchosmarket.repositories.*;
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,8 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final StockRepository stockRepository;
     private final PromotionRepository promotionRepository;
+
+    private final EmailService emailService;
 
     private void employeeWorksInBranch(String username, Long marketBranchId) throws EmployeeNotWorksInException {
         User user = userRepository.findByEmail(username);
@@ -87,7 +90,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void buyProducts(String userEmail, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException, InvalidOrderException, AddressNotExistException {
+    public void buyProducts(String userEmail, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException, InvalidOrderException, AddressNotExistException, MessagingException {
         User user = userRepository.findByEmail(userEmail);
         if (user == null) throw new UserNotExistException();
 
@@ -138,6 +141,8 @@ public class OrderService {
 
         branch.addOrder(order);
         branchRepository.save(branch);
+
+        emailService.sendEmailUpdateOrderStatus(customer, null , order);
     }
 
     private float applyPromotion(Product product, int productQuantity) {
@@ -170,7 +175,7 @@ public class OrderService {
         return order;
     }
 
-    public void updateStatus(String userEmail, DtOrder dtOrder) throws EmployeeNotWorksInException, OrderNotExistException, InvalidOrderException {
+    public void updateStatus(String userEmail, DtOrder dtOrder) throws EmployeeNotWorksInException, OrderNotExistException, InvalidOrderException, MessagingException {
         employeeWorksInBranch(userEmail, dtOrder.getBranchId());
 
         Order order = validateOrder(dtOrder.getId());
@@ -178,9 +183,10 @@ public class OrderService {
 
         order.setStatus(dtOrder.getStatus());
         orderRepository.save(order);
+        emailService.sendEmailUpdateOrderStatus(order.getCustomer(), null , order);
     }
 
-    public void cancelOrder(String userEmail, Long order_id) throws OrderNotExistException, InvalidOrderException {
+    public void cancelOrder(String userEmail, Long order_id) throws OrderNotExistException, InvalidOrderException, MessagingException {
         Customer customer = (Customer) userRepository.findByEmail(userEmail);
         Order order = validateOrder(order_id);
 
@@ -193,5 +199,6 @@ public class OrderService {
         else throw new InvalidOrderException("La orden " + order_id + " no se puede cancelar. Verifique estado de compra.");
 
         orderRepository.save(order);
+        emailService.sendEmailUpdateOrderStatus(customer, null , order);
     }
 }
