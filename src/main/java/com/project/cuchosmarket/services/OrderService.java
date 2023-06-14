@@ -7,15 +7,15 @@ import com.project.cuchosmarket.enums.OrderType;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.*;
 import com.project.cuchosmarket.repositories.*;
-import com.project.cuchosmarket.repositories.specifications.OrderSpecifications;
 import lombok.AllArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,11 +37,12 @@ public class OrderService {
         if (!branchEmployee.getId().equals(marketBranchId)) throw new EmployeeNotWorksInException();
     }
 
-    public List<Order> getOrdersBy(String userEmail, Long marketBranchId, String orderStatus, LocalDate startDate,
-                                   LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException, UserNotExistException, InvalidOrderException {
+    public Page<DtOrder> getOrdersBy(String userEmail, int pageNumber, int pageSize, Long marketBranchId, String orderStatus, LocalDate startDate,
+                                     LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException, UserNotExistException, InvalidOrderException {
         employeeWorksInBranch(userEmail, marketBranchId);
 
         OrderStatus status = null;
+        Sort sort;
         if (orderStatus != null) {
             try {
                 status = OrderStatus.valueOf(orderStatus.toUpperCase());
@@ -49,9 +50,15 @@ public class OrderService {
                 throw new InvalidOrderException("Estado de la compra invalido.");
             }
         }
+        if (orderDirection == null || orderDirection.equalsIgnoreCase("desc")) sort = Sort.by("o.creationDate").descending();
+        else sort = Sort.by("o.creationDate").ascending();
 
-        Specification<Order> specification = OrderSpecifications.filterByAttributes(status, startDate, endDate, orderDirection);
-        return orderRepository.findAll(specification);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        return branchRepository.findOrders(marketBranchId, status, startDate, endDate,  pageable);
+    }
+
+    public Order getOrder(Long orderId) throws OrderNotExistException {
+        return orderRepository.findById(orderId).orElseThrow(() -> new OrderNotExistException(orderId));
     }
 
     @Transactional
@@ -129,7 +136,7 @@ public class OrderService {
 
     public void cancelOrder(String userEmail, Long order_id) throws OrderNotExistException, InvalidOrderException {
         Customer customer = (Customer) userRepository.findByEmail(userEmail);
-        if (customer.getOrdersPlaced().get(order_id) == null) throw new InvalidOrderException("Este pedido no pertence al cliente.");
+        if (customer.getOrder(order_id) == null) throw new InvalidOrderException("Este pedido no pertence al cliente.");
 
         Order order = validateOrder(order_id);
         if (order.getStatus().equals(OrderStatus.PENDING)) order.setStatus(OrderStatus.CANCELLED);

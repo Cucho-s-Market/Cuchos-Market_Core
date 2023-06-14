@@ -6,9 +6,11 @@ import com.project.cuchosmarket.dto.DtStock;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.*;
 import com.project.cuchosmarket.repositories.*;
-import com.project.cuchosmarket.repositories.specifications.ProductSpecifications;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,13 +41,6 @@ public class ProductService {
         if(product.isEmpty()) throw new ProductNotExistException(dtProduct.getName());
 
         return product.get();
-    }
-
-    public Product findProductByCode(String code) throws ProductNotExistException {
-        Product product = productRepository.findByCode(code);
-        if(product == null) throw new ProductNotExistException(code.toString());
-
-        return product;
     }
 
     @Transactional
@@ -109,9 +104,29 @@ public class ProductService {
         productRepository.delete(product);
     }
   
-    public List<Product> getProductsBy(String name, String brand, Long category_id, String orderBy, String orderDirection) {
-        Specification<Product> specification = ProductSpecifications.filterByAttributes(name, brand, orderBy, orderDirection, category_id);
-        return productRepository.findAll(specification);
+    public Page<DtProduct> getProducts(int pageNumber, int pageSize, Long branchId, String code, String name, String brand, Long category_id, String orderBy, String orderDirection) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sortBy(orderBy, orderDirection));
+        if (branchId != null) return stockRepository.findProducts(branchId, code, name, brand, category_id, pageable);
+        else return productRepository.findProducts(code, name, brand, category_id, pageable);
+    }
+
+    private Sort sortBy(String orderBy, String orderDirection) {
+        Sort.Direction direction = null;
+        Sort sort = null;
+
+        if(orderDirection.equalsIgnoreCase("desc")) {
+            direction = Sort.Direction.DESC;
+        } else {
+            direction = Sort.Direction.ASC;
+        }
+
+        if (orderBy.equals("name") || orderBy.equals("price") || orderBy.equals("entryDate")) {
+            sort = Sort.by(direction, orderBy);
+        } else {
+            sort = Sort.by(direction, "name");
+        }
+
+        return sort;
     }
 
     public void updateStockProduct(String userEmail, DtStock stockProduct) throws EmployeeNotWorksInException, ProductNotExistException, UserNotExistException, NoStockException {
@@ -132,4 +147,5 @@ public class ProductService {
         }
         else throw new NoStockException("No se encontró el stock del producto.");
     }
+
 }

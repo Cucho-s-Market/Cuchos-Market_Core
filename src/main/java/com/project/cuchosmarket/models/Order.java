@@ -36,6 +36,11 @@ public class Order {
     private List<Item> products;
 
     @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
+
+    @ManyToOne
     @JoinColumn(name = "client_address_id")
     private Address clientAddress;
 
