@@ -13,7 +13,6 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -30,9 +29,6 @@ public class Customer extends User {
     @JoinColumn(name = "client_id")
     private List<Address> addresses;
 
-    @OneToMany(mappedBy = "customer")
-    private List<Order> ordersPlaced;
-
     public Customer(String firstName, String lastName, String email, String password, LocalDate birthdate, long telephone,long dni) {
         super(firstName, lastName, email, password, Role.CUSTOMER);
         this.birthdate = birthdate;
@@ -47,16 +43,5 @@ public class Customer extends User {
 
     public Boolean removeAddress(Long addressId) {
         return this.addresses.removeIf(address -> address.getId().equals(addressId));
-    }
-
-    public void addOrder(Order order){
-        this.ordersPlaced.add(order);
-    }
-
-    public Order getOrder(Long orderId) {
-        return ordersPlaced.stream()
-                .filter(order -> order.getId().equals(orderId))
-                .findFirst()
-                .orElse(null);
     }
 }
