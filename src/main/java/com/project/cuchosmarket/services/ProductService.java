@@ -1,5 +1,6 @@
 package com.project.cuchosmarket.services;
 
+import com.project.cuchosmarket.controllers.ProductController;
 import com.project.cuchosmarket.dto.DtProduct;
 import com.project.cuchosmarket.dto.DtStock;
 import com.project.cuchosmarket.exceptions.*;
@@ -105,7 +106,8 @@ public class ProductService {
   
     public Page<DtProduct> getProducts(int pageNumber, int pageSize, Long branchId, String code, String name, String brand, Long category_id, String orderBy, String orderDirection) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sortBy(orderBy, orderDirection));
-        return stockRepository.findProducts(branchId, code, name, brand, category_id, pageable);
+        if (branchId != null) return stockRepository.findProducts(branchId, code, name, brand, category_id, pageable);
+        else return productRepository.findProducts(code, name, brand, category_id, pageable);
     }
 
     private Sort sortBy(String orderBy, String orderDirection) {

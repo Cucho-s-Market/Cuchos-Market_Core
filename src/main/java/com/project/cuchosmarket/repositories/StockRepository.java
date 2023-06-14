@@ -28,7 +28,7 @@ public interface StockRepository extends JpaRepository<Stock, StockId> {
             "AND (:code IS NULL OR s.id.product.code = :code) " +
             "AND (:name IS NULL OR LOWER(s.id.product.name) LIKE CONCAT('%', LOWER(:name), '%')) " +
             "AND (:brand IS NULL OR LOWER(s.id.product.brand) = LOWER(:brand)) " +
-            "AND (:categoryId IS NULL OR s.id.product.category.id = :categoryId)") //TODO Se repiten si no se indica la branch
+            "AND (:categoryId IS NULL OR s.id.product.category.id = :categoryId)")
     Page<DtProduct> findProducts(@Param("branchId") Long branchId,
                                  @Param("code") String code,
                                  @Param("name") String name,

@@ -136,7 +136,7 @@ public class OrderService {
 
     public void cancelOrder(String userEmail, Long order_id) throws OrderNotExistException, InvalidOrderException {
         Customer customer = (Customer) userRepository.findByEmail(userEmail);
-        if (customer.getOrdersPlaced().get(order_id) == null) throw new InvalidOrderException("Este pedido no pertence al cliente.");
+        if (customer.getOrder(order_id) == null) throw new InvalidOrderException("Este pedido no pertence al cliente.");
 
         Order order = validateOrder(order_id);
         if (order.getStatus().equals(OrderStatus.PENDING)) order.setStatus(OrderStatus.CANCELLED);

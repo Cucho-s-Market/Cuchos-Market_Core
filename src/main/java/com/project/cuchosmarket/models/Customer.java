@@ -30,10 +30,8 @@ public class Customer extends User {
     @JoinColumn(name = "client_id")
     private List<Address> addresses;
 
-    @OneToMany
-    @JoinColumn(name = "client_id")
-    private Map<Long, Order> ordersPlaced;
-
+    @OneToMany(mappedBy = "customer")
+    private List<Order> ordersPlaced;
 
     public Customer(String firstName, String lastName, String email, String password, LocalDate birthdate, long telephone,long dni) {
         super(firstName, lastName, email, password, Role.CUSTOMER);
@@ -52,6 +50,13 @@ public class Customer extends User {
     }
 
     public void addOrder(Order order){
-        this.ordersPlaced.put(order.getId(), order);
+        this.ordersPlaced.add(order);
+    }
+
+    public Order getOrder(Long orderId) {
+        return ordersPlaced.stream()
+                .filter(order -> order.getId().equals(orderId))
+                .findFirst()
+                .orElse(null);
     }
 }
