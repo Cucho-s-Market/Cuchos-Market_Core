@@ -45,7 +45,7 @@ public class UserService {
         }
 
         if (user.getRole().equals(Role.CUSTOMER)) {
-            if (customerRepository.findById(user.getId()).get().isDisabled()) {
+            if (customerRepository.findById(user.getId()).get().getDisabled()) {
                 throw new CustomerDisabledException("Usuario inhabilitado.");
             }
             Customer customer = (Customer) user;
