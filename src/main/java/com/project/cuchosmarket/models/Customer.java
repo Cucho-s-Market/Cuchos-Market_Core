@@ -23,7 +23,7 @@ public class Customer extends User {
     private LocalDate birthdate;
     private long telephone;
     private long dni;
-    private boolean disabled;
+    private Boolean disabled;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "client_id")
