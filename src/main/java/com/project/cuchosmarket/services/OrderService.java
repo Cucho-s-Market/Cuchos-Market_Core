@@ -45,10 +45,10 @@ public class OrderService {
             throw new InvalidOrderException("Estado de la compra inválido.");
         }
     }
-    private Sort createSortByCreationDate(String orderDirection) {
+    private Sort createSortBy(String sortBy, String orderDirection) {
         return (orderDirection == null || orderDirection.equalsIgnoreCase("desc")) ?
-                Sort.by("creationDate").descending() :
-                Sort.by("creationDate").ascending();
+                Sort.by(sortBy).descending() :
+                Sort.by(sortBy).ascending();
     }
 
     public Page<DtOrder> getOrdersBy(String userEmail, int pageNumber, int pageSize, Long marketBranchId, String orderStatus, LocalDate startDate,
@@ -56,7 +56,7 @@ public class OrderService {
         employeeWorksInBranch(userEmail, marketBranchId);
 
         OrderStatus status = parseOrderStatus(orderStatus);
-        Sort sort = createSortByCreationDate(orderDirection);
+        Sort sort = createSortBy("o.creationDate", orderDirection);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         return branchRepository.findOrders(marketBranchId, status, startDate, endDate, pageable);
@@ -68,14 +68,21 @@ public class OrderService {
         if (user == null) throw new UserNotExistException();
 
         OrderStatus status = parseOrderStatus(orderStatus);
-        Sort sort = createSortByCreationDate(orderDirection);
+        Sort sort = createSortBy("creationDate", orderDirection);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         return orderRepository.findCustomerOrders(user.getId(), status, startDate, endDate, pageable);
     }
 
     public Order getOrder(Long orderId) throws OrderNotExistException {
-        return orderRepository.findById(orderId).orElseThrow(() -> new OrderNotExistException(orderId));
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotExistException(orderId));
+        order.getCustomer().setId(null);
+        order.getCustomer().setPassword(null);
+        order.getCustomer().setRole(null);
+        order.getCustomer().setDisabled(null);
+        order.getCustomer().setAddresses(null);
+
+        return order;
     }
 
     @Transactional
