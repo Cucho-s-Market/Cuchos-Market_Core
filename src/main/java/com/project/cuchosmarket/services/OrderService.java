@@ -124,7 +124,7 @@ public class OrderService {
         order = new Order(totalPrice, LocalDate.now(), OrderStatus.PENDING, dtOrder.getType(), items);
         if (order.getType().equals(OrderType.DELIVERY)) {
 
-            if (dtOrder.getAddressId() == null) throw new IllegalArgumentException("No se ha seleccionado ninguna direccion.");
+            if (dtOrder.getAddressId() == null) throw new InvalidOrderException("No se ha seleccionado ninguna direccion.");
             Address address = customer.getAddresses()
                     .stream()
                     .filter(address1 -> address1.getId().equals(dtOrder.getAddressId()))

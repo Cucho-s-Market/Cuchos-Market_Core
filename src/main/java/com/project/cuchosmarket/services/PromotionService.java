@@ -89,6 +89,6 @@ public class PromotionService {
     }
 
     public List<Promotion> getPromotions(boolean includeExpired) {
-        return promotionRepository.findPromotions(includeExpired);   //TODO Agregar filtro de promociones
+        return promotionRepository.findPromotions(includeExpired);
     }
 }

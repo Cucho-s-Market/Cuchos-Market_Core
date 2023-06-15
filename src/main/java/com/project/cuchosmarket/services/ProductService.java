@@ -104,14 +104,16 @@ public class ProductService {
             promotion.getProducts().remove(product);
             promotionRepository.save(promotion);
         });
-        branchRepository.findAll().forEach(branch -> stockRepository.findById(new StockId(product, branch)).ifPresent(stockRepository::delete));
+        branchRepository.findAll().forEach(branch -> stockRepository.findById(new StockId(product, branch))
+                .ifPresent(stockRepository::delete));
         productRepository.delete(product);
     }
   
-    public Page<DtProduct> getProducts(int pageNumber, int pageSize, Long branchId, String code, String name, String brand, Long category_id, String orderBy, String orderDirection) {
+    public Page<DtProduct> getProducts(int pageNumber, int pageSize, Long branchId, String code, String name, String brand,
+                                       Long category_id, Long promotion_id, String orderBy, String orderDirection) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sortBy(orderBy, orderDirection));
-        if (branchId != null) return stockRepository.findProducts(branchId, code, name, brand, category_id, pageable);
-        else return productRepository.findProducts(code, name, brand, category_id, pageable);
+        if (branchId != null) return stockRepository.findProducts(branchId, code, name, brand, category_id, promotion_id, pageable);
+        else return productRepository.findProducts(code, name, brand, category_id, promotion_id, pageable);
     }
 
     private Sort sortBy(String orderBy, String orderDirection) {

@@ -24,15 +24,18 @@ public interface StockRepository extends JpaRepository<Stock, StockId> {
             "s.id.product.images AS images, " +
             "s.quantity AS quantity) " +
             "FROM Stock s " +
+            "LEFT JOIN s.id.product.promotions p " +
             "WHERE (:branchId IS NULL OR s.id.branch.id = :branchId) " +
             "AND (:code IS NULL OR s.id.product.code = :code) " +
             "AND (:name IS NULL OR LOWER(s.id.product.name) LIKE CONCAT('%', LOWER(:name), '%')) " +
             "AND (:brand IS NULL OR LOWER(s.id.product.brand) = LOWER(:brand)) " +
-            "AND (:categoryId IS NULL OR s.id.product.category.id = :categoryId)")
+            "AND (:categoryId IS NULL OR s.id.product.category.id = :categoryId) " +
+            "AND (:promotionId IS NULL OR p.id = :promotionId)")
     Page<DtProduct> findProducts(@Param("branchId") Long branchId,
                                  @Param("code") String code,
                                  @Param("name") String name,
                                  @Param("brand") String brand,
                                  @Param("categoryId") Long categoryId,
+                                 @Param("promotionId") Long promotionId,
                                  Pageable pageable);
 }

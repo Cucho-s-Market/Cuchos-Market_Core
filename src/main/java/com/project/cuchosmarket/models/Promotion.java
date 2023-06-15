@@ -24,7 +24,7 @@ public abstract class Promotion {
 
     @ManyToMany
     @JoinTable(
-            name = "promotion_product",
+            name = "promotion_products",
             joinColumns = @JoinColumn(name = "promotion_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
