@@ -42,6 +42,30 @@ public class OrderController {
                 .build();
     }
 
+    @GetMapping("/customer")
+    public DtResponse getPurchasesHistory(@RequestParam(value = "page_number", required = false, defaultValue = "0") int page_number,
+                                       @RequestParam(value = "page_size", required = false, defaultValue = "50") int page_size,
+                                       @RequestParam(value = "orderStatus", required = false) String orderStatus,
+                                       @RequestParam(value = "startDate", required = false) LocalDate startDate,
+                                       @RequestParam(value = "endDate", required = false) LocalDate endDate,
+                                       @RequestParam(value = "orderDirection", required = false) String orderDirection) {
+        Page<DtOrder> orderList = null;
+        try {
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            orderList = orderService.getPurchasesByCustomer(userEmail, page_number, page_size, orderStatus,
+                    startDate, endDate, orderDirection);
+        } catch (UserNotExistException | InvalidOrderException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+        return DtResponse.builder()
+                .error(false)
+                .data(orderList)
+                .build();
+    }
+
     @GetMapping("/{order_id}")
     public DtResponse getOrder(@PathVariable("order_id") Long order_id) {
         try {

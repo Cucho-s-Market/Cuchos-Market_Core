@@ -25,7 +25,6 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
-    private final CustomerRepository customerRepository;
     private final BranchRepository branchRepository;
     private final ProductRepository productRepository;
     private final StockRepository stockRepository;
@@ -37,24 +36,42 @@ public class OrderService {
         if (!branchEmployee.getId().equals(marketBranchId)) throw new EmployeeNotWorksInException();
     }
 
+    private OrderStatus parseOrderStatus(String orderStatus) throws InvalidOrderException {
+        if (orderStatus == null) return null;
+
+        try {
+            return OrderStatus.valueOf(orderStatus.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidOrderException("Estado de la compra inválido.");
+        }
+    }
+    private Sort createSortByCreationDate(String orderDirection) {
+        return (orderDirection == null || orderDirection.equalsIgnoreCase("desc")) ?
+                Sort.by("creationDate").descending() :
+                Sort.by("creationDate").ascending();
+    }
+
     public Page<DtOrder> getOrdersBy(String userEmail, int pageNumber, int pageSize, Long marketBranchId, String orderStatus, LocalDate startDate,
                                      LocalDate endDate, String orderDirection) throws EmployeeNotWorksInException, UserNotExistException, InvalidOrderException {
         employeeWorksInBranch(userEmail, marketBranchId);
 
-        OrderStatus status = null;
-        Sort sort;
-        if (orderStatus != null) {
-            try {
-                status = OrderStatus.valueOf(orderStatus.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new InvalidOrderException("Estado de la compra invalido.");
-            }
-        }
-        if (orderDirection == null || orderDirection.equalsIgnoreCase("desc")) sort = Sort.by("o.creationDate").descending();
-        else sort = Sort.by("o.creationDate").ascending();
+        OrderStatus status = parseOrderStatus(orderStatus);
+        Sort sort = createSortByCreationDate(orderDirection);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
-        return branchRepository.findOrders(marketBranchId, status, startDate, endDate,  pageable);
+        return branchRepository.findOrders(marketBranchId, status, startDate, endDate, pageable);
+    }
+
+    public Page<DtOrder> getPurchasesByCustomer(String userEmail, int pageNumber, int pageSize, String orderStatus, LocalDate startDate,
+                                                LocalDate endDate, String orderDirection) throws UserNotExistException, InvalidOrderException {
+        User user = userRepository.findByEmail(userEmail);
+        if (user == null) throw new UserNotExistException();
+
+        OrderStatus status = parseOrderStatus(orderStatus);
+        Sort sort = createSortByCreationDate(orderDirection);
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        return orderRepository.findCustomerOrders(user.getId(), status, startDate, endDate, pageable);
     }
 
     public Order getOrder(Long orderId) throws OrderNotExistException {
@@ -64,11 +81,13 @@ public class OrderService {
     @Transactional
     public void buyProducts(String userEmail, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException, InvalidOrderException, AddressNotExistException {
         User user = userRepository.findByEmail(userEmail);
-        Customer customer = customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
+        if (user == null) throw new UserNotExistException();
+
+        Customer customer = (Customer) user;
         Branch marketBranch = branchRepository.findById(dtOrder.getBranchId())
                 .orElseThrow(() -> new BranchNotExistException(dtOrder.getBranchId()));
 
-        if (dtOrder.getStatus() == null || dtOrder.getType() == null) throw new InvalidOrderException("Informacion de orden invalida.");
+        if (dtOrder.getStatus() == null && dtOrder.getType() == null) throw new InvalidOrderException("Informacion de orden invalida.");
         if (dtOrder.getProducts().isEmpty()) throw new InvalidOrderException("No se selecciono ningun producto para comprar.");
 
 
@@ -106,10 +125,8 @@ public class OrderService {
             order.setClientAddress(address);
         }
 
+        order.setCustomer(customer);
         orderRepository.save(order);
-
-        customer.addOrder(order);
-        customerRepository.save(customer);
 
         marketBranch.addOrder(order);
         branchRepository.save(marketBranch);
@@ -136,9 +153,10 @@ public class OrderService {
 
     public void cancelOrder(String userEmail, Long order_id) throws OrderNotExistException, InvalidOrderException {
         Customer customer = (Customer) userRepository.findByEmail(userEmail);
-        if (customer.getOrder(order_id) == null) throw new InvalidOrderException("Este pedido no pertence al cliente.");
-
         Order order = validateOrder(order_id);
+
+        if(!order.getCustomer().getId().equals(customer.getId())) throw new InvalidOrderException("Este pedido no pertence al cliente.");
+
         if (order.getStatus().equals(OrderStatus.PENDING)) order.setStatus(OrderStatus.CANCELLED);
         else throw new InvalidOrderException("La orden " + order_id + " no se puede cancelar. Verifique estado de compra.");
 

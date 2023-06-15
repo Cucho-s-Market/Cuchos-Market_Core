@@ -85,7 +85,7 @@ public class WebSecurityConfig {
                 //Employees users
                 .requestMatchers(
                         HttpMethod.GET,
-                        "/orders/**",
+                        "/orders/branch/**",
                         "/products/{branch_id}/{category_id}/stock"
                 ).hasRole(EMPLOYEE.name())
 
@@ -99,6 +99,11 @@ public class WebSecurityConfig {
                         HttpMethod.POST,
                         "/users/customer/**",
                         "/orders/**"
+                ).hasRole(CUSTOMER.name())
+
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/orders/customer"
                 ).hasRole(CUSTOMER.name())
 
                 .requestMatchers(

@@ -1,6 +1,5 @@
 package com.project.cuchosmarket.services;
 
-import com.project.cuchosmarket.controllers.ProductController;
 import com.project.cuchosmarket.dto.DtProduct;
 import com.project.cuchosmarket.dto.DtStock;
 import com.project.cuchosmarket.exceptions.*;
