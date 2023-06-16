@@ -1,5 +1,7 @@
 package com.project.cuchosmarket.services;
 
+import com.project.cuchosmarket.enums.OrderStatus;
+import com.project.cuchosmarket.enums.OrderType;
 import com.project.cuchosmarket.models.Order;
 import com.project.cuchosmarket.models.User;
 import jakarta.mail.MessagingException;
@@ -26,12 +28,14 @@ public class EmailService {
     private String setFromEmail;
 
 
-    public void sendEmailUpdateOrderStatus(User user, String subject, Order order) throws MessagingException {
+    public void sendEmailUpdateOrderStatus(User user, Order order) throws MessagingException {
         MimeMessage message = sender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(
                 message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                 StandardCharsets.UTF_8.name()
         );
+
+        String subject = setSubjectForUpdateOrderStatus(order.getStatus(), order.getType());
 
         helper.setTo(user.getEmail());
         helper.setSubject(subject);
@@ -45,4 +49,45 @@ public class EmailService {
         helper.setFrom(setFromEmail);
         sender.send(message);
     }
+
+    private String setSubjectForUpdateOrderStatus(OrderStatus orderStatus, OrderType orderType) {
+        switch (orderStatus) {
+            case PENDING:
+                return "Tu pedido ha sido realizado con éxito";
+            case PREPARING:
+                return "Tu pedido está siendo preparado";
+            case CANCELLED:
+                return "Tu pedido ha sido cancelado";
+            case DELIVERED:
+                if (orderType.equals(OrderType.PICK_UP))
+                    return "Tu pedido está pronto para ser retirado";
+                else if (orderType.equals(OrderType.DELIVERY))
+                    return "Tu pedido ya está en camino";
+            default:
+                return "Este mensaje es enviado por Cucho's Market";
+        }
+    }
+
+    public void sendResetTokenEmail(String contextPath, String token, User user) throws MessagingException {
+        MimeMessage message = sender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(
+                message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                StandardCharsets.UTF_8.name()
+        );
+
+        String url = contextPath + "/users/changePassword";
+        String authorizationHeader = "Bearer " + token;
+
+        helper.setTo(user.getEmail());
+        helper.setFrom(setFromEmail);
+        helper.setSubject("Solicitud para restablecer contraseña");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("resetPasswordUrl", url);
+        variables.put("authorizationHeader", authorizationHeader);
+        variables.put("first_name", user.getFirstName());
+        helper.setText(thymeleafService.createContent("reset-password-email-template.html", variables), true);
+        sender.send(message);
+    }
+
 }

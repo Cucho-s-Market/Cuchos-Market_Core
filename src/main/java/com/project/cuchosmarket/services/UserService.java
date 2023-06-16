@@ -13,6 +13,8 @@ import com.project.cuchosmarket.repositories.*;
 import com.project.cuchosmarket.security.JwtService;
 import com.project.cuchosmarket.security.UserDetailsImpl;
 import io.micrometer.common.util.StringUtils;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,19 +39,22 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final EmailService emailService;
 
-    public DtResponse authenticate(DtUser dtUser) throws UserNotExistException, CustomerDisabledException {
+    public User validateUserAuthentication(DtUser dtUser) throws UserNotExistException, CustomerDisabledException {
         User user = userRepository.findByEmail(dtUser.getEmail());
-        if (user == null) {
-            throw new UserNotExistException();
-        }
+        if (user == null) throw new UserNotExistException();
 
         if (user.getRole().equals(Role.CUSTOMER)) {
-            if (customerRepository.findById(user.getId()).get().getDisabled()) {
-                throw new CustomerDisabledException("Usuario inhabilitado.");
-            }
-            Customer customer = (Customer) user;
-        } else if (user.getRole().equals(Role.EMPLOYEE)) {
+            if (customerRepository.findById(user.getId()).get().getDisabled()) throw new CustomerDisabledException("Usuario bloqueado.");
+        }
+        return user;
+    }
+
+    public DtResponse authenticate(DtUser dtUser) throws UserNotExistException, CustomerDisabledException {
+        User user = validateUserAuthentication(dtUser);
+
+        if (user.getRole().equals(Role.EMPLOYEE)) {
             Employee employee = (Employee) user;
             employee.getBranch().setOrders(null);
         }
@@ -70,11 +75,29 @@ public class UserService {
                 .build();
     }
 
+    public void resetPassword(HttpServletRequest request, DtUser dtUser) throws UserNotExistException, CustomerDisabledException, MessagingException {
+        User user = validateUserAuthentication(dtUser);
+        var jwtToken = jwtService.createToken(new HashMap<>(), new UserDetailsImpl(user));
+        emailService.sendResetTokenEmail(request.getContextPath(), jwtToken, user);
+    }
+
+
+    public void updatePassword(String userEmail, DtUser dtUser) throws UserNotExistException, CustomerDisabledException {
+        dtUser.setEmail(userEmail);
+        User user = validateUserAuthentication(dtUser);
+
+        if (StringUtils.isBlank(dtUser.getPassword())) throw new IllegalArgumentException("La contraseña no puede estar vacia.");
+        else if (passwordEncoder.matches(dtUser.getPassword(), user.getPassword())) throw new IllegalArgumentException("La nueva contraseña ha de ser distinta a la anterior.");
+
+        passwordEncoder.encode(dtUser.getPassword());
+        userRepository.save(user);
+    }
+
     private void validateUser(DtUser dtUser) throws UserExistException {
 
         if (StringUtils.isBlank(dtUser.getPassword())) throw new IllegalArgumentException("La contraseña no puede estar vacia.");
-        
-        if (StringUtils.isBlank(dtUser.getFirstName()) || StringUtils.isBlank(dtUser.getLastName()) || dtUser.getFirstName().length() > 25 || dtUser.getLastName().length() > 25 ) 
+
+        if (StringUtils.isBlank(dtUser.getFirstName()) || StringUtils.isBlank(dtUser.getLastName()) || dtUser.getFirstName().length() > 25 || dtUser.getLastName().length() > 25 )
             throw new IllegalArgumentException("Datos invalidos: Nombre invalido.");
     }
 
@@ -90,7 +113,7 @@ public class UserService {
         if((userRepository.existsByEmail(user.getEmail()))) throw new UserExistException("Usuario con email " + user.getEmail() + " ya se encuentra en el sistema.");
 
         Branch branch = branchRepository.findById(branchId).orElseThrow(() -> new BranchNotExistException(branchId));
-        
+
         validateUser(user);
 
         Employee employee = new Employee(user.getFirstName(),
@@ -104,7 +127,7 @@ public class UserService {
     public DtResponse addCustomer(DtCustomer dtCustomer) throws UserExistException {
 
         if((userRepository.existsByEmail(dtCustomer.getEmail()))) throw new UserExistException("Usuario con email " + dtCustomer.getEmail() + " ya se encuentra en el sistema.");
-        
+
         validateUser(dtCustomer);
         validateCustomer(null, dtCustomer);
 
@@ -128,7 +151,7 @@ public class UserService {
     public void updateUser(String userEmail, DtCustomer dtUser) throws UserNotExistException, UserExistException {
         User user = userRepository.findByEmail(userEmail);
         if (user == null) throw new UserNotExistException();
-        
+
         validateUser(dtUser);
 
         if (user.getRole().equals(Role.CUSTOMER)) {

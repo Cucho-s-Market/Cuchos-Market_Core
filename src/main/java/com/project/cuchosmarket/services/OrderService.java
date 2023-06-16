@@ -142,7 +142,7 @@ public class OrderService {
         branch.addOrder(order);
         branchRepository.save(branch);
 
-        emailService.sendEmailUpdateOrderStatus(customer, null , order);
+        emailService.sendEmailUpdateOrderStatus(customer, order);
     }
 
     private float applyPromotion(Product product, int productQuantity) {
@@ -183,7 +183,7 @@ public class OrderService {
 
         order.setStatus(dtOrder.getStatus());
         orderRepository.save(order);
-        emailService.sendEmailUpdateOrderStatus(order.getCustomer(), null , order);
+        emailService.sendEmailUpdateOrderStatus(order.getCustomer(), order);
     }
 
     public void cancelOrder(String userEmail, Long order_id) throws OrderNotExistException, InvalidOrderException, MessagingException {
@@ -199,6 +199,6 @@ public class OrderService {
         else throw new InvalidOrderException("La orden " + order_id + " no se puede cancelar. Verifique estado de compra.");
 
         orderRepository.save(order);
-        emailService.sendEmailUpdateOrderStatus(customer, null , order);
+        emailService.sendEmailUpdateOrderStatus(customer, order);
     }
 }
