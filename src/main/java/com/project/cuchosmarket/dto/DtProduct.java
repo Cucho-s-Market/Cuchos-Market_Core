@@ -3,6 +3,7 @@ package com.project.cuchosmarket.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @Builder
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class DtProduct {
     private String code;
     private String name;
