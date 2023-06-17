@@ -143,7 +143,7 @@ public class OrderController {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             issueService.addComplaint(userEmail, dtIssue);
-        } catch (InvalidOrderException | OrderNotExistException | UserNotExistException e) {
+        } catch (InvalidOrderException | IllegalArgumentException | OrderNotExistException | UserNotExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
