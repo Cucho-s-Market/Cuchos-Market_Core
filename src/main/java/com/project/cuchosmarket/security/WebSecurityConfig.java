@@ -87,7 +87,8 @@ public class WebSecurityConfig {
                 .requestMatchers(
                         HttpMethod.GET,
                         "/orders/branch/**",
-                        "/products/{branch_id}/{category_id}/stock"
+                        "/products/{branch_id}/{category_id}/stock",
+                        "/branches/**"
                 ).hasRole(EMPLOYEE.name())
 
                 .requestMatchers(

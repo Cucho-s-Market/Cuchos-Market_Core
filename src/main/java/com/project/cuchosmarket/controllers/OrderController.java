@@ -1,8 +1,10 @@
 package com.project.cuchosmarket.controllers;
 
+import com.project.cuchosmarket.dto.DtIssue;
 import com.project.cuchosmarket.dto.DtOrder;
 import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.exceptions.*;
+import com.project.cuchosmarket.services.IssueService;
 import com.project.cuchosmarket.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import java.time.LocalDate;
 @RequestMapping("/orders")
 public class OrderController {
     private final OrderService orderService;
+    private final IssueService issueService;
 
     @GetMapping("/branch/{branch_id}")
     public DtResponse getOrdersHistory(@PathVariable("branch_id") Long branch_id,
@@ -132,6 +135,23 @@ public class OrderController {
         return DtResponse.builder()
                 .error(false)
                 .message("Orden cancelada")
+                .build();
+    }
+
+    @PostMapping("/issues")
+    public DtResponse fileOrderComplaint(@RequestBody DtIssue dtIssue) {
+        try {
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            issueService.addComplaint(userEmail, dtIssue);
+        } catch (InvalidOrderException | OrderNotExistException | UserNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+        return DtResponse.builder()
+                .error(false)
+                .message("Reclamo realizado. Nos contactaremos a la brevedad.")
                 .build();
     }
 }
