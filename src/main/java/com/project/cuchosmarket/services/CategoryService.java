@@ -6,6 +6,7 @@ import com.project.cuchosmarket.models.Category;
 import com.project.cuchosmarket.repositories.CategoryRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
+    @Autowired
     private final CategoryRepository categoryRepository;
 
     private void validateCategory(DtCategory dtCategory) throws InvalidCategoryException {
