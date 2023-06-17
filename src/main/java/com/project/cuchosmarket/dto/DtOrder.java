@@ -35,4 +35,13 @@ public class DtOrder {
         this.status = status;
         this.type = type;
     }
+
+    public DtOrder(Long id, float totalPrice, LocalDate creationDate, LocalDate endDate, OrderStatus status, OrderType type) {
+        this.id = id;
+        this.totalPrice = totalPrice;
+        this.creationDate = creationDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.type = type;
+    }
 }
