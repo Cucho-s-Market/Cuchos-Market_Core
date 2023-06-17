@@ -71,7 +71,7 @@ public class UserService {
     }
 
     private void validateUser(User user, DtUser dtUser) throws UserExistException {
-        if((user == null || (!user.getEmail().equals(dtUser.getEmail())) && userRepository.existsByEmail(dtUser.getEmail()))) {
+        if((user != null && (!user.getEmail().equals(dtUser.getEmail())) && userRepository.existsByEmail(dtUser.getEmail()))) {
             throw new UserExistException("Usuario con email " + dtUser.getEmail() + " ya se encuentra en el sistema.");
         }
 
