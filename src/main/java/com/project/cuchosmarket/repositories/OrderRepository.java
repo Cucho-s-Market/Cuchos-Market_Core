@@ -16,7 +16,6 @@ import java.time.LocalDate;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
     @Query("SELECT DISTINCT new com.project.cuchosmarket.dto.DtOrder(" +
-            "o.customer.id, " +
             "o.id, " +
             "o.totalPrice, " +
             "o.creationDate, " +
