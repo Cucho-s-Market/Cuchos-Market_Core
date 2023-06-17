@@ -28,6 +28,7 @@ public class OrderService {
     private final BranchRepository branchRepository;
     private final ProductRepository productRepository;
     private final StockRepository stockRepository;
+    private final PromotionRepository promotionRepository;
 
     private void employeeWorksInBranch(String username, Long marketBranchId) throws EmployeeNotWorksInException {
         User user = userRepository.findByEmail(username);
@@ -114,7 +115,7 @@ public class OrderService {
                 productStock.setQuantity(productStock.getQuantity() - dtItem.getQuantity());
             }
 
-            Item item = new Item(dtItem.getName(), product.getPrice(), product.getPrice() * dtItem.getQuantity(),
+            Item item = new Item(dtItem.getName(), product.getPrice(), applyPromotion(product, dtItem.getQuantity()),
                     dtItem.getQuantity(), product);
             items.add(item);
             totalPrice+=item.getFinalPrice();
@@ -123,7 +124,7 @@ public class OrderService {
         order = new Order(totalPrice, LocalDate.now(), OrderStatus.PENDING, dtOrder.getType(), items);
         if (order.getType().equals(OrderType.DELIVERY)) {
 
-            if (dtOrder.getAddressId() == null) throw new IllegalArgumentException("No se ha seleccionado ninguna direccion.");
+            if (dtOrder.getAddressId() == null) throw new InvalidOrderException("No se ha seleccionado ninguna direccion.");
             Address address = customer.getAddresses()
                     .stream()
                     .filter(address1 -> address1.getId().equals(dtOrder.getAddressId()))
@@ -137,6 +138,27 @@ public class OrderService {
 
         marketBranch.addOrder(order);
         branchRepository.save(marketBranch);
+    }
+
+    private float applyPromotion(Product product, int productQuantity) {
+        List<Promotion> productPromotions = promotionRepository.findPromotionsByProduct(product);
+        if (productPromotions.isEmpty()) return product.getPrice();
+
+        float finalPrice = 0f;
+        for (Promotion promotion : productPromotions) {
+            if (promotion instanceof Discount discount) {
+                float totalCost = product.getPrice() * productQuantity;
+                float discountAmount = totalCost * (discount.getPercentage() / 100.0f);
+                finalPrice += totalCost - discountAmount;
+            } else if (promotion instanceof NxM nxM) {
+                int paidProducts = productQuantity / nxM.getN();
+                int notApply = productQuantity % nxM.getN();
+
+                finalPrice = (paidProducts * product.getPrice() * nxM.getM()) + (notApply * product.getPrice());
+            }
+        }
+
+        return finalPrice;
     }
 
     private Order validateOrder(Long orderId) throws OrderNotExistException, InvalidOrderException {

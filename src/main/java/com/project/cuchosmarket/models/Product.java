@@ -1,10 +1,7 @@
 package com.project.cuchosmarket.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,13 +22,16 @@ public class Product {
     private LocalDate entryDate;
     private float price;
     private String brand;
+    private List<String> images;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     @JsonIgnore
     private Category category;
 
-    private List<String> images;
+    @ManyToMany(mappedBy = "products")
+    @JsonIgnore
+    private List<Promotion> promotions;
 
     public Product(String name, String code, String description, LocalDate entryDate, float price, String brand, Category category, List<String> images) {
         this.name = name;

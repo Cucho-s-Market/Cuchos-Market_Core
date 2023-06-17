@@ -23,13 +23,16 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
             "p.category.id AS categoryId, " +
             "p.images AS images) " +
             "FROM Product p " +
+            "LEFT JOIN p.promotions prom " +
             "WHERE (:code IS NULL OR p.code = :code) " +
             "AND (:name IS NULL OR LOWER(p.name) LIKE CONCAT('%', LOWER(:name), '%')) " +
             "AND (:brand IS NULL OR LOWER(p.brand) = LOWER(:brand)) " +
-            "AND (:categoryId IS NULL OR p.category.id = :categoryId)")
+            "AND (:categoryId IS NULL OR p.category.id = :categoryId) " +
+            "AND (:promotionId IS NULL OR prom.id = :promotionId)")
     Page<DtProduct> findProducts(@Param("code") String code,
                                  @Param("name") String name,
                                  @Param("brand") String brand,
                                  @Param("categoryId") Long categoryId,
+                                 @Param("promotionId") Long promotionId,
                                  Pageable pageable);
 }
