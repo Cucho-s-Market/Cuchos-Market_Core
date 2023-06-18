@@ -186,7 +186,10 @@ public class OrderService {
 
         if(!order.getCustomer().getId().equals(customer.getId())) throw new InvalidOrderException("Este pedido no pertence al cliente.");
 
-        if (order.getStatus().equals(OrderStatus.PENDING)) order.setStatus(OrderStatus.CANCELLED);
+        if (order.getStatus().equals(OrderStatus.PENDING)) {
+            order.setStatus(OrderStatus.CANCELLED);
+            order.setEndDate(LocalDate.now());
+        }
         else throw new InvalidOrderException("La orden " + order_id + " no se puede cancelar. Verifique estado de compra.");
 
         orderRepository.save(order);

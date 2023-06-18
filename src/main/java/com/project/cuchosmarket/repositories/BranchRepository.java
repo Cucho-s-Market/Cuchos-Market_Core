@@ -1,9 +1,11 @@
 package com.project.cuchosmarket.repositories;
 
 import com.project.cuchosmarket.dto.DtBranch;
+import com.project.cuchosmarket.dto.DtIssue;
 import com.project.cuchosmarket.dto.DtOrder;
 import com.project.cuchosmarket.enums.OrderStatus;
 import com.project.cuchosmarket.models.Branch;
+import com.project.cuchosmarket.models.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -46,4 +48,17 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
                              @Param("endDate") LocalDate endDate,
                              Pageable pageable);
 
+    Branch findByOrdersContains(Order order);
+
+    @Query("SELECT DISTINCT new com.project.cuchosmarket.dto.DtIssue(" +
+            "i.title, " +
+            "i.description, " +
+            "i.creationDate, " +
+            "i.userEmail, " +
+            "i.order.id) " +
+            "FROM Branch b " +
+            "JOIN b.issues i " +
+            "WHERE b.id = :branchId ")
+    Page<DtIssue> findIssues(@Param("branchId") Long branchId,
+                             Pageable pageable);
 }
