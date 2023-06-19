@@ -28,4 +28,9 @@ public class Address {
         this.location   = location;
         this.state = state;
     }
+
+    @Override
+    public String toString() {
+        return address + " " + doorNumber + ", " + location+ ", "  + state;
+    }
 }

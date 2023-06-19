@@ -76,10 +76,10 @@ public class AddressService {
         addressRepository.save(address);
     }
 
-    public void deleteAddress(String userEmail, DtAddress dtAddress) throws UserNotExistException, AddressNotExistException {
+    public void deleteAddress(String userEmail, Long address_id) throws UserNotExistException, AddressNotExistException {
         Customer customer = validateCustomer(userEmail);
 
-        if(!customer.removeAddress(dtAddress.getId())) throw new AddressNotExistException();
+        if(!customer.removeAddress(address_id)) throw new AddressNotExistException();
 
         userRepository.save(customer);
     }

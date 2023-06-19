@@ -170,11 +170,11 @@ public class UserController {
                 .build();
     }
 
-    @DeleteMapping("/customer/address")
-    public DtResponse deleteAddress(@RequestBody DtAddress address) {
+    @DeleteMapping("/customer/address/{address_id}")
+    public DtResponse deleteAddress(@PathVariable("address_id") Long address_id) {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-            addressService.deleteAddress(userEmail, address);
+            addressService.deleteAddress(userEmail, address_id);
         } catch (UserNotExistException | AddressNotExistException e) {
             return DtResponse.builder()
                     .error(true)
