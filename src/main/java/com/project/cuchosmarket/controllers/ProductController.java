@@ -23,33 +23,14 @@ public class ProductController {
             @RequestParam(value = "brand", required = false) String brand,
             @RequestParam(value = "category_id", required = false) Long category_id,
             @RequestParam(value = "orderBy", required = false) String orderBy,
-            @RequestParam(value = "orderDirection", required = false) String orderDirection) {
+            @RequestParam(value = "orderDirection", required = false) String orderDirection)
+    {
         List<Product> productsList = productService.getProductsBy(name, brand, category_id, orderBy, orderDirection);
         return DtResponse.builder()
                 .error(false)
                 .message(String.valueOf(productsList.size()))
                 .data(productsList)
                 .build();
-    }
-
-    @GetMapping("/{code}")
-    public DtResponse getProduct(@PathVariable("code") String code) throws ProductNotExistException {
-        try {
-            Product product = productService.findProductByCode(code);
-
-            return DtResponse.builder()
-                    .error(false)
-                    .message(String.valueOf("Producto encontrado."))
-                    .data(product)
-                    .build();
-
-        } catch (ProductNotExistException e) {
-            return DtResponse.builder()
-                    .error(true)
-                    .message(e.getMessage())
-                    .build();
-        }
-
     }
 
     @PostMapping
