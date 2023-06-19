@@ -10,10 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderSpecifications {
-    public static Specification<Order> filterByAttributes(OrderStatus orderStatus, LocalDate startDate, LocalDate endDate,
-                                                          String orderDirection) {
+    public static Specification<Order> filterByAttributes(List<Long> orderIdsFromBranch, OrderStatus orderStatus, LocalDate startDate,
+                                                          LocalDate endDate, String orderDirection) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            if (!orderIdsFromBranch.isEmpty()) {
+                predicates.add(root.get("id").in(orderIdsFromBranch));
+            }
 
             if (orderStatus != null) {
                 predicates.add(criteriaBuilder.equal(root.get("orderStatus"), orderStatus));

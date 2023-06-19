@@ -36,8 +36,10 @@ public class Order {
     private List<Item> products;
 
     @ManyToOne
-    @JoinColumn(name = "client_address_id")
-    private Address clientAddress;
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
+    private String clientAddress;
 
     public Order(float totalPrice, LocalDate creationDate, OrderStatus status, OrderType type, List<Item> products) {
         this.totalPrice = totalPrice;

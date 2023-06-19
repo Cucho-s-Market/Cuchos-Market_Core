@@ -45,11 +45,10 @@ public class UserService {
         }
 
         if (user.getRole().equals(Role.CUSTOMER)) {
-            if (customerRepository.findById(user.getId()).get().isDisabled()) {
+            if (customerRepository.findById(user.getId()).get().getDisabled()) {
                 throw new CustomerDisabledException("Usuario inhabilitado.");
             }
             Customer customer = (Customer) user;
-            customer.setOrdersPlaced(null);
         } else if (user.getRole().equals(Role.EMPLOYEE)) {
             Employee employee = (Employee) user;
             employee.getBranch().setOrders(null);
@@ -71,19 +70,12 @@ public class UserService {
                 .build();
     }
 
-    private void validateUser(User user, DtUser dtUser) throws UserExistException {
-        if((user == null || !user.getEmail().equals(dtUser.getEmail())) && userRepository.existsByEmail(dtUser.getEmail())) {
-            throw new UserExistException("Usuario con email " + dtUser.getEmail() + " ya se encuentra en el sistema.");
-        }
+    private void validateUser(DtUser dtUser) throws UserExistException {
 
-        if (StringUtils.isBlank(dtUser.getPassword())) {
-            throw new IllegalArgumentException("La contraseña no puede estar vacia.");
-        }
-
-        if (StringUtils.isBlank(dtUser.getFirstName()) || StringUtils.isBlank(dtUser.getLastName()) ||
-                dtUser.getFirstName().length() > 25 || dtUser.getLastName().length() > 25 ) {
+        if (StringUtils.isBlank(dtUser.getPassword())) throw new IllegalArgumentException("La contraseña no puede estar vacia.");
+        
+        if (StringUtils.isBlank(dtUser.getFirstName()) || StringUtils.isBlank(dtUser.getLastName()) || dtUser.getFirstName().length() > 25 || dtUser.getLastName().length() > 25 ) 
             throw new IllegalArgumentException("Datos invalidos: Nombre invalido.");
-        }
     }
 
     private void validateCustomer(Customer customer, DtCustomer dtCustomer) throws UserExistException {
@@ -95,19 +87,25 @@ public class UserService {
     }
 
     public void addEmployee(Long branchId, DtUser user) throws BranchNotExistException, UserExistException {
-        Branch marketBranch = branchRepository.findById(branchId).orElseThrow(() -> new BranchNotExistException(branchId));
-        validateUser(null, user);
+        if((userRepository.existsByEmail(user.getEmail()))) throw new UserExistException("Usuario con email " + user.getEmail() + " ya se encuentra en el sistema.");
+
+        Branch branch = branchRepository.findById(branchId).orElseThrow(() -> new BranchNotExistException(branchId));
+        
+        validateUser(user);
 
         Employee employee = new Employee(user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
                 passwordEncoder.encode(user.getPassword()),
-                marketBranch);
+                branch);
         employeeRepository.save(employee);
     }
 
     public DtResponse addCustomer(DtCustomer dtCustomer) throws UserExistException {
-        validateUser(null, dtCustomer);
+
+        if((userRepository.existsByEmail(dtCustomer.getEmail()))) throw new UserExistException("Usuario con email " + dtCustomer.getEmail() + " ya se encuentra en el sistema.");
+        
+        validateUser(dtCustomer);
         validateCustomer(null, dtCustomer);
 
         Customer customer = new Customer(dtCustomer.getFirstName(),
@@ -130,7 +128,8 @@ public class UserService {
     public void updateUser(String userEmail, DtCustomer dtUser) throws UserNotExistException, UserExistException {
         User user = userRepository.findByEmail(userEmail);
         if (user == null) throw new UserNotExistException();
-        validateUser(user, dtUser);
+        
+        validateUser(dtUser);
 
         if (user.getRole().equals(Role.CUSTOMER)) {
             Customer customer = customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
@@ -161,7 +160,10 @@ public class UserService {
     }
 
     public DtResponse addAdmin(DtUser admin) throws UserExistException {
-        validateUser(null, admin);
+
+        if((userRepository.existsByEmail(admin.getEmail()))) throw new UserExistException("Usuario con email " + admin.getEmail() + " ya se encuentra en el sistema.");
+
+        validateUser(admin);
         Admin administrator = new Admin(admin.getFirstName(),
                 admin.getLastName(),
                 admin.getEmail(),
