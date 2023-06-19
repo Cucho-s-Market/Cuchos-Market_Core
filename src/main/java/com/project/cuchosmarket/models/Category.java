@@ -24,10 +24,20 @@ public class Category {
     private Map<String, Product> products;
 
 
+    public Category(Long id, String name, String description, String image, Long categoryParent) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.image = image;
+        this.categoryParent = categoryParent;
+    }
+
     public Category(String name, String description, String image) {
         this.name = name;
         this.description = description;
         this.image = image;
     }
+
+
 
 }

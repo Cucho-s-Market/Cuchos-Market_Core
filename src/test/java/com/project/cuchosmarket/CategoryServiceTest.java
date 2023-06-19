@@ -13,24 +13,26 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.testng.AssertJUnit.assertNotNull;
 
 
-@ExtendWith(MockitoExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CategoryServiceTest{
 
-    @Mock
+    @MockBean
     private CategoryRepository categoryRepository;
-    @InjectMocks
+    @Autowired
     private CategoryService categoryService;
 
 
@@ -51,20 +53,18 @@ public class CategoryServiceTest{
         @Test
         public void testGetListCategories() {
             List<Category> categories = Arrays.asList(
-                    new Category("electronica1", "cables", "carlos@"),
-                    new Category("electronica", "disipadores", "carlos@")
+                    new Category(1l,"electronica1", "cables", "carlos@",123l),
+                    new Category(2l, "electronica", "disipadores", "carlos@", 123l)
             );
-
-        assertNotNull(categoryRepository);
 
         // Configurar el comportamiento del mock
         when(categoryRepository.findAll()).thenReturn(categories);
 
             List<DtCategory> resultado = categoryService.getCategories();
-            Assert.assertEquals(resultado.size(),categories.size());
-         // Assertions.assertEquals(resultado.get(0).getDescription(), categories.get(0).getDescription());
-        // Assertions.assertEquals(resultado.get(1).getId(), categories.get(1).getId());
-
+            assertEquals(categoryService.getCategories().size(),categories.size());
+            assertEquals(resultado.get(0).getDescription(), categories.get(0).getDescription());
+            assertEquals(resultado.get(1).getId(), categories.get(1).getId());
+            System.out.println(resultado.size());
 
         }
 
