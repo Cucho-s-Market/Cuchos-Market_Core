@@ -92,7 +92,7 @@ public class OrderService {
         if (user == null) throw new UserNotExistException();
 
         Customer customer = (Customer) user;
-        Branch marketBranch = branchRepository.findById(dtOrder.getBranchId())
+        Branch branch = branchRepository.findById(dtOrder.getBranchId())
                 .orElseThrow(() -> new BranchNotExistException(dtOrder.getBranchId()));
 
         if (dtOrder.getStatus() == null && dtOrder.getType() == null) throw new InvalidOrderException("Informacion de orden invalida.");
@@ -100,14 +100,14 @@ public class OrderService {
 
 
         List<Item> items = new ArrayList<>();
-        Order order = null;
+        Order order;
         float totalPrice = 0;
 
         for (DtItem dtItem : dtOrder.getProducts()) {
             if (dtItem.getQuantity() < 1) throw new InvalidOrderException("La cantidad del producto que se encarga ha de ser mayor a 0.");
 
             Product product = productRepository.findById(dtItem.getName()).orElseThrow(() -> new ProductNotExistException(dtItem.getName()));
-            Stock productStock = stockRepository.findById(new StockId(product, marketBranch)).get();
+            Stock productStock = stockRepository.findById(new StockId(product, branch)).get();
 
             if (productStock.getQuantity() < 1 || productStock.getQuantity() < dtItem.getQuantity()) {
                 throw new NoStockException("Stock insuficiente para " + dtItem.getName() + " en sucursal.");
@@ -122,22 +122,22 @@ public class OrderService {
         }
 
         order = new Order(totalPrice, LocalDate.now(), OrderStatus.PENDING, dtOrder.getType(), items);
-        if (order.getType().equals(OrderType.DELIVERY)) {
 
+        if (order.getType().equals(OrderType.DELIVERY)) {
             if (dtOrder.getAddressId() == null) throw new InvalidOrderException("No se ha seleccionado ninguna direccion.");
             Address address = customer.getAddresses()
                     .stream()
                     .filter(address1 -> address1.getId().equals(dtOrder.getAddressId()))
                     .findFirst()
                     .orElseThrow(AddressNotExistException::new);
-            order.setClientAddress(address);
+            order.setClientAddress(address.toString());
         }
 
         order.setCustomer(customer);
         orderRepository.save(order);
 
-        marketBranch.addOrder(order);
-        branchRepository.save(marketBranch);
+        branch.addOrder(order);
+        branchRepository.save(branch);
     }
 
     private float applyPromotion(Product product, int productQuantity) {
