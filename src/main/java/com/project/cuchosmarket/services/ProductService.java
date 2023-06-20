@@ -28,7 +28,7 @@ public class ProductService {
     private final EmployeeRepository employeeRepository;
 
     private void validateProduct(DtProduct dtProduct) throws InvalidProductException {
-        if(dtProduct.getCode() == null | dtProduct.getName() == null | dtProduct.getCategoryId() == null | dtProduct.getEntryDate() == null) throw new InvalidProductException();
+        if(dtProduct.getCode() == null || dtProduct.getName() == null || dtProduct.getCategoryId() == null || dtProduct.getEntryDate() == null) throw new InvalidProductException();
 
         if(dtProduct.getCode().isBlank()) throw new InvalidProductException("Codigo de producto invalido.");
         if(dtProduct.getName().isBlank() || dtProduct.getName().length() > 50) throw new InvalidProductException("Nombre de producto invalido.");
