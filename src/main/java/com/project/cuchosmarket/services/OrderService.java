@@ -9,6 +9,7 @@ import com.project.cuchosmarket.models.*;
 import com.project.cuchosmarket.repositories.*;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Service
 public class OrderService {
+    @Autowired
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
