@@ -194,4 +194,14 @@ public class OrderService {
 
         orderRepository.save(order);
     }
+
+    public void statusAfterPayment(Long orderId, DtOrder dtOrder) throws InvalidOrderException, OrderNotExistException {
+        Order order = validateOrder(orderId);
+
+        if (dtOrder.getStatus().equals(OrderStatus.CANCELLED)) {
+            order.setStatus(OrderStatus.CANCELLED);
+            order.setEndDate(LocalDate.now());
+            orderRepository.save(order);
+        } else System.out.println("Se envia email al cliente.");
+    }
 }

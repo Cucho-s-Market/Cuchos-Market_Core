@@ -138,6 +138,23 @@ public class OrderController {
                 .build();
     }
 
+    @PutMapping("/{order_id}/status")
+    public DtResponse statusAfterPayment(@PathVariable("order_id") Long order_id, @RequestBody DtOrder dtOrder) {
+        try {
+            orderService.statusAfterPayment(order_id, dtOrder);
+        } catch (InvalidOrderException | OrderNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Pago realizado con exito.")
+                .build();
+    }
+
     @PostMapping("/issues")
     public DtResponse fileOrderComplaint(@RequestBody DtIssue dtIssue) {
         try {
