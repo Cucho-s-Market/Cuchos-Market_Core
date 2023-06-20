@@ -142,7 +142,7 @@ public class OrderService {
 
     private float applyPromotion(Product product, int productQuantity) {
         List<Promotion> productPromotions = promotionRepository.findPromotionsByProduct(product);
-        if (productPromotions.isEmpty()) return product.getPrice();
+        if (productPromotions.isEmpty()) return product.getPrice() * productQuantity;
 
         float finalPrice = 0f;
         for (Promotion promotion : productPromotions) {
