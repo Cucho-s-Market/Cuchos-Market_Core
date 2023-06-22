@@ -5,6 +5,7 @@ import com.project.cuchosmarket.dto.DtStock;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.*;
 import com.project.cuchosmarket.repositories.*;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,9 +31,9 @@ public class ProductService {
     private void validateProduct(DtProduct dtProduct) throws InvalidProductException {
         if(dtProduct.getCode() == null || dtProduct.getName() == null || dtProduct.getCategoryId() == null || dtProduct.getEntryDate() == null) throw new InvalidProductException();
 
-        if(dtProduct.getCode().isBlank()) throw new InvalidProductException("Codigo de producto invalido.");
-        if(dtProduct.getName().isBlank() || dtProduct.getName().length() > 50) throw new InvalidProductException("Nombre de producto invalido.");
-        if(dtProduct.getDescription().isBlank() || dtProduct.getDescription().length() > 50) throw new InvalidProductException("Descripcion de producto invalido.");
+        if(StringUtils.isBlank(dtProduct.getCode())) throw new InvalidProductException("Codigo de producto invalido.");
+        if(StringUtils.isBlank(dtProduct.getName()) || dtProduct.getName().length() > 50) throw new InvalidProductException("Nombre de producto invalido.");
+        if(StringUtils.isBlank(dtProduct.getDescription()) || dtProduct.getDescription().length() > 50) throw new InvalidProductException("Descripcion de producto invalido.");
         if(dtProduct.getPrice() <= 0) throw new InvalidProductException("Precio de producto invalido.");
     }
 
