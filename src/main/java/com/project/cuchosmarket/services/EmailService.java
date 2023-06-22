@@ -68,23 +68,21 @@ public class EmailService {
         }
     }
 
-    public void sendResetTokenEmail(String contextPath, String token, User user) throws MessagingException {
+    public void sendResetTokenEmail(String token, User user) throws MessagingException {
         MimeMessage message = sender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(
                 message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                 StandardCharsets.UTF_8.name()
         );
 
-        String url = contextPath + "/users/changePassword";
-        String authorizationHeader = "Bearer " + token;
+        String resetPasswordUrl = "http://localhost:8080/doc/swagger-ui/index.html?token=" + token;  //Modificar Url para redirigir a la pag
 
         helper.setTo(user.getEmail());
         helper.setFrom(setFromEmail);
         helper.setSubject("Solicitud para restablecer contraseña");
 
         Map<String, Object> variables = new HashMap<>();
-        variables.put("resetPasswordUrl", url);
-        variables.put("authorizationHeader", authorizationHeader);
+        variables.put("resetPasswordUrl", resetPasswordUrl);
         variables.put("first_name", user.getFirstName());
         helper.setText(thymeleafService.createContent("reset-password-email-template.html", variables), true);
         sender.send(message);

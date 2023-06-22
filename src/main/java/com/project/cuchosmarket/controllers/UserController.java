@@ -50,9 +50,9 @@ public class UserController {
     }
 
     @PostMapping("/auth/resetPassword")
-    public DtResponse resetPassword(HttpServletRequest request, @RequestBody DtUser user) {
+    public DtResponse resetPassword(@RequestBody DtUser user) {
         try {
-            userService.resetPassword(request, user);
+            userService.resetPassword( user);
         } catch (UserNotExistException | CustomerDisabledException e) {
             return DtResponse.builder()
                     .error(true)
@@ -64,40 +64,18 @@ public class UserController {
 
         return DtResponse.builder()
                 .error(false)
-                .message("e.getMessage()")
+                .message("Si esa dirección de correo electrónico está en nuestra base de datos, " +
+                        "te enviaremos un correo electrónico para restablecer tu contraseña.")
                 .build();
     }
 
-    @PostMapping("/auth/updatePassword")
-    public DtResponse updatePassword(@RequestBody DtUser dtUser) {
-        DtResponse token;
-        try {
-            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-            userService.updatePassword(userEmail, dtUser);
-            token = userService.authenticate(dtUser);
-        } catch (IllegalArgumentException |UserNotExistException | CustomerDisabledException e) {
-            return DtResponse.builder()
-                    .error(true)
-                    .message(e.getMessage())
-                    .build();
-        }
-
-        token.setError(false);
-        return token;
+    @GetMapping("/token")
+    public DtResponse checkTokenValidation() {
+        return DtResponse.builder()
+                .error(false)
+                .message("Token valido")
+                .build();
     }
-
-    //Este endpoint tambien se podria saltear y hacer que el link del email redirija a un formulario para cambiar las pass en Front
-    //Y endpoint de actualizar la password verificaria el token y en caso de que este bien actualiza la contrs o tirara un 403 Forbidden
-    @GetMapping("/changePassword")
-    public String showChangePasswordPage(Locale locale, Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String token = (String) authentication.getCredentials();
-
-        model.addAttribute("token", token);
-        return "redirect:/updatePassword.html?lang=" + locale.getLanguage(); //Checkear el redireccionamiento en front
-        //La idea es que el link del email pegue a este endpoint para validar el token y hacer que se redireccione a la pagina de actualizar la password
-    }
-
 
     @PostMapping("/{branch_id}/employee")
     public DtResponse addEmployee(@PathVariable("branch_id") Long branch_id, @RequestBody DtUser employee) {

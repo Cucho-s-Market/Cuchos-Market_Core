@@ -75,22 +75,10 @@ public class UserService {
                 .build();
     }
 
-    public void resetPassword(HttpServletRequest request, DtUser dtUser) throws UserNotExistException, CustomerDisabledException, MessagingException {
+    public void resetPassword(DtUser dtUser) throws UserNotExistException, CustomerDisabledException, MessagingException {
         User user = validateUserAuthentication(dtUser);
         var jwtToken = jwtService.createToken(new HashMap<>(), new UserDetailsImpl(user));
-        emailService.sendResetTokenEmail(request.getContextPath(), jwtToken, user);
-    }
-
-
-    public void updatePassword(String userEmail, DtUser dtUser) throws UserNotExistException, CustomerDisabledException {
-        dtUser.setEmail(userEmail);
-        User user = validateUserAuthentication(dtUser);
-
-        if (StringUtils.isBlank(dtUser.getPassword())) throw new IllegalArgumentException("La contraseña no puede estar vacia.");
-        else if (passwordEncoder.matches(dtUser.getPassword(), user.getPassword())) throw new IllegalArgumentException("La nueva contraseña ha de ser distinta a la anterior.");
-
-        passwordEncoder.encode(dtUser.getPassword());
-        userRepository.save(user);
+        emailService.sendResetTokenEmail(jwtToken, user);
     }
 
     private void validateUser(DtUser dtUser) throws UserExistException {
