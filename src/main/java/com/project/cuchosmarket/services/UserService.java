@@ -75,12 +75,11 @@ public class UserService {
                 .build();
     }
 
-    public void resetPassword(HttpServletRequest request, DtUser dtUser) throws UserNotExistException, CustomerDisabledException, MessagingException {
+    public void resetPassword(DtUser dtUser) throws UserNotExistException, CustomerDisabledException, MessagingException {
         User user = validateUserAuthentication(dtUser);
         var jwtToken = jwtService.createToken(new HashMap<>(), new UserDetailsImpl(user));
-        emailService.sendResetTokenEmail(request.getContextPath(), jwtToken, user);
+        emailService.sendResetTokenEmail(jwtToken, user);
     }
-
 
     public void updatePassword(String userEmail, DtUser dtUser) throws UserNotExistException, CustomerDisabledException {
         dtUser.setEmail(userEmail);
@@ -93,7 +92,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private void validateUser(DtUser dtUser) throws UserExistException {
+    private void validateUser(DtUser dtUser) {
 
         if (StringUtils.isBlank(dtUser.getPassword())) throw new IllegalArgumentException("La contraseña no puede estar vacia.");
 
