@@ -87,5 +87,4 @@ public class EmailService {
         helper.setText(thymeleafService.createContent("reset-password-email-template.html", variables), true);
         sender.send(message);
     }
-
 }
