@@ -47,16 +47,15 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             "LIMIT 10")
     List<DtStatistics.DtTopProduct> findTopSellingProducts(@Param("startDate") LocalDate startDate,
                                                            @Param("endDate") LocalDate endDate);
-
-//    @Query("SELECT DISTINCT new com.project.cuchosmarket.dto.DtStatistics$DtSales(" +
-//            "b.name AS branchName, COUNT(o) AS totalSales) " +
-//            "FROM Branch b " +
-//            "JOIN b.orders o " +
-//            "WHERE b.id = :branchId " +
-//            "AND o.creationDate >= :startDate AND o.creationDate <= :endDate " +
-//            "AND o.status = 'DELIVERED' " +
-//            "GROUP BY i.name " +
-//            "ORDER BY COUNT(o) DESC")
-//    List<DtStatistics.DtSales> findSales(@Param("startDate") LocalDate startDate,
-//                                         @Param("endDate") LocalDate endDate);
+    @Query("SELECT new com.project.cuchosmarket.dto.DtStatistics$DtPopularBrand(" +
+            "p.brand AS brandName, COUNT(i) AS salesCount) " +
+            "FROM Order o " +
+            "JOIN o.products i JOIN i.product p " +
+            "WHERE o.creationDate >= :startDate AND o.creationDate <= :endDate " +
+            "AND o.status = 'DELIVERED' " +
+            "GROUP BY p.brand " +
+            "ORDER BY COUNT(i) DESC " +
+            "LIMIT 10")
+    List<DtStatistics.DtPopularBrand> findTopBrands(@Param("startDate") LocalDate startDate,
+                                                    @Param("endDate") LocalDate endDate);
 }

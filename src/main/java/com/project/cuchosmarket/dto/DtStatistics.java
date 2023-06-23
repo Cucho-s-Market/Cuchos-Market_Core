@@ -45,7 +45,6 @@ public class DtStatistics {
     @Setter
     @AllArgsConstructor
     public static class DtProfitInBranch {
-        private double totalProfit;
         private double completedOrdersProfit;
         private double cancelledOrdersProfit;
     }
@@ -55,7 +54,7 @@ public class DtStatistics {
     @AllArgsConstructor
     public static class DtPopularBrand {
         private String brandName;
-        private double popularityScore;
+        private Long salesCount;
     }
 
     @Getter

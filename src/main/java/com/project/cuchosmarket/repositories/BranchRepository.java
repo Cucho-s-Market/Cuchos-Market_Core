@@ -99,4 +99,43 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
     List<DtStatistics.DtSalesInBranch> findSalesInBranch(@Param("branchId") Long branchId,
                                                          @Param("startDate") LocalDate startDate,
                                                          @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT new com.project.cuchosmarket.dto.DtStatistics$DtProfitByBranch(" +
+            "b.name, SUM(i.finalPrice - i.unitPrice))" +
+            "FROM Branch b " +
+            "JOIN b.orders o JOIN o.products i " +
+            "WHERE o.creationDate >= :startDate AND o.creationDate <= :endDate " +
+            "AND o.status = 'DELIVERED' " +
+            "GROUP BY b.name")
+    List<DtStatistics.DtProfitByBranch> calculateProfitByBranch(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("SELECT new com.project.cuchosmarket.dto.DtStatistics$DtProfitInBranch(" +
+            "SUM(CASE WHEN o.status = 'DELIVERED' THEN i.finalPrice - i.unitPrice ELSE 0 END) AS completedOrdersProfit, " +
+            "SUM(CASE WHEN o.status = 'CANCELLED' THEN i.finalPrice - i.unitPrice ELSE 0 END) AS cancelledOrdersProfit) " +
+            "FROM Branch b " +
+            "JOIN b.orders o JOIN o.products i " +
+            "WHERE b.id = :branchId " +
+            "AND o.creationDate >= :startDate AND o.creationDate <= :endDate")
+    List<DtStatistics.DtProfitInBranch> calculateProfitInBranch(@Param("branchId") Long branchId,
+                                                                @Param("startDate") LocalDate startDate,
+                                                                @Param("endDate") LocalDate endDate
+    );
+
+    @Query("SELECT DISTINCT new com.project.cuchosmarket.dto.DtStatistics$DtPopularBrand(" +
+            "p.brand AS brandName, COUNT(i) AS salesCount) " +
+            "FROM Branch b " +
+            "JOIN b.orders o JOIN o.products i " +
+            "JOIN i.product p " +
+            "WHERE b.id = :branchId " +
+            "AND o.creationDate >= :startDate AND o.creationDate <= :endDate " +
+            "AND o.status = 'DELIVERED' " +
+            "GROUP BY p.brand " +
+            "ORDER BY COUNT(i) DESC " +
+            "LIMIT 10")
+    List<DtStatistics.DtPopularBrand> findTopBrandsByBranch(@Param("branchId") Long branchId,
+                                                            @Param("startDate") LocalDate startDate,
+                                                            @Param("endDate") LocalDate endDate);
 }

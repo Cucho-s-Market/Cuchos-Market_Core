@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StatisticsController {
     private final StatisticsService statisticsService;
 
-    @GetMapping("/top-products")
+    @GetMapping("/products")
     public DtResponse getTopSellingProducts(@RequestParam(value = "branch_id", required = false) Long branch_id) {
         return DtResponse.builder()
                 .error(false)
@@ -29,6 +29,24 @@ public class StatisticsController {
                 .data((branch_id == null) ?
                         statisticsService.getSalesByBranch():
                         statisticsService.getSalesInBranch(branch_id))
+                .build();
+    }
+
+    @GetMapping("/profit")
+    public DtResponse getProfit(@RequestParam(value = "branch_id", required = false) Long branch_id) {
+        return DtResponse.builder()
+                .error(false)
+                .data((branch_id == null) ?
+                        statisticsService.getProfitByBranch():
+                        statisticsService.getProfitInBranch(branch_id))
+                .build();
+    }
+
+    @GetMapping("/brands")
+    public DtResponse getTopBrands(@RequestParam(value = "branch_id", required = false) Long branch_id) {
+        return DtResponse.builder()
+                .error(false)
+                .data(statisticsService.getTopBrands(branch_id))
                 .build();
     }
 

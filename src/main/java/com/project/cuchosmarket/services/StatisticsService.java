@@ -40,4 +40,30 @@ public class StatisticsService {
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
         return branchRepository.findSalesInBranch(branchId, startDate, endDate);
     }
+
+    public List<DtStatistics.DtProfitByBranch> getProfitByBranch() {
+        LocalDate currentDate = LocalDate.now();
+
+        LocalDate startDate = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        return branchRepository.calculateProfitByBranch(startDate, endDate);
+    }
+
+    public List<DtStatistics.DtProfitInBranch> getProfitInBranch(Long branchId) {
+        LocalDate currentDate = LocalDate.now();
+
+        LocalDate startDate = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        return branchRepository.calculateProfitInBranch(branchId, startDate, endDate);
+    }
+
+    public List<DtStatistics.DtPopularBrand> getTopBrands(Long branch_id) {
+        LocalDate currentDate = LocalDate.now();
+
+        LocalDate startDate = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        return (branch_id == null) ?
+                orderRepository.findTopBrands(startDate, endDate) :
+                branchRepository.findTopBrandsByBranch(branch_id, startDate, endDate);
+    }
 }
