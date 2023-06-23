@@ -1,7 +1,5 @@
 package com.project.cuchosmarket.services;
 
-import com.project.cuchosmarket.models.Order;
-import com.project.cuchosmarket.models.User;
 import com.project.cuchosmarket.enums.OrderStatus;
 import com.project.cuchosmarket.enums.OrderType;
 import com.project.cuchosmarket.models.Order;
@@ -77,7 +75,7 @@ public class EmailService {
                 StandardCharsets.UTF_8.name()
         );
 
-        String resetPasswordUrl = "http://localhost:8080/doc/swagger-ui/index.html?token=" + token;  //Modificar Url para redirigir a la pag
+        String resetPasswordUrl = "http://localhost:5173/forgot-password/recover?token=" + token;
 
         helper.setTo(user.getEmail());
         helper.setFrom(setFromEmail);

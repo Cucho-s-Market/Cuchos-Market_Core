@@ -8,14 +8,9 @@ import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.services.AddressService;
 import com.project.cuchosmarket.services.UserService;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Locale;
 
 @RequiredArgsConstructor
 @RestController
@@ -69,12 +64,13 @@ public class UserController {
                 .build();
     }
 
-    @PutMapping("/auth/updatePassword")
+    @PutMapping("/updatePassword")
     public DtResponse updatePassword(@RequestBody DtUser dtUser) {
         DtResponse token;
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-            userService.updatePassword(userEmail, dtUser);
+            dtUser.setEmail(userEmail);
+            userService.updatePassword(dtUser);
             token = userService.authenticate(dtUser);
         } catch (IllegalArgumentException |UserNotExistException | CustomerDisabledException e) {
             return DtResponse.builder()

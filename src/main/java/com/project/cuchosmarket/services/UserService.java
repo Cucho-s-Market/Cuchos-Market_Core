@@ -14,7 +14,6 @@ import com.project.cuchosmarket.security.JwtService;
 import com.project.cuchosmarket.security.UserDetailsImpl;
 import io.micrometer.common.util.StringUtils;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -81,14 +80,13 @@ public class UserService {
         emailService.sendResetTokenEmail(jwtToken, user);
     }
 
-    public void updatePassword(String userEmail, DtUser dtUser) throws UserNotExistException, CustomerDisabledException {
-        dtUser.setEmail(userEmail);
+    public void updatePassword(DtUser dtUser) throws UserNotExistException, CustomerDisabledException {
         User user = validateUserAuthentication(dtUser);
 
         if (StringUtils.isBlank(dtUser.getPassword())) throw new IllegalArgumentException("La contraseña no puede estar vacia.");
         else if (passwordEncoder.matches(dtUser.getPassword(), user.getPassword())) throw new IllegalArgumentException("La nueva contraseña ha de ser distinta a la anterior.");
 
-        passwordEncoder.encode(dtUser.getPassword());
+        user.setPassword(passwordEncoder.encode(dtUser.getPassword()));
         userRepository.save(user);
     }
 
