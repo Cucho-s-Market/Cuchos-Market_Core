@@ -3,6 +3,7 @@ package com.project.cuchosmarket.repositories;
 import com.project.cuchosmarket.dto.DtBranch;
 import com.project.cuchosmarket.dto.DtIssue;
 import com.project.cuchosmarket.dto.DtOrder;
+import com.project.cuchosmarket.dto.DtStatistics;
 import com.project.cuchosmarket.enums.OrderStatus;
 import com.project.cuchosmarket.models.Branch;
 import com.project.cuchosmarket.models.Order;
@@ -61,4 +62,18 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
             "WHERE b.id = :branchId ")
     Page<DtIssue> findIssues(@Param("branchId") Long branchId,
                              Pageable pageable);
+
+    @Query("SELECT DISTINCT new com.project.cuchosmarket.dto.DtStatistics$DtTopProduct(" +
+            "i.name AS productName, SUM(i.quantity) AS salesCount) " +
+            "FROM Branch b " +
+            "JOIN b.orders o JOIN o.products i " +
+            "WHERE b.id = :branchId " +
+            "AND o.creationDate >= :startDate AND o.creationDate <= :endDate " +
+            "AND o.status = 'DELIVERED' " +
+            "GROUP BY i.name " +
+            "ORDER BY SUM(i.quantity) DESC " +
+            "LIMIT 10")
+    List<DtStatistics.DtTopProduct> findTopSellingProductsByBranch(@Param("branchId") Long branchId,
+                                                                   @Param("startDate") LocalDate startDate,
+                                                                   @Param("endDate") LocalDate endDate);
 }
