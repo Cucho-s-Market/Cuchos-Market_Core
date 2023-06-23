@@ -24,4 +24,20 @@ public class StatisticsService {
                 orderRepository.findTopSellingProducts(startDate, endDate) :
                 branchRepository.findTopSellingProductsByBranch(branch_id, startDate, endDate);
     }
+
+    public List<DtStatistics.DtSalesByBranch> getSalesByBranch() {
+        LocalDate currentDate = LocalDate.now();
+
+        LocalDate startDate = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        return branchRepository.findSales(startDate, endDate);
+    }
+
+    public List<DtStatistics.DtSalesInBranch> getSalesInBranch(Long branchId) {
+        LocalDate currentDate = LocalDate.now();
+
+        LocalDate startDate = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        return branchRepository.findSalesInBranch(branchId, startDate, endDate);
+    }
 }

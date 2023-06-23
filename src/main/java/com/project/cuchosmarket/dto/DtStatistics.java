@@ -21,16 +21,16 @@ public class DtStatistics {
     @AllArgsConstructor
     public static class DtSalesByBranch {
         private String branchName;
-        private int totalSales;
+        private Long totalSales;
     }
 
     @Getter
     @Setter
     @AllArgsConstructor
-    public static class DtSales {
-        private int totalSales;
-        private int completedOrders;
-        private int cancelledOrders;
+    public static class DtSalesInBranch {
+        private Long totalSales;
+        private Long completedOrders;
+        private Long cancelledOrders;
     }
 
     @Getter
@@ -38,13 +38,13 @@ public class DtStatistics {
     @AllArgsConstructor
     public static class DtProfitByBranch {
         private String branchName;
-        private int totalProfit;
+        private Long totalProfit;
     }
 
     @Getter
     @Setter
     @AllArgsConstructor
-    public static class DtProfit {
+    public static class DtProfitInBranch {
         private double totalProfit;
         private double completedOrdersProfit;
         private double cancelledOrdersProfit;

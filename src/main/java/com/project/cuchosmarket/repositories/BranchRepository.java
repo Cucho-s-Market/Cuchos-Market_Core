@@ -76,4 +76,27 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
     List<DtStatistics.DtTopProduct> findTopSellingProductsByBranch(@Param("branchId") Long branchId,
                                                                    @Param("startDate") LocalDate startDate,
                                                                    @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT DISTINCT new com.project.cuchosmarket.dto.DtStatistics$DtSalesByBranch(" +
+            "b.name AS branchName, COUNT(o) AS totalSales) " +
+            "FROM Branch b " +
+            "JOIN b.orders o " +
+            "WHERE o.creationDate >= :startDate AND o.creationDate <= :endDate " +
+            "AND o.status = 'DELIVERED' " +
+            "GROUP BY b.name " +
+            "ORDER BY COUNT(o) DESC")
+    List<DtStatistics.DtSalesByBranch> findSales(@Param("startDate") LocalDate startDate,
+                                                 @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT new com.project.cuchosmarket.dto.DtStatistics$DtSalesInBranch(" +
+            "COUNT(o), " +
+            "SUM(CASE WHEN o.status = 'DELIVERED' THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN o.status = 'CANCELLED' THEN 1 ELSE 0 END)) " +
+            "FROM Branch b " +
+            "JOIN b.orders o " +
+            "WHERE b.id = :branchId " +
+            "AND o.creationDate >= :startDate AND o.creationDate <= :endDate")
+    List<DtStatistics.DtSalesInBranch> findSalesInBranch(@Param("branchId") Long branchId,
+                                                         @Param("startDate") LocalDate startDate,
+                                                         @Param("endDate") LocalDate endDate);
 }

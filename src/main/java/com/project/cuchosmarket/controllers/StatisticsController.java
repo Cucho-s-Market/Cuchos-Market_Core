@@ -14,11 +14,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class StatisticsController {
     private final StatisticsService statisticsService;
 
-    @GetMapping("/top-selling-products")
+    @GetMapping("/top-products")
     public DtResponse getTopSellingProducts(@RequestParam(value = "branch_id", required = false) Long branch_id) {
         return DtResponse.builder()
                 .error(false)
                 .data(statisticsService.getTopSellingProducts(branch_id))
+                .build();
+    }
+
+    @GetMapping("/sales")
+    public DtResponse getSales(@RequestParam(value = "branch_id", required = false) Long branch_id) {
+        return DtResponse.builder()
+                .error(false)
+                .data((branch_id == null) ?
+                        statisticsService.getSalesByBranch():
+                        statisticsService.getSalesInBranch(branch_id))
                 .build();
     }
 
