@@ -25,10 +25,11 @@ public class ProductController {
                                   @RequestParam(value = "brand", required = false) String brand,
                                   @RequestParam(value = "category_id", required = false) Long category_id,
                                   @RequestParam(value = "promotion_id", required = false) Long promotion_id,
+                                  @RequestParam(value = "includeExpiredPromotion", required = false, defaultValue = "false") boolean includeExpiredPromotion,
                                   @RequestParam(value = "orderBy", required = false, defaultValue = "name") String orderBy,
                                   @RequestParam(value = "orderDirection", required = false, defaultValue = "asc") String orderDirection) {
         Page<DtProduct> productsList = productService.getProducts(page_number, page_size, branch_id, code, name, brand,
-                category_id, promotion_id, orderBy, orderDirection);
+                category_id, promotion_id, includeExpiredPromotion, orderBy, orderDirection);
         return DtResponse.builder()
                 .error(false)
                 .data(productsList)
