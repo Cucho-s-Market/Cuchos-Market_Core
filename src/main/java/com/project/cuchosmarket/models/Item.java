@@ -20,7 +20,7 @@ public class Item {
     private int quantity;
 
     @ManyToOne
-    @JoinColumn(name = "product_code")
+    @JoinColumn(name = "product_name")
     private Product product;
 
     public Item(String name, float unitPrice, float finalPrice, int quantity, Product product) {

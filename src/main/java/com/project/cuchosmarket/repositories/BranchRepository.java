@@ -3,6 +3,7 @@ package com.project.cuchosmarket.repositories;
 import com.project.cuchosmarket.dto.DtBranch;
 import com.project.cuchosmarket.dto.DtIssue;
 import com.project.cuchosmarket.dto.DtOrder;
+import com.project.cuchosmarket.dto.DtStatistics;
 import com.project.cuchosmarket.enums.OrderStatus;
 import com.project.cuchosmarket.models.Branch;
 import com.project.cuchosmarket.models.Order;
@@ -61,4 +62,80 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
             "WHERE b.id = :branchId ")
     Page<DtIssue> findIssues(@Param("branchId") Long branchId,
                              Pageable pageable);
+
+    @Query("SELECT DISTINCT new com.project.cuchosmarket.dto.DtStatistics$DtTopProduct(" +
+            "i.name AS productName, SUM(i.quantity) AS salesCount) " +
+            "FROM Branch b " +
+            "JOIN b.orders o JOIN o.products i " +
+            "WHERE b.id = :branchId " +
+            "AND o.creationDate >= :startDate AND o.creationDate <= :endDate " +
+            "AND o.status = 'DELIVERED' " +
+            "GROUP BY i.name " +
+            "ORDER BY SUM(i.quantity) DESC " +
+            "LIMIT 10")
+    List<DtStatistics.DtTopProduct> findTopSellingProductsByBranch(@Param("branchId") Long branchId,
+                                                                   @Param("startDate") LocalDate startDate,
+                                                                   @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT DISTINCT new com.project.cuchosmarket.dto.DtStatistics$DtSalesByBranch(" +
+            "b.name AS branchName, COUNT(o) AS totalSales) " +
+            "FROM Branch b " +
+            "JOIN b.orders o " +
+            "WHERE o.creationDate >= :startDate AND o.creationDate <= :endDate " +
+            "AND o.status = 'DELIVERED' " +
+            "GROUP BY b.name " +
+            "ORDER BY COUNT(o) DESC")
+    List<DtStatistics.DtSalesByBranch> findSales(@Param("startDate") LocalDate startDate,
+                                                 @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT new com.project.cuchosmarket.dto.DtStatistics$DtSalesInBranch(" +
+            "COUNT(o), " +
+            "SUM(CASE WHEN o.status = 'DELIVERED' THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN o.status = 'CANCELLED' THEN 1 ELSE 0 END)) " +
+            "FROM Branch b " +
+            "JOIN b.orders o " +
+            "WHERE b.id = :branchId " +
+            "AND o.creationDate >= :startDate AND o.creationDate <= :endDate")
+    List<DtStatistics.DtSalesInBranch> findSalesInBranch(@Param("branchId") Long branchId,
+                                                         @Param("startDate") LocalDate startDate,
+                                                         @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT new com.project.cuchosmarket.dto.DtStatistics$DtProfitByBranch(" +
+            "b.name, SUM(i.finalPrice - i.unitPrice))" +
+            "FROM Branch b " +
+            "JOIN b.orders o JOIN o.products i " +
+            "WHERE o.creationDate >= :startDate AND o.creationDate <= :endDate " +
+            "AND o.status = 'DELIVERED' " +
+            "GROUP BY b.name")
+    List<DtStatistics.DtProfitByBranch> calculateProfitByBranch(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("SELECT new com.project.cuchosmarket.dto.DtStatistics$DtProfitInBranch(" +
+            "SUM(CASE WHEN o.status = 'DELIVERED' THEN i.finalPrice - i.unitPrice ELSE 0 END) AS completedOrdersProfit, " +
+            "SUM(CASE WHEN o.status = 'CANCELLED' THEN i.finalPrice - i.unitPrice ELSE 0 END) AS cancelledOrdersProfit) " +
+            "FROM Branch b " +
+            "JOIN b.orders o JOIN o.products i " +
+            "WHERE b.id = :branchId " +
+            "AND o.creationDate >= :startDate AND o.creationDate <= :endDate")
+    List<DtStatistics.DtProfitInBranch> calculateProfitInBranch(@Param("branchId") Long branchId,
+                                                                @Param("startDate") LocalDate startDate,
+                                                                @Param("endDate") LocalDate endDate
+    );
+
+    @Query("SELECT DISTINCT new com.project.cuchosmarket.dto.DtStatistics$DtPopularBrand(" +
+            "p.brand AS brandName, COUNT(i) AS salesCount) " +
+            "FROM Branch b " +
+            "JOIN b.orders o JOIN o.products i " +
+            "JOIN i.product p " +
+            "WHERE b.id = :branchId " +
+            "AND o.creationDate >= :startDate AND o.creationDate <= :endDate " +
+            "AND o.status = 'DELIVERED' " +
+            "GROUP BY p.brand " +
+            "ORDER BY COUNT(i) DESC " +
+            "LIMIT 10")
+    List<DtStatistics.DtPopularBrand> findTopBrandsByBranch(@Param("branchId") Long branchId,
+                                                            @Param("startDate") LocalDate startDate,
+                                                            @Param("endDate") LocalDate endDate);
 }

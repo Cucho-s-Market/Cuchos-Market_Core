@@ -59,7 +59,7 @@ public class ProductController {
         try {
             productService.updateProduct(updatedProduct);
         }
-        catch (ProductNotExistException | InvalidProductException e) {
+        catch (ProductNotExistException | InvalidProductException | CategoryNotExistException e) {
             return  DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
