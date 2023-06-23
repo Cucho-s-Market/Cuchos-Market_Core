@@ -1,14 +1,12 @@
 package com.project.cuchosmarket.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class DtUser {
     private Long id;
@@ -17,4 +15,8 @@ public class DtUser {
     private String email;
     private String password;
     private String role;
+
+    public DtUser(Long id, String firstName, String lastName, String email, String password) {
+    }
 }
+

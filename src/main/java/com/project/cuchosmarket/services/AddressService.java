@@ -11,6 +11,7 @@ import com.project.cuchosmarket.repositories.AddressRepository;
 import com.project.cuchosmarket.repositories.CustomerRepository;
 import com.project.cuchosmarket.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Optional;
 @Service
 public class AddressService {
     private final CustomerRepository customerRepository;
+    @Autowired
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
 
@@ -46,20 +48,29 @@ public class AddressService {
         List<DtAddress> dtAddresses = new ArrayList<>();
         List<Address> addresses = customer.getAddresses();
 
-        addresses.forEach(address -> dtAddresses.add(new DtAddress(address.getId(), address.getAddress(), address.getDoorNumber(), address.getLocation(), address.getState())));
+  addresses.forEach(address ->
+                dtAddresses.add(new DtAddress(address.getId(), address.getAddress(), address.getDoorNumber(), address.getLocation(), address.getState())));
+
 
         return dtAddresses;
     }
 
-    public void addAddress(DtAddress dtAddress,String userEmail) throws UserNotExistException, InvalidAddressException {
+    public void addAddress(DtAddress dtAddress,String userEmail) throws UserNotExistException, InvalidAddressException, AddressNotExistException {
         Customer customer = validateCustomer(userEmail);
         if(dtAddress.getAddress() == null || dtAddress.getAddress().length() > 50
-                || dtAddress.getLocation() == null || dtAddress.getState() == null) throw new InvalidAddressException();
+                || dtAddress.getLocation() == null || dtAddress.getState() == null)
+
+            throw new InvalidAddressException();
+
 
         Address address = new Address(dtAddress.getAddress(), dtAddress.getDoorNumber(), dtAddress.getLocation(), dtAddress.getState());
 
         customer.addAddress(address);
         customerRepository.save(customer);
+        if (addressRepository.findById(address.getId()) == null) {
+
+            throw new AddressNotExistException();
+        }
     }
 
     public void updateAddress(String userEmail, DtAddress dtAddress) throws UserNotExistException, AddressNotExistException, InvalidAddressException {

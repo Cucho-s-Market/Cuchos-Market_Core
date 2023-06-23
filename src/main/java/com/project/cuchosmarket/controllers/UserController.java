@@ -207,6 +207,8 @@ public class UserController {
                     .error(true)
                     .message(e.getMessage())
                     .build();
+        } catch (AddressNotExistException e) {
+            throw new RuntimeException(e);
         }
 
         return DtResponse.builder()

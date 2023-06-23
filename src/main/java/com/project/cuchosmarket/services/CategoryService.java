@@ -34,10 +34,9 @@ public class CategoryService {
 
         //New category creation
         Category newCategory = new Category(
-                dtCategory.getName(),
+                1L, dtCategory.getName(),
                 dtCategory.getDescription(),
-                dtCategory.getImage()
-        );
+                dtCategory.getImage());
 
         if(dtCategory.getCategoryParent() != null) {
             categoryParent = categoryRepository.findById(dtCategory.getCategoryParent());
