@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/statistics")
@@ -15,38 +17,46 @@ public class StatisticsController {
     private final StatisticsService statisticsService;
 
     @GetMapping("/products")
-    public DtResponse getTopSellingProducts(@RequestParam(value = "branch_id", required = false) Long branch_id) {
+    public DtResponse getTopSellingProducts(@RequestParam(value = "branch_id", required = false) Long branch_id,
+                                            @RequestParam(value = "startDate") LocalDate startDate,
+                                            @RequestParam(value = "endDate") LocalDate endDate) {
         return DtResponse.builder()
                 .error(false)
-                .data(statisticsService.getTopSellingProducts(branch_id))
+                .data(statisticsService.getTopSellingProducts(branch_id, startDate, endDate))
                 .build();
     }
 
     @GetMapping("/sales")
-    public DtResponse getSales(@RequestParam(value = "branch_id", required = false) Long branch_id) {
+    public DtResponse getSales(@RequestParam(value = "branch_id", required = false) Long branch_id,
+                               @RequestParam(value = "startDate") LocalDate startDate,
+                               @RequestParam(value = "endDate") LocalDate endDate) {
         return DtResponse.builder()
                 .error(false)
                 .data((branch_id == null) ?
-                        statisticsService.getSalesByBranch():
-                        statisticsService.getSalesInBranch(branch_id))
+                        statisticsService.getSalesByBranch(startDate, endDate):
+                        statisticsService.getSalesInBranch(branch_id, startDate, endDate))
                 .build();
     }
 
     @GetMapping("/profit")
-    public DtResponse getProfit(@RequestParam(value = "branch_id", required = false) Long branch_id) {
+    public DtResponse getProfit(@RequestParam(value = "branch_id", required = false) Long branch_id,
+                                @RequestParam(value = "startDate") LocalDate startDate,
+                                @RequestParam(value = "endDate") LocalDate endDate) {
         return DtResponse.builder()
                 .error(false)
                 .data((branch_id == null) ?
-                        statisticsService.getProfitByBranch():
-                        statisticsService.getProfitInBranch(branch_id))
+                        statisticsService.getProfitByBranch(startDate, endDate):
+                        statisticsService.getProfitInBranch(branch_id, startDate, endDate))
                 .build();
     }
 
     @GetMapping("/brands")
-    public DtResponse getTopBrands(@RequestParam(value = "branch_id", required = false) Long branch_id) {
+    public DtResponse getTopBrands(@RequestParam(value = "branch_id", required = false) Long branch_id,
+                                   @RequestParam(value = "startDate") LocalDate startDate,
+                                   @RequestParam(value = "endDate") LocalDate endDate) {
         return DtResponse.builder()
                 .error(false)
-                .data(statisticsService.getTopBrands(branch_id))
+                .data(statisticsService.getTopBrands(branch_id, startDate, endDate))
                 .build();
     }
 

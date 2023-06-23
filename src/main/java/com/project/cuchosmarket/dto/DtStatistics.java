@@ -62,6 +62,6 @@ public class DtStatistics {
     @AllArgsConstructor
     public static class DtSuccessfulPromotion {
         private String promotionName;
-        private double successRate;
+        private Long salesCount;
     }
 }

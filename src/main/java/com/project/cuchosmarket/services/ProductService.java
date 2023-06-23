@@ -81,14 +81,18 @@ public class ProductService {
         }
     }
 
-    public void updateProduct(DtProduct dtProduct) throws ProductNotExistException, InvalidProductException {
+    public void updateProduct(DtProduct dtProduct) throws ProductNotExistException, InvalidProductException, CategoryNotExistException {
         Product product;
+        Category category = categoryRepository.findById(dtProduct.getCategoryId()).orElseThrow(CategoryNotExistException::new);
+
         //Verify and get product
         validateProduct(dtProduct);
         product = findProduct(dtProduct);
 
+
         //Update product information
         product.setCode(dtProduct.getCode());
+        product.setCategory(category);
         product.setDescription(dtProduct.getDescription());
         product.setPrice(dtProduct.getPrice());
         product.setEntryDate(dtProduct.getEntryDate());

@@ -15,53 +15,29 @@ public class StatisticsService {
     private final OrderRepository orderRepository;
     private final BranchRepository branchRepository;
 
-    public List<DtStatistics.DtTopProduct> getTopSellingProducts(Long branch_id) {
-        LocalDate currentDate = LocalDate.now();
-
-        LocalDate startDate = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), 1);
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+    public List<DtStatistics.DtTopProduct> getTopSellingProducts(Long branch_id, LocalDate startDate, LocalDate endDate) {
         return (branch_id == null) ?
                 orderRepository.findTopSellingProducts(startDate, endDate) :
                 branchRepository.findTopSellingProductsByBranch(branch_id, startDate, endDate);
     }
 
-    public List<DtStatistics.DtSalesByBranch> getSalesByBranch() {
-        LocalDate currentDate = LocalDate.now();
-
-        LocalDate startDate = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), 1);
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+    public List<DtStatistics.DtSalesByBranch> getSalesByBranch(LocalDate startDate, LocalDate endDate) {
         return branchRepository.findSales(startDate, endDate);
     }
 
-    public List<DtStatistics.DtSalesInBranch> getSalesInBranch(Long branchId) {
-        LocalDate currentDate = LocalDate.now();
-
-        LocalDate startDate = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), 1);
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+    public List<DtStatistics.DtSalesInBranch> getSalesInBranch(Long branchId, LocalDate startDate, LocalDate endDate) {
         return branchRepository.findSalesInBranch(branchId, startDate, endDate);
     }
 
-    public List<DtStatistics.DtProfitByBranch> getProfitByBranch() {
-        LocalDate currentDate = LocalDate.now();
-
-        LocalDate startDate = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), 1);
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+    public List<DtStatistics.DtProfitByBranch> getProfitByBranch(LocalDate startDate, LocalDate endDate) {
         return branchRepository.calculateProfitByBranch(startDate, endDate);
     }
 
-    public List<DtStatistics.DtProfitInBranch> getProfitInBranch(Long branchId) {
-        LocalDate currentDate = LocalDate.now();
-
-        LocalDate startDate = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), 1);
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+    public List<DtStatistics.DtProfitInBranch> getProfitInBranch(Long branchId, LocalDate startDate, LocalDate endDate) {
         return branchRepository.calculateProfitInBranch(branchId, startDate, endDate);
     }
 
-    public List<DtStatistics.DtPopularBrand> getTopBrands(Long branch_id) {
-        LocalDate currentDate = LocalDate.now();
-
-        LocalDate startDate = LocalDate.of(currentDate.getYear(), currentDate.getMonthValue(), 1);
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+    public List<DtStatistics.DtPopularBrand> getTopBrands(Long branch_id, LocalDate startDate, LocalDate endDate) {
         return (branch_id == null) ?
                 orderRepository.findTopBrands(startDate, endDate) :
                 branchRepository.findTopBrandsByBranch(branch_id, startDate, endDate);
