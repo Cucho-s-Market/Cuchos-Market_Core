@@ -1,5 +1,7 @@
 package com.project.cuchosmarket.services;
 
+import com.project.cuchosmarket.models.Order;
+import com.project.cuchosmarket.models.User;
 import com.project.cuchosmarket.enums.OrderStatus;
 import com.project.cuchosmarket.enums.OrderType;
 import com.project.cuchosmarket.models.Order;
@@ -67,4 +69,25 @@ public class EmailService {
                 return "Este mensaje es enviado por Cucho's Market";
         }
     }
+
+    public void sendResetTokenEmail(String token, User user) throws MessagingException {
+        MimeMessage message = sender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(
+                message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                StandardCharsets.UTF_8.name()
+        );
+
+        String resetPasswordUrl = "http://localhost:8080/doc/swagger-ui/index.html?token=" + token;  //Modificar Url para redirigir a la pag
+
+        helper.setTo(user.getEmail());
+        helper.setFrom(setFromEmail);
+        helper.setSubject("Solicitud para restablecer contraseña");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("resetPasswordUrl", resetPasswordUrl);
+        variables.put("first_name", user.getFirstName());
+        helper.setText(thymeleafService.createContent("reset-password-email-template.html", variables), true);
+        sender.send(message);
+    }
+
 }

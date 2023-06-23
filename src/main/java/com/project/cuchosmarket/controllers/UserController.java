@@ -7,9 +7,15 @@ import com.project.cuchosmarket.dto.DtUser;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.services.AddressService;
 import com.project.cuchosmarket.services.UserService;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Locale;
 
 @RequiredArgsConstructor
 @RestController
@@ -41,6 +47,52 @@ public class UserController {
 
         token.setError(false);
         return token;
+    }
+
+    @PostMapping("/auth/resetPassword")
+    public DtResponse resetPassword(@RequestBody DtUser user) {
+        try {
+            userService.resetPassword(user);
+        } catch (UserNotExistException | CustomerDisabledException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Si esa dirección de correo electrónico está en nuestra base de datos, " +
+                        "te enviaremos un correo electrónico para restablecer tu contraseña.")
+                .build();
+    }
+
+    @PutMapping("/auth/updatePassword")
+    public DtResponse updatePassword(@RequestBody DtUser dtUser) {
+        DtResponse token;
+        try {
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            userService.updatePassword(userEmail, dtUser);
+            token = userService.authenticate(dtUser);
+        } catch (IllegalArgumentException |UserNotExistException | CustomerDisabledException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+        token.setError(false);
+        return token;
+    }
+
+    @GetMapping("/token")
+    public DtResponse checkTokenValidation() {
+        return DtResponse.builder()
+                .error(false)
+                .message("Token valido")
+                .build();
     }
 
     @PostMapping("/{branch_id}/employee")

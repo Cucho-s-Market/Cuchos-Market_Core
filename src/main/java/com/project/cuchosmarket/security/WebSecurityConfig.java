@@ -41,7 +41,8 @@ public class WebSecurityConfig {
                 //All users
                 .requestMatchers(
                         HttpMethod.POST,
-                        "/users/auth/**",
+                        "/users/auth/login",
+                        "/users/auth/resetPassword",
                         "/users/customer"
                 ).permitAll()
 
