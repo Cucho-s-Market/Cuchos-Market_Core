@@ -15,16 +15,15 @@ import com.project.cuchosmarket.services.OrderService;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 
 import java.time.LocalDate;
 import java.util.*;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.testng.Assert.assertEquals;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -101,17 +100,17 @@ public class OrderServiceTest {
     public void testGetOrder() {
         Long orderId = 1l;
         Order order = new Order();
+        order.setId(orderId);
+        Customer customer = new Customer("adriana", "pisano","adri@email.com", "1111",LocalDate.of(1988,10,01),12345678, 44017427 );
+        order.setCustomer(customer);
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-
-        order = orderService.getOrder(orderId);
-        System.out.println(order);
-        verify(orderRepository, atLeastOnce()).findById(orderId);
+        Order salida = orderService.getOrder(orderId);
+        assertNotNull(salida);
 
     }
 
-    @SneakyThrows
     @Test
-    public void testGetPurchasesByCustomer(){
+    public void testGetPurchasesByCustomer() throws InvalidOrderException, UserNotExistException {
         String userEmail = "adri@email.com";
         int pageNumber = 2;
         int pageSize = 3;
@@ -122,72 +121,81 @@ public class OrderServiceTest {
         User user = new Customer();
         when(userRepository.findByEmail(userEmail)).thenReturn(user);
 
-        Page<DtOrder> salida = null;
+        List<DtOrder> expectedOrders = new ArrayList<>();
+        Page<DtOrder> entrada = new PageImpl<>(expectedOrders);
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("creationDate",orderDirection));
-        when(orderRepository.findCustomerOrders(user.getId(), OrderStatus.PENDING, startDate, endDate, pageable)).thenReturn(salida);
-        salida = orderService.getPurchasesByCustomer("adri@email.com",2,3,"PENDING",LocalDate.now(),LocalDate.now().plusDays(3),"calle 1234");
-        System.out.println(salida.get());
+        when(orderRepository.findCustomerOrders(eq(user.getId()), eq(OrderStatus.PENDING), eq(startDate), eq(endDate), any(Pageable.class))).thenReturn(entrada);
+        Page<DtOrder> salida = orderService.getPurchasesByCustomer("adri@email.com",2,3,"PENDING",LocalDate.now(),LocalDate.now().plusDays(3),"calle 1234");
+        assertNotNull(salida);
+
     }
 
-    @SneakyThrows
     @Test
-    public void testGetOrdersBy(){
+    public void testGetOrdersBy() throws InvalidOrderException, EmployeeNotWorksInException, UserNotExistException {
         String userEmail = "adri@email.com";
-        int pageNumber = 2;
-        int pageSize = 3;
+        int pageNumber = 0;
+        int pageSize = 1;
         String orderStatus = "PENDING";
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.now().plusDays(3);
         String orderDirection = "calle 1234";
-
-        User user = new Customer("adriana", "pisano", userEmail, "123", LocalDate.of(1988,10,01),99867791, 44017427 );
-        when(userRepository.findByEmail(userEmail)).thenReturn(user);
-
         Long marketBranchId = 1l;
 
-        Page<DtOrder> salida = null;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("o.creationDate", orderDirection));
+        Employee user = new Employee("adriana", "pisano", userEmail, "1111",  Branch.builder().id(1l).build() );
+        when(userRepository.findByEmail(userEmail)).thenReturn(user);
+        when(employeeRepository.findById(any())).thenReturn(Optional.of(user));
 
-        when(branchRepository.findOrders(marketBranchId, OrderStatus.PENDING, startDate, endDate, pageable)).thenReturn(salida);
-        salida = orderService.getOrdersBy(userEmail,pageNumber,pageSize,marketBranchId,orderStatus,startDate, endDate, orderDirection);
+        List<DtOrder> expectedOrders = new ArrayList<>();
+
+
+        Page<DtOrder> entrada = new PageImpl<>(expectedOrders);
+        when(branchRepository.findOrders(eq(marketBranchId), eq(OrderStatus.PENDING), eq(startDate), eq(endDate), any(Pageable.class))).thenReturn(entrada);
+
+        Page<DtOrder> salida = orderService.getOrdersBy(userEmail,pageNumber,pageSize,marketBranchId,orderStatus,startDate, endDate, orderDirection);
         System.out.println(salida.getTotalElements());
+        assertNotNull(salida);
+        assertEquals(expectedOrders.size(), salida.getContent().size());
     }
 @Test
     public void testUpdateStatus() throws EmployeeNotWorksInException, OrderNotExistException, InvalidOrderException {
         String userEmail = "adri@email.com";
         DtOrder dtOrder = new DtOrder();
-        dtOrder.setId(1l);
-        dtOrder.setStatus(OrderStatus.PENDING);
-      //  User user = new Customer("adriana", "pisano", userEmail, "123", LocalDate.of(1988,10,01),99867791, 44017427 );
+        Branch branchE = new Branch();
+        Long marketBranchId = 1l;
+        branchE.setId(marketBranchId);
+        Employee userEWIB = new Employee();
+        User user = new Employee();
+        user.setEmail(userEmail);
+        user.setId(1l);
+        when(userRepository.findByEmail(userEmail)).thenReturn(user);
+        when(employeeRepository.findById(1l)).thenReturn(Optional.of(userEWIB));
+        dtOrder.setBranchId(branchE.getId());
+        dtOrder.setId(2l);
+        userEWIB.setId(1l);
+        userEWIB.setBranch(branchE);
 
-        Order order = new Order();
-        order.setId(1l);
-        when(orderRepository.save(order));
-        when(orderRepository.existsById(1l)).thenReturn(true);
-
+        Order orderVO = new Order();
+        orderVO.setId(2l);
+        orderVO.setStatus(OrderStatus.PREPARING);
+        when(orderRepository.findById(2l)).thenReturn(Optional.of(orderVO));
+        dtOrder.setStatus(OrderStatus.PREPARING);
         orderService.updateStatus(userEmail,dtOrder);
+        verify(orderRepository).save(any(Order.class));
     }
     @Test
-    public void cancelOrder() {
+    public void cancelOrder() throws InvalidOrderException, OrderNotExistException {
         String userEmail = "adri@email.com";
         Long order_id = 1l;
-        Customer user = new Customer() ;
+
+        Customer user = new Customer();
+        user.setEmail(userEmail);
         user.setId(11l);
-
         when(userRepository.findByEmail(userEmail)).thenReturn(user);
-
         Order order = new Order();
         order.setId(order_id);
-        order.setCustomer(user);
         order.setStatus(OrderStatus.PENDING);
-        when(orderRepository.save(order));
-        try {
-            orderService.cancelOrder(userEmail,order_id);
-        } catch (OrderNotExistException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidOrderException e) {
-            throw new RuntimeException(e);
-        }
+        when(orderRepository.findById(order_id)).thenReturn(Optional.of(order));
+        order.setCustomer(user);
+        orderService.cancelOrder(userEmail,order_id);
     }
 }
