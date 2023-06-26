@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,7 @@ public class ProductService {
     private final PromotionRepository promotionRepository;
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
+    private final ItemRepository itemRepository;
 
     private void validateProduct(DtProduct dtProduct) throws InvalidProductException {
         if(dtProduct.getCode() == null || dtProduct.getName() == null || dtProduct.getCategoryId() == null || dtProduct.getEntryDate() == null) throw new InvalidProductException();
@@ -89,7 +91,6 @@ public class ProductService {
         validateProduct(dtProduct);
         product = findProduct(dtProduct);
 
-
         //Update product information
         product.setCode(dtProduct.getCode());
         product.setCategory(category);
@@ -105,12 +106,24 @@ public class ProductService {
     @Transactional
     public void deleteProduct(DtProduct dtProduct) throws ProductNotExistException {
         Product product = findProduct(dtProduct);
+
+        List<Promotion> promotionsToUpdate = new ArrayList<>();
         product.getPromotions().forEach(promotion -> {
             promotion.getProducts().remove(product);
-            promotionRepository.save(promotion);
+            promotionsToUpdate.add(promotion);
         });
+        promotionRepository.saveAll(promotionsToUpdate);
+
+        List<Item> itemsToUpdate = new ArrayList<>();
+        itemRepository.findItemsByProduct(product.getName()).forEach(item -> {
+            item.setProduct(null);
+            itemsToUpdate.add(item);
+        });
+        itemRepository.saveAll(itemsToUpdate);
+
         branchRepository.findAll().forEach(branch -> stockRepository.findById(new StockId(product, branch))
                 .ifPresent(stockRepository::delete));
+
         productRepository.delete(product);
     }
   
