@@ -89,58 +89,57 @@ public class OrderService {
     }
 
     @Transactional
-    public void buyProducts(String userEmail, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException, InvalidOrderException, AddressNotExistException {
-        User user = userRepository.findByEmail(userEmail);
-        if (user == null) throw new UserNotExistException();
+public void buyProducts(String userEmail, DtOrder dtOrder) throws BranchNotExistException, UserNotExistException, ProductNotExistException, NoStockException, InvalidOrderException, AddressNotExistException {
+    User user = userRepository.findByEmail(userEmail);
+    if (user == null) throw new UserNotExistException();
 
-        Customer customer = (Customer) user;
-        Branch branch = branchRepository.findById(dtOrder.getBranchId())
-                .orElseThrow(() -> new BranchNotExistException(dtOrder.getBranchId()));
+    Customer customer = (Customer) user;
+    Branch branch = branchRepository.findById(dtOrder.getBranchId())
+            .orElseThrow(() -> new BranchNotExistException(dtOrder.getBranchId()));
 
-        if (dtOrder.getStatus() == null && dtOrder.getType() == null) throw new InvalidOrderException("Informacion de orden invalida.");
-        if (dtOrder.getProducts().isEmpty()) throw new InvalidOrderException("No se selecciono ningun producto para comprar.");
+    if (dtOrder.getStatus() == null && dtOrder.getType() == null) throw new InvalidOrderException("Informacion de orden invalida.");
+    if (dtOrder.getProducts().isEmpty()) throw new InvalidOrderException("No se selecciono ningun producto para comprar.");
 
 
-        List<Item> items = new ArrayList<>();
-        Order order;
-        float totalPrice = 0;
+    List<Item> items = new ArrayList<>();
+    Order order;
+    float totalPrice = 0;
 
-        for (DtItem dtItem : dtOrder.getProducts()) {
-            if (dtItem.getQuantity() < 1) throw new InvalidOrderException("La cantidad del producto que se encarga ha de ser mayor a 0.");
+    for (DtItem dtItem : dtOrder.getProducts()) {
+        if (dtItem.getQuantity() < 1) throw new InvalidOrderException("La cantidad del producto que se encarga ha de ser mayor a 0.");
 
-            Product product = productRepository.findById(dtItem.getName()).orElseThrow(() -> new ProductNotExistException(dtItem.getName()));
-            Stock productStock = stockRepository.findById(new StockId(product, branch)).get();
+        Product product = productRepository.findById(dtItem.getName()).orElseThrow(() -> new ProductNotExistException(dtItem.getName()));
+        Stock productStock = stockRepository.findById(new StockId(product, branch)).get();
 
-            if (productStock.getQuantity() < 1 || productStock.getQuantity() < dtItem.getQuantity()) {
-                throw new NoStockException("Stock insuficiente para " + dtItem.getName() + " en sucursal.");
-            } else {
-                productStock.setQuantity(productStock.getQuantity() - dtItem.getQuantity());
-            }
-
-            Item item = new Item(dtItem.getName(), product.getPrice(), applyPromotion(product, dtItem.getQuantity()),
-                    dtItem.getQuantity(), product);
-            items.add(item);
-            totalPrice+=item.getFinalPrice();
+        if (productStock.getQuantity() < 1 || productStock.getQuantity() < dtItem.getQuantity()) {
+            throw new NoStockException("Stock insuficiente para " + dtItem.getName() + " en sucursal.");
+        } else {
+            productStock.setQuantity(productStock.getQuantity() - dtItem.getQuantity());
         }
-
-        order = new Order(totalPrice, LocalDate.now(), OrderStatus.PENDING, dtOrder.getType(), items);
-
-        if (order.getType().equals(OrderType.DELIVERY)) {
-            if (dtOrder.getAddressId() == null) throw new InvalidOrderException("No se ha seleccionado ninguna direccion.");
-            Address address = customer.getAddresses()
-                    .stream()
-                    .filter(address1 -> address1.getId().equals(dtOrder.getAddressId()))
-                    .findFirst()
-                    .orElseThrow(AddressNotExistException::new);
-            order.setClientAddress(address.toString());
-        }
-
-        order.setCustomer(customer);
-        orderRepository.save(order);
-
-        branch.addOrder(order);
-        branchRepository.save(branch);
+        Item item = new Item(dtItem.getName(), product.getPrice(), applyPromotion(product, dtItem.getQuantity()),
+                dtItem.getQuantity(), product);
+        items.add(item);
+        totalPrice+=item.getFinalPrice();
     }
+
+    order = new Order(totalPrice, LocalDate.now(), OrderStatus.PENDING, dtOrder.getType(), items);
+
+    if (order.getType().equals(OrderType.DELIVERY)) {
+        if (dtOrder.getAddressId() == null) throw new InvalidOrderException("No se ha seleccionado ninguna direccion.");
+        Address address = customer.getAddresses()
+                .stream()
+                .filter(address1 -> address1.getId().equals(dtOrder.getAddressId()))
+                .findFirst()
+                .orElseThrow(AddressNotExistException::new);
+        order.setClientAddress(address.toString());
+    }
+
+    order.setCustomer(customer);
+    orderRepository.save(order);
+//ROMPIMIENTO
+    branch.addOrder(order);
+    branchRepository.save(branch);
+}
 
     private float applyPromotion(Product product, int productQuantity) {
         List<Promotion> productPromotions = promotionRepository.findPromotionsByProduct(product);

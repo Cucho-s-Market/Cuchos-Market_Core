@@ -12,6 +12,7 @@ import com.project.cuchosmarket.models.Promotion;
 import com.project.cuchosmarket.repositories.ProductRepository;
 import com.project.cuchosmarket.repositories.PromotionRepository;
 import io.micrometer.common.util.StringUtils;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
