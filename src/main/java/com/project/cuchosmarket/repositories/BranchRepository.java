@@ -138,4 +138,19 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
     List<DtStatistics.DtPopularBrand> findTopBrandsByBranch(@Param("branchId") Long branchId,
                                                             @Param("startDate") LocalDate startDate,
                                                             @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT new com.project.cuchosmarket.dto.DtStatistics$DtSuccessfulPromotion(" +
+            "prom.name AS promotionName, SUM(i.quantity) AS salesCount) " +
+            "FROM Branch b " +
+            "JOIN b.orders o JOIN o.products i " +
+            "JOIN i.product p JOIN p.promotions prom " +
+            "WHERE b.id = :branchId " +
+            "AND o.creationDate >= :startDate AND o.creationDate <= :endDate " +
+            "AND o.status = 'DELIVERED' AND prom.endDate >= CURRENT_DATE " +
+            "GROUP BY prom.name " +
+            "ORDER BY SUM(i.quantity) DESC " +
+            "LIMIT 10")
+    List<DtStatistics.DtSuccessfulPromotion> findTopPromotionsByBranch(@Param("branchId") Long branchId,
+                                                                       @Param("startDate") LocalDate startDate,
+                                                                       @Param("endDate") LocalDate endDate);
 }

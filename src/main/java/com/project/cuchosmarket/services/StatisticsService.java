@@ -42,4 +42,10 @@ public class StatisticsService {
                 orderRepository.findTopBrands(startDate, endDate) :
                 branchRepository.findTopBrandsByBranch(branch_id, startDate, endDate);
     }
+
+    public List<DtStatistics.DtSuccessfulPromotion> getTopPromotions(Long branch_id, LocalDate startDate, LocalDate endDate) {
+        return (branch_id == null) ?
+                orderRepository.findTopPromotions(startDate, endDate) :
+                branchRepository.findTopPromotionsByBranch(branch_id, startDate, endDate);
+    }
 }

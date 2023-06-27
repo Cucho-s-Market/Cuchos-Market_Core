@@ -60,4 +60,14 @@ public class StatisticsController {
                 .build();
     }
 
+    @GetMapping("/promotions")
+    public DtResponse getTopPromotions(@RequestParam(value = "branch_id", required = false) Long branch_id,
+                                       @RequestParam(value = "startDate") LocalDate startDate,
+                                       @RequestParam(value = "endDate") LocalDate endDate) {
+        return DtResponse.builder()
+                .error(false)
+                .data(statisticsService.getTopPromotions(branch_id, startDate, endDate))
+                .build();
+    }
+
 }
