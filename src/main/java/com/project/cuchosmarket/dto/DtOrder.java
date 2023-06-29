@@ -23,25 +23,30 @@ public class DtOrder {
     private LocalDate endDate;
     private OrderStatus status;
     private Long addressId;
+    private String clientAddress;
     private OrderType type;
     private List<DtItem> products;
 
-    public DtOrder(Long branchId, Long id, float totalPrice, LocalDate creationDate, LocalDate endDate, OrderStatus status, OrderType type) {
+    public DtOrder(Long branchId, Long id, float totalPrice, LocalDate creationDate, LocalDate endDate, OrderStatus status,
+                   String clientAddress, OrderType type) {
         this.branchId = branchId;
         this.id = id;
         this.totalPrice = totalPrice;
         this.creationDate = creationDate;
         this.endDate = endDate;
         this.status = status;
+        this.clientAddress = clientAddress;
         this.type = type;
     }
 
-    public DtOrder(Long id, float totalPrice, LocalDate creationDate, LocalDate endDate, OrderStatus status, OrderType type) {
+    public DtOrder(Long id, float totalPrice, LocalDate creationDate, LocalDate endDate, OrderStatus status, String clientAddress,
+                   OrderType type) {
         this.id = id;
         this.totalPrice = totalPrice;
         this.creationDate = creationDate;
         this.endDate = endDate;
         this.status = status;
+        this.clientAddress = clientAddress;
         this.type = type;
     }
 }

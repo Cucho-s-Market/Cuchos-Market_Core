@@ -179,6 +179,24 @@ public class UserService {
         return dtUsers;
     }
 
+    public User getUser(Long userId) throws UserNotExistException {
+        User user = userRepository.findById(userId).orElseThrow(UserNotExistException::new);
+
+        switch (user.getRole()) {
+            case CUSTOMER:
+                return customerRepository.findById(userId).get();
+            case EMPLOYEE:
+                Employee employee = employeeRepository.findById(userId).get();
+                employee.getBranch().setOrders(null);
+                employee.getBranch().setIssues(null);
+                return employee;
+            case ADMIN:
+                return user;
+            default:
+                return null;
+        }
+    }
+
     public DtResponse addAdmin(DtUser admin) throws UserExistException {
 
         if((userRepository.existsByEmail(admin.getEmail()))) throw new UserExistException("Usuario con email " + admin.getEmail() + " ya se encuentra en el sistema.");
