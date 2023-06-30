@@ -1,7 +1,6 @@
 package com.project.cuchosmarket.repositories;
 
 import com.project.cuchosmarket.models.Item;
-import com.project.cuchosmarket.models.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

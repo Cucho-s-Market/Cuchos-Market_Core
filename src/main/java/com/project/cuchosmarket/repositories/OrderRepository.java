@@ -23,6 +23,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             "o.creationDate, " +
             "o.endDate, " +
             "o.status, " +
+            "o.clientAddress, " +
             "o.type) " +
             "FROM Order o " +
             "JOIN o.customer c " +

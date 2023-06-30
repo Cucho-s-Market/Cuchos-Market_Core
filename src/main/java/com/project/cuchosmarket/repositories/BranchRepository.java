@@ -36,6 +36,7 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
             "o.creationDate, " +
             "o.endDate, " +
             "o.status, " +
+            "o.clientAddress, " +
             "o.type) " +
             "FROM Branch b " +
             "JOIN b.orders o " +

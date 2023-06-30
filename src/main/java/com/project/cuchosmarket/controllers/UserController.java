@@ -28,6 +28,21 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/{user_id}")
+    public DtResponse getUser(@PathVariable("user_id") Long user_id) {
+        try {
+            return DtResponse.builder()
+                    .error(false)
+                    .data(userService.getUser(user_id))
+                    .build();
+        } catch (UserNotExistException e) {
+            return DtResponse.builder()
+                    .error(true)
+                    .message(e.getMessage())
+                    .build();
+        }
+    }
+
     @PostMapping("/auth/login")
     public DtResponse login(@RequestBody DtUser user) {
         DtResponse token;
