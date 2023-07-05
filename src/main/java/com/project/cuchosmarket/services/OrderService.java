@@ -78,7 +78,7 @@ public class OrderService {
         return orderRepository.findCustomerOrders(user.getId(), status, startDate, endDate, pageable);
     }
 
-    public Order getOrder(Long orderId) throws OrderNotExistException {
+    public Map<String, Object> getOrder(Long orderId) throws OrderNotExistException {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotExistException(orderId));
         order.getCustomer().setId(null);
         order.getCustomer().setPassword(null);
@@ -86,7 +86,12 @@ public class OrderService {
         order.getCustomer().setDisabled(null);
         order.getCustomer().setAddresses(null);
 
-        return order;
+        Branch branch = branchRepository.findByOrdersContains(order);
+        Map<String, Object> result = new HashMap<>();
+        result.put("order", order);
+        result.put("branchId", branch.getId());
+
+        return result;
     }
 
     @Transactional
