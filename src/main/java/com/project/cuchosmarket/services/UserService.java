@@ -149,7 +149,8 @@ public class UserService {
         User user = userRepository.findByEmail(userEmail);
         if (user == null) throw new UserNotExistException();
 
-        validateUser(dtUser);
+        if (StringUtils.isBlank(dtUser.getFirstName()) || StringUtils.isBlank(dtUser.getLastName()) || dtUser.getFirstName().length() > 25 || dtUser.getLastName().length() > 25 )
+            throw new IllegalArgumentException("Datos invalidos: Nombre invalido.");
 
         if (user.getRole().equals(Role.CUSTOMER)) {
             Customer customer = customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
@@ -165,7 +166,8 @@ public class UserService {
         user.setEmail(dtUser.getEmail());
         user.setFirstName(dtUser.getFirstName());
         user.setLastName(dtUser.getLastName());
-        user.setPassword(passwordEncoder.encode(dtUser.getPassword()));
+
+        if (StringUtils.isNotBlank(dtUser.getPassword())) user.setPassword(dtUser.getPassword());
 
         userRepository.save(user);
     }
