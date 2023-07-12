@@ -178,7 +178,7 @@ public class UserService {
             user.setLastName(dtUser.getLastName());
         }
 
-        if (StringUtils.isNotBlank(dtUser.getPassword())) user.setPassword(dtUser.getPassword());
+        if (StringUtils.isNotBlank(dtUser.getPassword())) user.setPassword(passwordEncoder.encode(dtUser.getPassword()));
 
         userRepository.save(user);
     }

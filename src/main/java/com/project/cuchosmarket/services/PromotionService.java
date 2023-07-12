@@ -2,6 +2,7 @@ package com.project.cuchosmarket.services;
 
 import com.project.cuchosmarket.dto.DtProduct;
 import com.project.cuchosmarket.dto.DtPromotion;
+import com.project.cuchosmarket.dto.DtResponse;
 import com.project.cuchosmarket.exceptions.InvalidPromotionException;
 import com.project.cuchosmarket.exceptions.ProductNotExistException;
 import com.project.cuchosmarket.exceptions.PromotionNotExistException;
@@ -30,7 +31,10 @@ public class PromotionService {
         if (dtPromotion.getProducts() != null) {
             List<Product> promotionProducts = new ArrayList<>();
             for (DtProduct dtProduct : dtPromotion.getProducts()) {
-                promotionProducts.add(productRepository.findById(dtProduct.getName()).orElseThrow(() -> new ProductNotExistException(dtProduct.getName())));
+                Product product = productRepository.findById(dtProduct.getName()).orElseThrow(() -> new ProductNotExistException(dtProduct.getName()));
+                if (promotionRepository.findPromotionsByProduct(product).isEmpty()) {
+                    promotionProducts.add(product);
+                }
             }
             return promotionProducts;
         }
@@ -45,7 +49,7 @@ public class PromotionService {
         if (dtPromotion.getN() <= 0 || dtPromotion.getM() <= 0) throw new InvalidPromotionException();
     }
 
-    public void addPromotion(DtPromotion dtPromotion) throws InvalidPromotionException, ProductNotExistException {
+    public DtResponse addPromotion(DtPromotion dtPromotion) throws InvalidPromotionException, ProductNotExistException {
         List<Product> products = validatePromotion(dtPromotion);
 
         if (dtPromotion.getPromotionType().equalsIgnoreCase("discount")) {
@@ -61,9 +65,21 @@ public class PromotionService {
             promotionRepository.save(nxM);
 
         } else throw new InvalidPromotionException("El sistema no soporta ese tipo de promocion.");
+
+        if (dtPromotion.getProducts().size() != products.size()) {
+            return DtResponse.builder()
+                    .error(false)
+                    .message("Algunos productos no pudieron ser seleccionados por ya ser parte de otra promocion activa.")
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Promocion agregada correctamente")
+                .build();
     }
 
-    public void updatePromotion(DtPromotion dtPromotion) throws InvalidPromotionException, PromotionNotExistException, ProductNotExistException {
+    public DtResponse updatePromotion(DtPromotion dtPromotion) throws InvalidPromotionException, PromotionNotExistException, ProductNotExistException {
         List<Product> products = validatePromotion(dtPromotion);
         Promotion promotion = promotionRepository.findById(dtPromotion.getId()).orElseThrow(PromotionNotExistException::new);
 
@@ -86,6 +102,17 @@ public class PromotionService {
             promotionRepository.save(nxM);
         }
 
+        if (dtPromotion.getProducts().size() != products.size()) {
+            return DtResponse.builder()
+                    .error(false)
+                    .message("Algunos productos no pudieron ser seleccionados por ya ser parte de otra promocion activa.")
+                    .build();
+        }
+
+        return DtResponse.builder()
+                .error(false)
+                .message("Promocion agregada correctamente")
+                .build();
     }
 
     public List<Promotion> getPromotions(boolean includeExpired) {
