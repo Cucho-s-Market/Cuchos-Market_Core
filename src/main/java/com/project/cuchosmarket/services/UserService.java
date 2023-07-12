@@ -149,9 +149,6 @@ public class UserService {
         User user = userRepository.findByEmail(userEmail);
         if (user == null) throw new UserNotExistException();
 
-        if (StringUtils.isBlank(dtUser.getFirstName()) || StringUtils.isBlank(dtUser.getLastName()) || dtUser.getFirstName().length() > 25 || dtUser.getLastName().length() > 25 )
-            throw new IllegalArgumentException("Datos invalidos: Nombre invalido.");
-
         if (user.getRole().equals(Role.CUSTOMER)) {
             Customer customer = customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
 
@@ -163,9 +160,23 @@ public class UserService {
             customerRepository.save(customer);
         }
 
-        user.setEmail(dtUser.getEmail());
-        user.setFirstName(dtUser.getFirstName());
-        user.setLastName(dtUser.getLastName());
+        if (StringUtils.isNotBlank(dtUser.getEmail())) {
+            if (!userEmail.equals(dtUser.getEmail())) {
+                User newUser = userRepository.findByEmail(dtUser.getEmail());
+                if (newUser != null) throw new UserExistException("Usuario con email " + dtUser.getEmail() + " ya existe.");
+                else user.setEmail(dtUser.getEmail());
+            }
+        }
+
+        if (StringUtils.isNotBlank(dtUser.getFirstName())) {
+            if (dtUser.getFirstName().length() > 25) throw new IllegalArgumentException("Datos invalidos: Nombre invalido.");
+            user.setFirstName(dtUser.getFirstName());
+        }
+
+        if (StringUtils.isNotBlank(dtUser.getLastName())) {
+            if (dtUser.getLastName().length() > 25) throw new IllegalArgumentException("Datos invalidos: Nombre invalido.");
+            user.setLastName(dtUser.getLastName());
+        }
 
         if (StringUtils.isNotBlank(dtUser.getPassword())) user.setPassword(dtUser.getPassword());
 
