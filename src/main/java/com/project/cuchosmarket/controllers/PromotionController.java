@@ -21,35 +21,25 @@ public class PromotionController {
     @PostMapping
     public DtResponse addPromotion(@RequestBody DtPromotion dtPromotion) {
         try {
-            promotionService.addPromotion(dtPromotion);
+            return promotionService.addPromotion(dtPromotion);
         } catch (InvalidPromotionException | ProductNotExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
                     .build();
         }
-
-        return DtResponse.builder()
-                .error(false)
-                .message("Promocion agregada correctamente")
-                .build();
     }
 
     @PutMapping
     public DtResponse updatePromotion(@RequestBody DtPromotion dtPromotion) {
         try {
-            promotionService.updatePromotion(dtPromotion);
+            return promotionService.updatePromotion(dtPromotion);
         } catch (InvalidPromotionException | ProductNotExistException | PromotionNotExistException e) {
             return DtResponse.builder()
                     .error(true)
                     .message(e.getMessage())
                     .build();
         }
-
-        return DtResponse.builder()
-                .error(false)
-                .message("Promocion actualizada correctamente")
-                .build();
     }
 
     @GetMapping
