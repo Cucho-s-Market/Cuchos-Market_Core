@@ -10,12 +10,12 @@ import com.project.cuchosmarket.models.User;
 import com.project.cuchosmarket.repositories.AddressRepository;
 import com.project.cuchosmarket.repositories.CustomerRepository;
 import com.project.cuchosmarket.repositories.UserRepository;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -24,18 +24,15 @@ public class AddressService {
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
 
-    private Address findAddress(DtAddress dtAddress,Long id) throws AddressNotExistException {
-        Optional<Address> address = addressRepository.findById(dtAddress.getId());
-
-        if(address.isEmpty()) throw new AddressNotExistException("Direccion no encontrada.");
-
-        return address.get();
-    }
-
     private Customer validateCustomer(String userEmail) throws UserNotExistException {
         User user = userRepository.findByEmail(userEmail);
         if (user == null) throw new UserNotExistException();
         return customerRepository.findById(user.getId()).orElseThrow(UserNotExistException::new);
+    }
+
+    private void validateAddress(DtAddress dtAddress) throws InvalidAddressException {
+        if(StringUtils.isBlank(dtAddress.getAddress()) || dtAddress.getAddress().length() > 50
+                || StringUtils.isBlank(dtAddress.getLocation()) || StringUtils.isBlank(dtAddress.getState())) throw new InvalidAddressException();
     }
 
     public List<DtAddress> getAddress(String userEmail) throws UserNotExistException {
@@ -53,8 +50,7 @@ public class AddressService {
 
     public void addAddress(DtAddress dtAddress,String userEmail) throws UserNotExistException, InvalidAddressException {
         Customer customer = validateCustomer(userEmail);
-        if(dtAddress.getAddress() == null || dtAddress.getAddress().length() > 50
-                || dtAddress.getLocation() == null || dtAddress.getState() == null) throw new InvalidAddressException();
+        validateAddress(dtAddress);
 
         Address address = new Address(dtAddress.getAddress(), dtAddress.getDoorNumber(), dtAddress.getLocation(), dtAddress.getState());
 
@@ -64,10 +60,9 @@ public class AddressService {
 
     public void updateAddress(String userEmail, DtAddress dtAddress) throws UserNotExistException, AddressNotExistException, InvalidAddressException {
         Customer customer = validateCustomer(userEmail);
-        if(dtAddress.getAddress() == null || dtAddress.getAddress().length() > 50
-                || dtAddress.getLocation() == null || dtAddress.getState() == null) throw new InvalidAddressException();
+        validateAddress(dtAddress);
 
-        Address address = findAddress(dtAddress, customer.getId());
+        Address address = addressRepository.findById(dtAddress.getId()).orElseThrow(() -> new AddressNotExistException("Direccion no encontrada."));
         address.setAddress(dtAddress.getAddress());
         address.setDoorNumber(dtAddress.getDoorNumber());
         address.setLocation(dtAddress.getLocation());

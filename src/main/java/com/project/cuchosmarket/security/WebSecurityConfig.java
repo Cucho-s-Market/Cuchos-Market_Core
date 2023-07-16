@@ -36,7 +36,7 @@ public class WebSecurityConfig {
                         "/swagger-resources/**",
                         "/doc/swagger-ui/**"
                 )
-                    .permitAll()
+                .permitAll()
 
                 //All users
                 .requestMatchers(
@@ -137,10 +137,10 @@ public class WebSecurityConfig {
                 ).hasAnyRole(ADMIN.name(), CUSTOMER.name())
 
                 .anyRequest()
-                    .authenticated()
+                .authenticated()
                 .and()
                 .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
