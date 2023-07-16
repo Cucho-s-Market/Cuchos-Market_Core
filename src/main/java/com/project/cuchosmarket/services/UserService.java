@@ -187,7 +187,16 @@ public class UserService {
         List<DtUser> dtUsers = new ArrayList<>();
         List<User> users = userRepository.findAll();
 
-        users.forEach(user -> dtUsers.add(new DtUser(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), null, user.getRole().name())));
+        for (User user : users) {
+            if (user.getRole().equals(Role.CUSTOMER)) {
+                Customer customer = (Customer) user;
+
+                dtUsers.add(new DtCustomer(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),
+                        null, user.getRole().name(), customer.getDisabled()));
+
+            } else dtUsers.add(new DtUser(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),
+                    null, user.getRole().name()));
+        }
 
         return dtUsers;
     }
