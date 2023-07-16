@@ -14,13 +14,9 @@ public class DtCustomer extends DtUser{
     private long dni;
     private boolean disabled;
 
-
-    public DtCustomer(Long id, String firstName, String lastName, String email, String password, String role) {
-        super(id, firstName, lastName, email, password, role);
-    }
-
     public DtCustomer(Long id, String firstName, String lastName, String email, String password, String role, boolean disabled) {
         super(id, firstName, lastName, email, password, role);
         this.disabled = disabled;
     }
+
 }
