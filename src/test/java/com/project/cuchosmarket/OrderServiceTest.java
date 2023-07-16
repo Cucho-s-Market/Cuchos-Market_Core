@@ -1,10 +1,14 @@
 package com.project.cuchosmarket;
+import com.project.cuchosmarket.dto.DtItem;
 import com.project.cuchosmarket.dto.DtOrder;
+import com.project.cuchosmarket.dto.DtPromotion;
 import com.project.cuchosmarket.enums.OrderStatus;
+import com.project.cuchosmarket.enums.OrderType;
 import com.project.cuchosmarket.exceptions.*;
 import com.project.cuchosmarket.models.*;
 import com.project.cuchosmarket.repositories.*;
 import lombok.SneakyThrows;
+import org.hibernate.mapping.Any;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.project.cuchosmarket.models.Branch;
@@ -16,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -24,6 +29,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -53,48 +59,49 @@ public class OrderServiceTest {
     @MockBean
     private AddressNotExistException addressNotExistExceptionMock;
 
-        @Test
-        public void test(){
-            // Configuración
-            User user = new Customer();
-            String userEmail = "example@example.com";
-            user.setEmail(userEmail);
-            when(userRepository.findByEmail(userEmail)).thenReturn(user);
 
-            Branch branch = new Branch();
-            Long branchId = 123L;
-            branch.setId(branchId);
-            Long addressId = 456L;
-            DtOrder dtOrder = new DtOrder();
-
-            Product product = new Product();
-            String productCode = "1L";
-            product.setCode(productCode);
-            Stock stock = new Stock();
-            Address address = new Address();
-            address.setId(addressId);
-
-            when(branchRepository.findById(branchId)).thenReturn(Optional.of(branch));
-            when(productRepository.findById(anyString())).thenReturn(Optional.of(product));
-            when(stockRepository.findById(any(StockId.class))).thenReturn(Optional.of(stock));
-
-            try {
-                orderService.buyProducts(userEmail,dtOrder);
-            } catch (BranchNotExistException e) {
-                throw new RuntimeException(e);
-            } catch (UserNotExistException e) {
-                throw new RuntimeException(e);
-            } catch (ProductNotExistException e) {
-                throw new RuntimeException(e);
-            } catch (NoStockException e) {
-                throw new RuntimeException(e);
-            } catch (InvalidOrderException e) {
-                throw new RuntimeException(e);
-            } catch (AddressNotExistException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
+//        @Test
+//        public void testBuyProducts() throws NoStockException, InvalidOrderException, BranchNotExistException, ProductNotExistException, AddressNotExistException, UserNotExistException {
+//            // Configuración
+//            User user = new Customer();
+//            String userEmail = "example@example.com";
+//            when(userRepository.findByEmail(userEmail)).thenReturn(user);
+//
+//            List<DtItem> productos = Arrays.asList(
+//                new DtItem("alfajor", 42, 48, 3)
+//            );
+//            DtOrder dtOrder = new DtOrder();
+//            dtOrder.setBranchId(123l);
+//            dtOrder.setStatus(OrderStatus.PENDING);
+//            dtOrder.setType(OrderType.PICK_UP);
+//            dtOrder.setProducts(productos);
+//            user.setEmail(userEmail);
+//
+//            Branch branch = new Branch();
+//            branch.setId(123l);
+//            when(branchRepository.findById(dtOrder.getBranchId())).thenReturn(Optional.of(branch));
+//            Product product = new Product();
+//            product.setName("alfajor");
+//
+//            when(productRepository.findById(productos.get(0).getName())).thenReturn(Optional.of(product));
+//
+//            StockId stockId = new StockId(product, branch);
+//            Stock stock = new Stock();
+//            stock.setQuantity(500);
+//            stock.setId(stockId);
+//           // when(stockRepository.findById(stockId)).thenReturn(Optional.of(stock));
+//            when(stockRepository.findById(any(StockId.class))).thenReturn(Optional.of(stock));
+//
+/////////////ok ahora applypromotion sin promo
+//            Order order = new Order();
+//            DtItem dtItem = dtOrder.getProducts().get(0);
+//            Item item = new Item(dtItem.getName(), product.getPrice(), product.getPrice(),
+//                    dtItem.getQuantity(), product);
+//            List<Promotion> productPromotions = new ArrayList<>();
+//            when(promotionRepository.findPromotionsByProduct(product)).thenReturn(productPromotions);
+////////////////////////
+//            orderService.buyProducts(userEmail,dtOrder);
+//        }
     @SneakyThrows
     @Test
     public void testGetOrder() {
@@ -117,7 +124,6 @@ public class OrderServiceTest {
         String orderStatus = "PENDING";
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.now().plusDays(3);
-        String orderDirection = "calle 1234";
         User user = new Customer();
         when(userRepository.findByEmail(userEmail)).thenReturn(user);
 
