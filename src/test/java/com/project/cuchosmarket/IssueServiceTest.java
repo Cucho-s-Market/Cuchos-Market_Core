@@ -1,7 +1,6 @@
 package com.project.cuchosmarket;
 
 import com.project.cuchosmarket.dto.DtIssue;
-import com.project.cuchosmarket.dto.DtOrder;
 import com.project.cuchosmarket.exceptions.EmployeeNotWorksInException;
 import com.project.cuchosmarket.exceptions.InvalidOrderException;
 import com.project.cuchosmarket.exceptions.OrderNotExistException;
@@ -12,6 +11,7 @@ import com.project.cuchosmarket.repositories.EmployeeRepository;
 import com.project.cuchosmarket.repositories.OrderRepository;
 import com.project.cuchosmarket.repositories.UserRepository;
 import com.project.cuchosmarket.services.IssueService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
@@ -27,11 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.postgresql.hostchooser.HostRequirement.any;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -46,11 +44,13 @@ public class IssueServiceTest {
     private OrderRepository orderRepository;
     @MockBean
     private EmployeeRepository employeeRepository;
+
+    @DisplayName("Hacer reclamo por una compra")
     @Test
     public void testAddComplaint() throws InvalidOrderException, OrderNotExistException, UserNotExistException {
         String userEmail = "adri@email.com";
         DtIssue dtIssue = new DtIssue("titulo", "descriptions", LocalDate.now(), "adri", 1l);
-        /////
+
         Customer user = new Customer();
         user.setEmail(userEmail);
         when(userRepository.findByEmail(userEmail)).thenReturn(user);
@@ -75,6 +75,8 @@ public class IssueServiceTest {
 
         issueService.addComplaint(userEmail,dtIssue);
     }
+
+    @DisplayName("Obtener reclamos de compras de una sucursal")
     @Test
     public void testGetIssuesByBranch() throws EmployeeNotWorksInException {
         String userEmail = "adri@email.com";
@@ -94,7 +96,7 @@ public class IssueServiceTest {
         Page<DtIssue> entrada = new PageImpl<>(expectedIssues);
         when(branchRepository.findIssues(eq(branchId), any(Pageable.class))).thenReturn(entrada);
         Page<DtIssue> salida = issueService.getIssuesByBranch(userEmail,branchId,orderDirection,pageNumber,pageSize);
-        assertNotNull(salida);
 
+        assertNotNull(salida);
     }
 }
