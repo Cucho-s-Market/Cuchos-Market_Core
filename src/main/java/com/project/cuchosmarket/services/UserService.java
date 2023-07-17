@@ -15,6 +15,7 @@ import com.project.cuchosmarket.security.UserDetailsImpl;
 import io.micrometer.common.util.StringUtils;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class UserService {
+    @Autowired
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
     private final AdminRepository adminRepository;
