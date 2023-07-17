@@ -75,7 +75,7 @@ public class EmailService {
                 StandardCharsets.UTF_8.name()
         );
 
-        String resetPasswordUrl = "http://localhost:5173/forgot-password/recover?token=" + token;
+        String resetPasswordUrl = "https://cuchosmarket-web.onrender.com/forgot-password/recover?token=" + token;
 
         helper.setTo(user.getEmail());
         helper.setFrom(setFromEmail);
