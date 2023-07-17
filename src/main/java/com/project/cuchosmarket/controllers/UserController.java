@@ -143,9 +143,8 @@ public class UserController {
 
     @PutMapping
     public DtResponse updateUser(@RequestBody DtCustomer dtUser) {
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
-            userService.updateUser(userEmail, dtUser);
+            userService.updateUser(dtUser);
         } catch (UserNotExistException | IllegalArgumentException | UserExistException e) {
             return DtResponse.builder()
                     .error(true)
