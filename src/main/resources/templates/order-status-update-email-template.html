@@ -10,13 +10,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- use the font -->
     <style>
-      @media screen and (max-width: 768px) {
-        table {
-          min-width: auto;
-          width: 100%;
-          margin-left: auto;
-          margin-right: auto;
-        }
+      table {
+        min-width: auto;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
       }
       body {
         font-family: "Poppins", sans-serif;
@@ -71,10 +69,17 @@
               </p>
             </span>
 
-            <span
-              th:if="${order_status == 'PREPARING' || order_status == 'CANCELLED'}"
-            >
+            <span th:if="${order_status == 'PREPARING'}">
               <p>¡Tu pedido ya está siendo preparado!</p>
+            </span>
+
+            <span th:if="${order_status == 'CANCELLED'}">
+              <p>¡Tu pedido ha sido cancelado!</p>
+              <p>
+                En caso de no haber cancelado tu pedido, puedes realizar un
+                reclamo sobre esta orden en nuestra aplicación si deseas obtener
+                más informacion sobre la razón detras de este cambio.
+              </p>
             </span>
 
             <span th:if="${order_status == 'DELIVERED'}">
