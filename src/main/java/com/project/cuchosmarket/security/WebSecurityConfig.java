@@ -78,7 +78,6 @@ public class WebSecurityConfig {
                 ).hasRole(ADMIN.name())
 
                 .requestMatchers(
-                        "/users/admin/**",
                         "/branches/admin/**",
                         "/categories/admin/**",
                         "/orders/admin/**"
@@ -130,6 +129,11 @@ public class WebSecurityConfig {
                 .requestMatchers(
                         HttpMethod.DELETE,
                         "/users/**"
+                ).hasAnyRole(ADMIN.name(), CUSTOMER.name())
+
+                .requestMatchers(
+                        HttpMethod.PUT,
+                        "/admin/disable-customer"
                 ).hasAnyRole(ADMIN.name(), CUSTOMER.name())
 
                 .anyRequest()

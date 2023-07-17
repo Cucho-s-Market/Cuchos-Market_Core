@@ -66,7 +66,7 @@ public class PromotionService {
 
         } else throw new InvalidPromotionException("El sistema no soporta ese tipo de promocion.");
 
-        if (dtPromotion.getProducts().size() != products.size()) {
+        if (dtPromotion.getProducts() != null && (dtPromotion.getProducts().size() != products.size())) {
             return DtResponse.builder()
                     .error(false)
                     .message("Algunos productos no pudieron ser seleccionados por ya ser parte de otra promocion activa.")
@@ -102,7 +102,7 @@ public class PromotionService {
             promotionRepository.save(nxM);
         }
 
-        if (dtPromotion.getProducts().size() != products.size()) {
+        if (dtPromotion.getProducts() != null && (dtPromotion.getProducts().size() != products.size())) {
             return DtResponse.builder()
                     .error(false)
                     .message("Algunos productos no pudieron ser seleccionados por ya ser parte de otra promocion activa.")

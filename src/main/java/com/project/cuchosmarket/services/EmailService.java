@@ -44,7 +44,7 @@ public class EmailService {
         variables.put("subject", subject);
         variables.put("first_name", user.getFirstName());
         variables.put("order_status", order.getStatus().name());
-        variables.put("order_type", order.getType());
+        variables.put("order_type", order.getType().name());
         helper.setText(thymeleafService.createContent("order-status-update-email-template.html", variables), true);
         helper.setFrom(setFromEmail);
         sender.send(message);

@@ -145,8 +145,8 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(String userEmail, DtCustomer dtUser) throws UserNotExistException, UserExistException {
-        User user = userRepository.findByEmail(userEmail);
+    public void updateUser(DtCustomer dtUser) throws UserNotExistException, UserExistException {
+        User user = userRepository.findByEmail(dtUser.getEmail());
         if (user == null) throw new UserNotExistException();
 
         if (user.getRole().equals(Role.CUSTOMER)) {
@@ -161,7 +161,7 @@ public class UserService {
         }
 
         if (StringUtils.isNotBlank(dtUser.getEmail())) {
-            if (!userEmail.equals(dtUser.getEmail())) {
+            if (!user.getEmail().equals(dtUser.getEmail())) {
                 User newUser = userRepository.findByEmail(dtUser.getEmail());
                 if (newUser != null) throw new UserExistException("Usuario con email " + dtUser.getEmail() + " ya existe.");
                 else user.setEmail(dtUser.getEmail());
@@ -187,7 +187,16 @@ public class UserService {
         List<DtUser> dtUsers = new ArrayList<>();
         List<User> users = userRepository.findAll();
 
-        users.forEach(user -> dtUsers.add(new DtUser(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), null, user.getRole().name())));
+        for (User user : users) {
+            if (user.getRole().equals(Role.CUSTOMER)) {
+                Customer customer = (Customer) user;
+
+                dtUsers.add(new DtCustomer(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),
+                        null, user.getRole().name(), customer.getDisabled()));
+
+            } else dtUsers.add(new DtUser(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),
+                    null, user.getRole().name()));
+        }
 
         return dtUsers;
     }
