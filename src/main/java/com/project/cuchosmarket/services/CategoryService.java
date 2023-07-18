@@ -55,7 +55,7 @@ public class CategoryService {
 
     public List<DtCategory> getCategories() {
         List<DtCategory> dtCategories = new ArrayList<>();
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findByOrderByCategoryParentAsc();
 
         categories.forEach(
                 category -> dtCategories.add(new DtCategory(category.getId(), category.getName(), category.getDescription(), category.getImage(), category.getCategoryParent()))
