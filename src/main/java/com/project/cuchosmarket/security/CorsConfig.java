@@ -10,7 +10,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://cuchosmarket-web.onrender.com", "http://localhost:5173/") // Replace with your Svelte frontend URL
+                .allowedOrigins("https://cuchosmarket-web.onrender.com") // Replace with your Svelte frontend URL
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*"); // Include the desired headers her
     }
