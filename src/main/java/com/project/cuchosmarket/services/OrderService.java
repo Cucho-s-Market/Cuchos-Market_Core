@@ -186,7 +186,10 @@ public class OrderService {
         employeeWorksInBranch(userEmail, dtOrder.getBranchId());
 
         Order order = validateOrder(dtOrder.getId());
-        if (dtOrder.getStatus().equals(OrderStatus.CANCELLED) || dtOrder.getStatus().equals(OrderStatus.DELIVERED)) order.setEndDate(LocalDate.now());
+        if (dtOrder.getStatus().equals(OrderStatus.CANCELLED) || dtOrder.getStatus().equals(OrderStatus.DELIVERED)) {
+            order.setEndDate(LocalDate.now());
+            if (dtOrder.getStatus().equals(OrderStatus.CANCELLED)) updateStock(order);
+        }
 
         order.setStatus(dtOrder.getStatus());
         orderRepository.save(order);
@@ -202,10 +205,24 @@ public class OrderService {
         if (order.getStatus().equals(OrderStatus.PENDING)) {
             order.setStatus(OrderStatus.CANCELLED);
             order.setEndDate(LocalDate.now());
+            updateStock(order);
         }
         else throw new InvalidOrderException("La orden " + order_id + " no se puede cancelar. Verifique estado de compra.");
 
         orderRepository.save(order);
         emailService.sendEmailUpdateOrderStatus(customer, order);
     }
+
+    private void updateStock(Order order) {
+        List<Item> items = order.getProducts();
+        Branch branch = branchRepository.findByOrdersContains(order);
+        for (Item item : items) {
+            Stock productStock = stockRepository.findById(new StockId(item.getProduct(), branch)).orElse(null);
+            if (productStock != null) {
+                productStock.setQuantity(productStock.getQuantity() + item.getQuantity());
+                stockRepository.save(productStock);
+            }
+        }
+    }
+
 }
