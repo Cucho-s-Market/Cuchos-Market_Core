@@ -35,7 +35,7 @@ public class ProductService {
 
         if(StringUtils.isBlank(dtProduct.getCode())) throw new InvalidProductException("Codigo de producto invalido.");
         if(StringUtils.isBlank(dtProduct.getName()) || dtProduct.getName().length() > 50) throw new InvalidProductException("Nombre de producto invalido.");
-        if(StringUtils.isBlank(dtProduct.getDescription()) || dtProduct.getDescription().length() > 50) throw new InvalidProductException("Descripcion de producto invalido.");
+        if(StringUtils.isBlank(dtProduct.getDescription()) || dtProduct.getDescription().length() > 255) throw new InvalidProductException("Descripcion de producto invalido.");
         if(dtProduct.getPrice() <= 0) throw new InvalidProductException("Precio de producto invalido.");
     }
 
